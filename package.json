@@ -12,7 +12,7 @@
     "./host": "./host/src/index.mjs"
   },
   "scripts": {
-    "check": "for file in core/src/*.mjs runtime/src/*.mjs host/src/*.mjs host/test/*.mjs scripts/*.mjs test/*.mjs; do node --check \"$file\" || exit 1; done",
+    "check": "for file in core/src/*.mjs runtime/src/*.mjs host/src/*.mjs host/test/*.mjs examples/minimal/*.mjs scripts/*.mjs test/*.mjs; do node --check \"$file\" || exit 1; done",
     "test:core": "node --test --test-concurrency=1 core/test/*.test.mjs",
     "test:runtime": "node --test --test-concurrency=1 runtime/test/*.test.mjs",
     "test:host": "node --test --test-concurrency=1 host/test/*.test.mjs",
@@ -21,7 +21,11 @@
     "inspect": "node scripts/inspect-transcript.mjs",
     "verify-transcript": "node scripts/verify-transcript.mjs",
     "tamper-test": "node scripts/tamper-transcript.mjs",
-    "quickstart": "npm run inspect && npm run verify-transcript && npm run tamper-test"
+    "demo:generate": "node examples/minimal/generate.mjs .rhook/minimal-transcript.json",
+    "demo:inspect": "node scripts/inspect-transcript.mjs .rhook/minimal-transcript.json",
+    "demo:verify": "node scripts/verify-transcript.mjs .rhook/minimal-transcript.json",
+    "demo:tamper": "node scripts/tamper-transcript.mjs .rhook/minimal-transcript.json",
+    "quickstart": "npm run demo:generate && npm run demo:inspect && npm run demo:verify && npm run demo:tamper"
   },
   "repository": { "type": "git", "url": "git+https://github.com/USBVadik/rhook.git" },
   "bugs": { "url": "https://github.com/USBVadik/rhook/issues" },

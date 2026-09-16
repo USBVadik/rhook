@@ -13,9 +13,12 @@ The semantic value is read from the exact envelope-2 successor state. Full evide
 Run from the repository root:
 
 ```bash
-npm run inspect
-npm run verify-transcript
-npm run tamper-test
+npm run demo:generate
+npm run demo:inspect
+npm run demo:verify
+npm run demo:tamper
 ```
 
-[`transcript.json`](transcript.json) is the only generated execution artifact copied into this repository. It is a protocol-neutral engineering fixture, not a historical incident.
+[`generate.mjs`](generate.mjs) executes both branches through the public injected-runner host boundary and reproduces [`transcript.json`](transcript.json) byte-for-byte. The generator is a deterministic protocol-neutral lifecycle fixture, not a bundled historical EVM runner.
+
+`transcript.json` is the only generated execution artifact copied into this repository. It is a protocol-neutral engineering fixture, not a historical incident.

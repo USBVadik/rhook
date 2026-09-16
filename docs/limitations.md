@@ -11,6 +11,7 @@
 - One intervention target only.
 - The counterfactual branch follows a declared historical-envelope policy; it is not a claimed consensus-valid block or chain.
 - The public host accepts an injected `runBlock` implementation. The private research runner is not vendored here.
+- A runBlock adapter owns transaction-validation classification. Host requires an explicit typed classification and unchanged predecessor state before emitting invalidation evidence, but cannot prove that an adapter's classification policy is complete.
 - No multi-chain or throughput qualification is claimed.
 
 ## Evidence

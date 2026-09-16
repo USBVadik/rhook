@@ -38,7 +38,7 @@
     "runtime/src/index.mjs": "2597a66edde99a9582c58471bfb1eef78f4535e216a6be971788cc54d95c654f",
     "runtime/src/runtime-evidence.mjs": "b0d3ec8819df659edd4bd7c66eaaa17b8e117481c90d6797d80892eb348eed14",
     "host/src/index.mjs": "9b8198e1547ca880ac76edfb77c7430bbdf73b0d10b2f587044e14a5580776d5",
-    "host/src/instrumented-block.mjs": "71aa33564915faa9bccf92ceef2e0306c3e8f311497ae13c5a597181be9857f5",
+    "host/src/instrumented-block.mjs": "3f8c303c176bd6b6849ff3e9e3e8de7021547eae95b350c39e3406232797260f",
     "host/src/branch-transcript.mjs": "f975da2e8c9ce9cc7763cdf454ff03e303708323cdff8383be22df64d3690adf"
   },
   "packagingAuthoredFiles": [
@@ -46,5 +46,5 @@
     "runtime/src/index.mjs",
     "host/src/index.mjs"
   ],
-  "notes": "Hashes identify canonical pre-packaging source. Public adaptations localize imports, inject runBlock explicitly, simplify comments and error names, and rename the private typed-value brand symbol. Serialized evidence semantics are unchanged."
+  "notes": "Hashes identify canonical pre-packaging source separately from the current public derivative. Public adaptations localize imports, inject runBlock explicitly, simplify comments and error names, and rename the private typed-value brand symbol. The public host additionally requires explicit validation classification plus an unchanged state root before emitting pre-execution invalidation evidence. Serialized evidence schemas remain unchanged."
 }

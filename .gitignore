@@ -1,4 +1,5 @@
 node_modules/
+.rhook/
 .kiro/
 .env
 .env.*

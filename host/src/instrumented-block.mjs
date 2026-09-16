@@ -65,6 +65,56 @@ function removeListener(events, name, listener) {
   else if (typeof events.removeListener === 'function') events.removeListener(name, listener)
 }
 
+async function maybeAttachPreExecutionInvalidation({
+  error,
+  vm,
+  block,
+  mode,
+  canonicalEnvelopeIdentities,
+  before,
+  after,
+  classifyPreExecutionFailure,
+}) {
+  if (classifyPreExecutionFailure === null) return
+  const failedIndex = before.length - 1
+  if (failedIndex < 0 || after.length !== failedIndex) return
+
+  const predecessorStateRoot = before[failedIndex].stateRoot
+  try {
+    if (hex(await vm.stateManager.getStateRoot()) !== predecessorStateRoot) return
+    const decision = await classifyPreExecutionFailure(Object.freeze({
+      error,
+      mode,
+      envelopeIndex: failedIndex,
+      envelopeIdentity: Object.freeze({ ...canonicalEnvelopeIdentities[failedIndex] }),
+    }))
+    if (
+      decision === null
+      || !decision
+      || decision.kind !== 'PRE_EXECUTION_VALIDATION'
+      || typeof decision.classification !== 'string'
+      || decision.classification.trim().length === 0
+      || Object.keys(decision).sort().join(',') !== 'classification,kind'
+    ) return
+    if (hex(await vm.stateManager.getStateRoot()) !== predecessorStateRoot) return
+
+    const identity = canonicalEnvelopeIdentities[failedIndex]
+    const invalidation = buildInvalidatedEnvelopeEvidence({
+      blockNumber: identity.blockNumber,
+      transactionIndex: identity.transactionIndex,
+      transactionHash: identity.transactionHash,
+      gasLimit: block.transactions[failedIndex].gasLimit,
+      stateRoot: predecessorStateRoot,
+      classification: decision.classification,
+    })
+    if ((typeof error === 'object' || typeof error === 'function') && error !== null && Object.isExtensible(error)) {
+      Object.defineProperty(error, 'runtimeEvidence', { value: invalidation, enumerable: false })
+    }
+  } catch {
+    // Evidence collection must never replace the execution engine's original error.
+  }
+}
+
 export async function executeInstrumentedBlock({
   vm,
   block,
@@ -74,12 +124,14 @@ export async function executeInstrumentedBlock({
   observeSemantic = null,
   runBlock,
   runOptions = {},
+  classifyPreExecutionFailure = null,
 }) {
   requireCondition(vm?.events && vm?.stateManager, 'INVALID_VM_PORT', 'VM with events and state manager required')
   requireCondition(mode === 'ACTUAL' || mode === 'COUNTERFACTUAL', 'INVALID_EXECUTION_MODE', 'mode must be ACTUAL or COUNTERFACTUAL')
   requireCondition(Array.isArray(canonicalEnvelopeIdentities) && canonicalEnvelopeIdentities.length === block.transactions.length, 'ENVELOPE_IDENTITY_CARDINALITY_MISMATCH', 'one canonical identity per transaction required')
   requireCondition(observeSemantic === null || typeof observeSemantic === 'function', 'INVALID_SEMANTIC_OBSERVER', 'semantic observer must be a function or null')
   requireCondition(typeof runBlock === 'function', 'INVALID_RUN_BLOCK_PORT', 'a compatible runBlock function is required')
+  requireCondition(classifyPreExecutionFailure === null || typeof classifyPreExecutionFailure === 'function', 'INVALID_PRE_EXECUTION_CLASSIFIER', 'pre-execution classifier must be a function or null')
 
   const reservedRunOptions = ['block', 'generate', 'skipHeaderValidation', 'skipBlockValidation', 'setHardfork', 'forcedHistoricalEnvelopeReplay']
   for (const key of reservedRunOptions) requireCondition(!Object.hasOwn(runOptions, key), 'RESERVED_RUN_OPTION', `${key} is controlled by the host`)
@@ -125,21 +177,16 @@ export async function executeInstrumentedBlock({
     result = await runBlock(vm, options)
   } catch (error) {
     if (listenerFailure) throw listenerFailure
-    const failedIndex = before.length - 1
-    if (failedIndex >= 0 && after.length === failedIndex) {
-      const identity = canonicalEnvelopeIdentities[failedIndex]
-      const invalidation = buildInvalidatedEnvelopeEvidence({
-        blockNumber: identity.blockNumber,
-        transactionIndex: identity.transactionIndex,
-        transactionHash: identity.transactionHash,
-        gasLimit: block.transactions[failedIndex].gasLimit,
-        stateRoot: before[failedIndex].stateRoot,
-        classification: String(error?.message ?? error),
-      })
-      if ((typeof error === 'object' || typeof error === 'function') && error !== null && Object.isExtensible(error)) {
-        Object.defineProperty(error, 'runtimeEvidence', { value: invalidation, enumerable: false })
-      }
-    }
+    await maybeAttachPreExecutionInvalidation({
+      error,
+      vm,
+      block,
+      mode,
+      canonicalEnvelopeIdentities,
+      before,
+      after,
+      classifyPreExecutionFailure,
+    })
     throw error
   } finally {
     removeListener(vm.events, 'beforeTx', beforeListener)
