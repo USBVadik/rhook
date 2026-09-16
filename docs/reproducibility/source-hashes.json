@@ -1,0 +1,50 @@
+{
+  "schema": "rhook-public-source-provenance/1",
+  "canonicalManifests": {
+    "core": "5e8e639b5b7066acef1074acf5a1f102242f6bcf4718e0f1418252136e6f4747",
+    "runtime": "517f3c06faaabfc75df4c33478f38a35f73132044a5d33b6f7359080734b1df5",
+    "host": "aa9917a016afef531028e1d1849faa69d84e2306c048a4f5deb9b088be94d57c",
+    "runner": "9f1d783331b879066efc174eb287595bde2cfad674e5a157ad5fc9c7f1956dbf"
+  },
+  "canonicalSourceSha256ByPublicPath": {
+    "core/src/errors.mjs": "6dfec35256f8ad41f63bc2c3c42a26f93f4652ccdfd96aae1a169c3cc31c9547",
+    "core/src/boundary-types.mjs": "cae6e702fdfcf0c026b280d68a76b879ae46aaf388b55a7e5ffeb2a888461e3f",
+    "core/src/port-results.mjs": "cc3a58407d366ce2b5599bc4caf795fd630933f37f39934bd89baf175d909287",
+    "core/src/semantic-extraction.mjs": "cfb2b510c5b023be769c7e779325edc63a7a385f54f7a85fa29f707d346bb618",
+    "core/src/envelope-evidence.mjs": "e4319d95ecbbd5bad4642f57c9728bd4dd0e917aeae4b77405d14dbc1020c9e6",
+    "core/src/branch-evidence-transcript.mjs": "5e31972f95b87741ed4fbbf126fd9e77dbe04bc682f41add429f8d40e446ae76",
+    "core/src/strict-common.mjs": "44be01a38a7c04e404b1a1fa1c5b9299518b5242b90ebd051aa9ea57dd8945fe",
+    "core/src/strict-json.mjs": "8b0e1fed8e0ab50f218c4075dbbf23a9549ba21b5438c83f81e6404b4063627a",
+    "core/src/strict-envelope.mjs": "1b0c7eba92672ffc1daafe06a3aa378a9ecd98f2198907a1e354cd51d35c99b1",
+    "core/src/strict-branch.mjs": "7a8f2c167ff407a62db53f05d3e3ed9be81d8c610051f676738eb73f46deb7a1",
+    "core/src/strict-api.mjs": "224033d78a7db03ed060d6f5c5ed5c3dc25f3e2e64e37a84ee79bfeb7d8f2ce7",
+    "runtime/src/runtime-evidence.mjs": "b8a5d8199cf2f8882c9ad40c25e77041e9383a3133f323144618fe37703cff20",
+    "host/src/instrumented-block.mjs": "d00f91b770026a5016c7d1edd74a97feb85e68fd498a42d3a2c69211bd9bda1c",
+    "host/src/branch-transcript.mjs": "9417cddf4e20268c0bceb0b0d8fa87caa5ff4018b7f30f1ac5d3ec738040d201"
+  },
+  "publicSourceSha256": {
+    "core/src/errors.mjs": "120202e7d2da0625b18fc594cba91c1a2758b9a11ddfb6b6376fb89156ac0587",
+    "core/src/boundary-types.mjs": "d101223851fac49e9adb6034cdc759b5fb0f1020c8d0ba9349347da8a517fb35",
+    "core/src/port-results.mjs": "bfe1139dab6bb421df6b93cd28386e8eee66ec73314544ca3524cfa6ff08fab0",
+    "core/src/semantic-extraction.mjs": "d3ee909cda81b2709a98c33c15ea3e3eab7bf19c127437ba47e9fc489b08e791",
+    "core/src/envelope-evidence.mjs": "e4319d95ecbbd5bad4642f57c9728bd4dd0e917aeae4b77405d14dbc1020c9e6",
+    "core/src/branch-evidence-transcript.mjs": "5e31972f95b87741ed4fbbf126fd9e77dbe04bc682f41add429f8d40e446ae76",
+    "core/src/strict-common.mjs": "44be01a38a7c04e404b1a1fa1c5b9299518b5242b90ebd051aa9ea57dd8945fe",
+    "core/src/strict-json.mjs": "8b0e1fed8e0ab50f218c4075dbbf23a9549ba21b5438c83f81e6404b4063627a",
+    "core/src/strict-envelope.mjs": "1b0c7eba92672ffc1daafe06a3aa378a9ecd98f2198907a1e354cd51d35c99b1",
+    "core/src/strict-branch.mjs": "7a8f2c167ff407a62db53f05d3e3ed9be81d8c610051f676738eb73f46deb7a1",
+    "core/src/strict-api.mjs": "05e235b7919f41bb8717e2709d2945e62ec9d70703500df5eb3fc5d2030fe76b",
+    "core/src/index.mjs": "f2dcdd5e2154bf0873baa668eabfdc9e513275e9faf62ab8c1242f4373643892",
+    "runtime/src/index.mjs": "2597a66edde99a9582c58471bfb1eef78f4535e216a6be971788cc54d95c654f",
+    "runtime/src/runtime-evidence.mjs": "b0d3ec8819df659edd4bd7c66eaaa17b8e117481c90d6797d80892eb348eed14",
+    "host/src/index.mjs": "9b8198e1547ca880ac76edfb77c7430bbdf73b0d10b2f587044e14a5580776d5",
+    "host/src/instrumented-block.mjs": "71aa33564915faa9bccf92ceef2e0306c3e8f311497ae13c5a597181be9857f5",
+    "host/src/branch-transcript.mjs": "f975da2e8c9ce9cc7763cdf454ff03e303708323cdff8383be22df64d3690adf"
+  },
+  "packagingAuthoredFiles": [
+    "core/src/index.mjs",
+    "runtime/src/index.mjs",
+    "host/src/index.mjs"
+  ],
+  "notes": "Hashes identify canonical pre-packaging source. Public adaptations localize imports, inject runBlock explicitly, simplify comments and error names, and rename the private typed-value brand symbol. Serialized evidence semantics are unchanged."
+}

@@ -1,0 +1,10 @@
+node_modules/
+.kiro/
+.env
+.env.*
+!.env.example
+.DS_Store
+coverage/
+.nyc_output/
+*.log
+*.tgz
