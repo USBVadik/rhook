@@ -11,7 +11,7 @@
 - One intervention target only.
 - The counterfactual branch follows a declared historical-envelope policy; it is not a claimed consensus-valid block or chain.
 - The public host accepts an injected `runBlock` implementation. The private research runner is not vendored here.
-- A runBlock adapter owns transaction-validation classification. Host requires an explicit typed classification and unchanged predecessor state before emitting invalidation evidence, but cannot prove that an adapter's classification policy is complete.
+- A runBlock adapter owns transaction-validation classification. Host requires an explicit structured classification and unchanged predecessor state before emitting invalidation evidence, but cannot prove that an adapter's classification policy is complete.
 - No multi-chain or throughput qualification is claimed.
 
 ## Evidence
@@ -23,8 +23,8 @@
 
 ## Scientific and product claims
 
-- Claim R is supported only for the frozen Alchemix incident and question.
-- Claim P is not supported and was not adjudicated for correctness.
+- The Alchemix result supports sequential branch regeneration only for the frozen incident-level question.
+- It does not establish general superiority over bespoke simulators.
 - No product demand, token mechanism, attribution rule, liability decision, or recovery amount is established.
 
 ## License

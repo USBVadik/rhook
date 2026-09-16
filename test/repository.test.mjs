@@ -77,9 +77,10 @@ test('repository tree is small and excludes research/archive clutter', async () 
 
 test('README explains the primitive in its first screen without inflated claims', async () => {
   const readme = await readFile(join(root, 'README.md'), 'utf8')
-  const firstScreen = readme.slice(0, 900)
+  const firstScreen = readme.slice(0, 1_500)
   assert.match(firstScreen, /RHOOK is an explainable deterministic counterfactual execution substrate for onchain state machines\./)
   assert.match(firstScreen, /ACTUAL[\s\S]*COUNTERFACTUAL/)
+  assert.match(firstScreen, /Fixed inputs[\s\S]*Regenerated outputs/)
   assert.match(firstScreen, /npm run quickstart/)
   assert.doesNotMatch(readme, /revolutionary|world[- ]first|production[- ]ready|guaranteed|game[- ]changing/i)
   assert.match(readme, /has not been scientifically rerun on Alchemix/i)

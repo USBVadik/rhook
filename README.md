@@ -12,6 +12,18 @@ COUNTERFACTUAL  A -> B -> X′ -> C′ -> D′ -> E′
 
 Change one declared historical input, then execute the remaining envelopes in order against the state produced by the changed branch. RHOOK records enough evidence to explain the first lifecycle, state, and semantic divergence without rerunning the branch.
 
+## What stays fixed and what regenerates
+
+| Fixed inputs | Regenerated outputs |
+|---|---|
+| Parent checkpoint and historical domain | Envelope validity |
+| One declared intervention | `SUCCESS`, `REVERT`, or pre-execution invalidation |
+| Canonical envelope identities and order | Gas, fees, logs, and execution-result commitments |
+| Historical block-context policy | Successor state commitments |
+| Evaluation endpoint and semantic query | State-bound semantic value |
+
+See [`docs/counterfactual-model.md`](docs/counterfactual-model.md) for the exact boundary.
+
 ## Try it
 
 Requires Node.js 22 or newer.
@@ -48,9 +60,7 @@ A separate frozen Alchemix study regenerated 36,847 historical transactions afte
 | Downstream `SUCCESS -> REVERT` changes | 93 |
 | Pre-execution invalidations | 3 |
 
-Claim R is the incident-level claim that the exact answer requires sequential branch regeneration. Claim P is the broader claim that a reusable general-purpose system adds material value over the strongest bespoke substitute.
-
-The Alchemix study supports Claim R for that specific question. It does not establish general superiority or Claim P. This repository's evidence stack is qualified separately on the protocol-neutral fixture in [`examples/minimal/transcript.json`](examples/minimal/transcript.json); it has not been scientifically rerun on Alchemix.
+The Alchemix result supports sequential branch regeneration for that incident-level question. It does not establish general superiority over bespoke simulators. This repository's evidence stack is qualified separately on the protocol-neutral fixture in [`examples/minimal/transcript.json`](examples/minimal/transcript.json); it has not been scientifically rerun on Alchemix.
 
 ## Repository map
 
