@@ -10,4 +10,8 @@ A thrown runner error is not automatically a pre-execution invalidation. An adap
 
 Host does not implement transaction semantics or duplicate core verification rules.
 
+`verifyIntegrationEvidenceBundle()` requires exact actual/counterfactual projection shapes and one ordered native state-root binding per covered envelope. It cross-binds projection identities and execution commitments to the strict core transcript, checks changed-envelope lifecycle/accounting correspondence, verifies native boundary commitments and branch continuity, and only then recomputes execution and integration commitments.
+
+The projection's `finalStateRoot` and `receiptsRoot` are canonical post-block values covered by the execution commitment. They are not independently derived from the compact transcript, and `finalStateRoot` is not equated to the last `afterTx` successor because block finalization may occur after that event boundary.
+
 The frozen qualification's execution and hostile-producer checks are summarized in [`../docs/reproducibility/provenance.md`](../docs/reproducibility/provenance.md).

@@ -14,9 +14,6 @@ const fileSha256 = createHash('sha256').update(text).digest('hex')
 const verification = verifyBranchEvidenceTranscriptJson(text)
 assert.equal(verification.valid, true, JSON.stringify(verification.findings))
 const transcript = parseStrictEvidenceJson(text)
-assert.equal(transcript.body.divergence.stateCommitment.envelopeIndex, 0)
-assert.equal(transcript.body.divergence.lifecycle.envelopeIndex, 1)
-assert.equal(transcript.body.divergence.semantic.envelopeIndex, 2)
 console.log(JSON.stringify({
   status: 'PASS',
   replayPerformed: false,

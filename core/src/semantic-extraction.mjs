@@ -2,30 +2,28 @@
 //
 // Engineering conformance only. NO scientific validation, NO historical data,
 // NO network, NO protocol adapter, NO recovery policy, NO multi-target
-// intervention, NO historical case identity. This module reuses the section-1
-// typed boundary layer (boundary-types.mjs) and the section-2 evidence
-// commitments (execution-evidence.mjs) unchanged.
+// intervention, NO historical case identity. This module uses public boundary
+// values from boundary-types.mjs, receipt commitments from
+// envelope-evidence.mjs, and discriminated results from port-results.mjs.
 //
 // PURPOSE. A single SEMANTIC EXTRACTION is the atomic unit of "what a run says
 // about one observable fact". Every extraction is bound, at construction, to
 // SIX things and cannot exist without all six:
 //
 //   (1) exact endpoint            — the callable observed (address + selector),
-//                                   typed via section-1 Address + HexBytes.
-//   (2) exact post-state commitment — a section-2 execution-evidence receipt
-//                                   digest (Digest brand). The value being
-//                                   extracted MUST trace back to a stored
-//                                   execution-state commitment; an extraction
-//                                   with no committed post-state is rejected.
-//   (3) typed record identity     — a section-1 Commitment (domain-tagged
-//                                   Digest) naming the record the fact came
-//                                   from. Distinct from the post-state receipt.
+//                                   typed as Address + HexBytes by boundary-types.mjs.
+//   (2) exact post-state commitment — an envelope-evidence.mjs receipt digest.
+//                                   The value being extracted MUST trace back to
+//                                   a stored execution-state commitment; an
+//                                   extraction with no committed post-state is rejected.
+//   (3) typed record identity     — a boundary-types.mjs Commitment naming the
+//                                   source record. Distinct from the post-state receipt.
 //   (4) canonical lookup/source descriptor — HOW the value was located
 //                                   (storage-slot Hash32, return-word Hash32,
 //                                   account-field, or code). Canonical + typed.
 //   (5) explicit presence state   — PRESENT | VALID_ABSENT | NOT_COMPUTED from
-//                                   section-1. ABSENT is a first-class state.
-//   (6) canonical value           — a section-1 typed value (Quantity, Hash32,
+//                                   boundary-types.mjs. ABSENT is a first-class state.
+//   (6) canonical value           — a boundary-types.mjs value (Quantity, Hash32,
 //                                   HexBytes, Address, account/storage record),
 //                                   present ONLY when presence is PRESENT.
 //
@@ -71,11 +69,11 @@ function requireSelector(sel) {
 }
 
 // ---------------------------------------------------------------------------
-// (1) ENDPOINT — the exact callable observed. Address (section-1) + selector.
+// (1) ENDPOINT — the exact callable observed. Address + selector from boundary-types.mjs.
 // ---------------------------------------------------------------------------
 
 export function makeEndpoint(address, selector) {
-  requireCondition(isAddress(address), 'INVALID_ENDPOINT', 'endpoint address must be a typed Address (section-1)')
+  requireCondition(isAddress(address), 'INVALID_ENDPOINT', 'endpoint address must be a typed Address from boundary-types.mjs')
   requireSelector(selector)
   return Object.freeze({
     kind: 'Endpoint',
@@ -95,8 +93,8 @@ function endpointKey(e) {
 
 // ---------------------------------------------------------------------------
 // (4) LOOKUP / SOURCE DESCRIPTOR — canonical, typed description of HOW a value
-// was located. Every variant carries a typed section-1 locator, never a raw
-// string, so the descriptor itself cannot smuggle an un-parsed key.
+// was located. Every variant carries a boundary-types.mjs locator, never a raw
+// string, so the descriptor itself cannot smuggle an unparsed key.
 // ---------------------------------------------------------------------------
 
 export const SOURCE = Object.freeze({
@@ -109,7 +107,7 @@ export const SOURCE = Object.freeze({
 const ACCOUNT_FIELDS = Object.freeze(new Set(['balance', 'nonce', 'code']))
 
 export function sourceStorageSlot(slotKey) {
-  requireCondition(isHash32(slotKey), 'INVALID_SOURCE', 'storage-slot source key must be a typed Hash32 (section-1)')
+  requireCondition(isHash32(slotKey), 'INVALID_SOURCE', 'storage-slot source key must be a typed Hash32 from boundary-types.mjs')
   return Object.freeze({ kind: SOURCE.STORAGE_SLOT, slot: slotKey.value })
 }
 
@@ -147,27 +145,27 @@ function sourceKey(s) {
 // ---------------------------------------------------------------------------
 // Post-state commitment binding (2) + typed record identity (3).
 //
-// The post-state commitment is a section-2 evidence RECEIPT digest — the value
-// being extracted is asserted to have existed in the execution state committed
-// by that receipt. It is accepted either as a bare Digest (section-1) or as a
-// section-2 verified record's receipt.digest. The typed record identity is a
-// section-1 Commitment naming the source record.
+// The post-state commitment is an envelope-evidence.mjs receipt digest: the
+// value being extracted is asserted to have existed in the execution state
+// committed by that receipt. It is accepted either as a bare Digest from
+// boundary-types.mjs or as a verified envelope receipt. The typed record
+// identity is a boundary-types.mjs Commitment naming the source record.
 // ---------------------------------------------------------------------------
 
 function requirePostStateDigest(commitment) {
-  // Accept a section-1 Digest directly, or a section-2 receipt object
-  // { domain, algo, digest }. Reject anything that is not traceable to a
-  // stored commitment — an extraction with no committed post-state is illegal.
+  // Accept a boundary-types.mjs Digest directly, or an envelope-evidence.mjs
+  // receipt object { domain, algo, digest }. Reject anything that is not
+  // traceable to a stored commitment.
   rejectUndefined(commitment, 'MISSING_POST_STATE', 'extraction requires a post-state commitment (no untraceable values)')
   if (isDigest(commitment)) return commitment.value
   if (commitment !== null && typeof commitment === 'object'
     && typeof commitment.algo === 'string' && typeof commitment.digest === 'string') {
     requireCondition(commitment.algo === 'sha256', 'INVALID_POST_STATE', 'post-state receipt algo must be sha256')
-    // Re-validate through the section-1 Digest parser so a malformed digest
-    // string can never be accepted as a commitment.
+    // Re-validate through the boundary-types.mjs Digest parser so a malformed
+    // digest string can never be accepted as a commitment.
     return parseDigest(commitment.digest).value
   }
-  return fail('INVALID_POST_STATE', 'post-state commitment must be a section-1 Digest or a section-2 receipt')
+  return fail('INVALID_POST_STATE', 'post-state commitment must be a Digest from boundary-types.mjs or an envelope-evidence.mjs receipt')
 }
 
 // ---------------------------------------------------------------------------
@@ -179,14 +177,14 @@ export function makeExtraction({ endpoint, postState, recordIdentity, source, pr
   requireCondition(isEndpoint(endpoint), 'INVALID_EXTRACTION', 'extraction requires a typed Endpoint (binding 1)')
   const postStateDigest = requirePostStateDigest(postState) // binding 2
   requireCondition(isCommitment(recordIdentity), 'INVALID_EXTRACTION',
-    'extraction requires a typed record-identity Commitment (binding 3, section-1)')
+    'extraction requires a typed record-identity Commitment from boundary-types.mjs (binding 3)')
   requireCondition(isSource(source), 'INVALID_EXTRACTION', 'extraction requires a canonical source descriptor (binding 4)')
 
-  // binding 5 + 6: presence must be a section-1 Presence; a PRESENT presence
-  // must carry a canonical typed value; a non-PRESENT presence must NOT.
+  // bindings 5 + 6: presence must follow the boundary-types.mjs contract; a
+  // PRESENT presence must carry a canonical typed value, while non-PRESENT must not.
   rejectUndefined(presence, 'INVALID_EXTRACTION', 'extraction requires an explicit presence state (binding 5)')
   requireCondition(isPresent(presence) || isValidAbsent(presence) || isNotComputed(presence),
-    'INVALID_EXTRACTION', 'presence must be PRESENT | VALID_ABSENT | NOT_COMPUTED (section-1)')
+    'INVALID_EXTRACTION', 'presence must be PRESENT | VALID_ABSENT | NOT_COMPUTED from boundary-types.mjs')
 
   let value = null
   let valueKind = null
@@ -209,12 +207,12 @@ export function makeExtraction({ endpoint, postState, recordIdentity, source, pr
   })
 }
 
-// A PRESENT extraction's value must be a section-1 typed value, and its type
-// must be consistent with the source descriptor (a storage/return word is a
-// Hash32; a code source is HexBytes; an account balance/nonce is a Quantity).
+// A PRESENT extraction's value must follow boundary-types.mjs and remain
+// consistent with the source descriptor (a storage/return word is a Hash32;
+// a code source is HexBytes; an account balance/nonce is a Quantity).
 function canonicalValueKind(value, source) {
   requireCondition(value !== null && typeof value === 'object' && typeof value.kind === 'string',
-    'INVALID_EXTRACTION', 'a PRESENT extraction value must be a section-1 typed value (binding 6)')
+    'INVALID_EXTRACTION', 'a PRESENT extraction value must be typed by boundary-types.mjs (binding 6)')
   switch (source.kind) {
     case SOURCE.STORAGE_SLOT:
     case SOURCE.RETURN_WORD:
@@ -249,8 +247,8 @@ export function extractionSlotKey(x) {
 
 // ---------------------------------------------------------------------------
 // TYPED VALUE EQUALITY — explicit, per-kind, no coercion. Two PRESENT values
-// are equal only if they are the same section-1 kind AND canonically equal.
-// A Quantity zero and an empty HexBytes are DIFFERENT kinds -> never equal.
+// are equal only if they share the same boundary-types.mjs kind and canonical
+// value. A Quantity zero and an empty HexBytes are DIFFERENT kinds.
 // ---------------------------------------------------------------------------
 
 function typedValueEqual(a, b) {
@@ -389,8 +387,8 @@ export function isDiffVerdict(x) {
 // ---------------------------------------------------------------------------
 // DIFF as a discriminated port result — a diff that changed is a VALID result
 // carrying the verdict; a NOT_COMPARABLE diff is an ERROR (the comparison could
-// not be made), never a silent EQUAL. This keeps section-3 consistent with the
-// section-2 / port-results contract.
+// not be made), never a silent EQUAL. This keeps semantic-extraction.mjs
+// aligned with the discriminated result contract in port-results.mjs.
 // ---------------------------------------------------------------------------
 
 export function diffAsResult(actual, counterfactual) {
