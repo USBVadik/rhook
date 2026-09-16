@@ -26,11 +26,12 @@ The public package keeps evidence schemas intact while removing private workspac
 - host imports local core/runtime entry points;
 - the host execution function is dependency-injected rather than imported from a private research path;
 - public host hardening requires explicit pre-execution validation classification and unchanged predecessor state before an invalidation sidecar can be emitted;
+- the public integration-bundle verifier requires exact two-branch projections, complete per-envelope native state bindings, and projection-to-transcript cross-bindings before checking self-commitments;
 - `examples/minimal/generate.mjs` replays the protocol-neutral lifecycle fixture through the public host/runtime/core stack and reproduces the included transcript byte-for-byte;
 - freeze scripts, workflow logs, authorizations, provider configuration, failed attempts, and superseded versions are omitted;
 - one protocol-neutral transcript is included; large execution artifacts are not.
 
-The import, naming, and packaging edits do not alter serialized evidence semantics. The classifier/root guard is a public host correctness change: it narrows when a runner exception may receive `PRE_EXECUTION_INVALIDATED` evidence. It is not part of the canonical host manifest hash above and does not mutate any frozen component or historical result.
+The import, naming, and packaging edits do not alter serialized evidence semantics. The classifier/root guard and strict integration-bundle verification are public host correctness changes: they narrow which runner failures may receive invalidation evidence and which host integration bundles may be accepted. They are not part of the canonical host manifest hash above and do not mutate any frozen component, core transcript schema, or historical result.
 
 ## Selected source hashes
 

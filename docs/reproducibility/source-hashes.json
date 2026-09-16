@@ -26,7 +26,7 @@
     "core/src/errors.mjs": "120202e7d2da0625b18fc594cba91c1a2758b9a11ddfb6b6376fb89156ac0587",
     "core/src/boundary-types.mjs": "d101223851fac49e9adb6034cdc759b5fb0f1020c8d0ba9349347da8a517fb35",
     "core/src/port-results.mjs": "bfe1139dab6bb421df6b93cd28386e8eee66ec73314544ca3524cfa6ff08fab0",
-    "core/src/semantic-extraction.mjs": "d3ee909cda81b2709a98c33c15ea3e3eab7bf19c127437ba47e9fc489b08e791",
+    "core/src/semantic-extraction.mjs": "0684fb3a1e138018afcf064968346e4fb18b9b3b790c9abdcc500643fcd2d2c3",
     "core/src/envelope-evidence.mjs": "e4319d95ecbbd5bad4642f57c9728bd4dd0e917aeae4b77405d14dbc1020c9e6",
     "core/src/branch-evidence-transcript.mjs": "5e31972f95b87741ed4fbbf126fd9e77dbe04bc682f41add429f8d40e446ae76",
     "core/src/strict-common.mjs": "44be01a38a7c04e404b1a1fa1c5b9299518b5242b90ebd051aa9ea57dd8945fe",
@@ -39,12 +39,12 @@
     "runtime/src/runtime-evidence.mjs": "b0d3ec8819df659edd4bd7c66eaaa17b8e117481c90d6797d80892eb348eed14",
     "host/src/index.mjs": "9b8198e1547ca880ac76edfb77c7430bbdf73b0d10b2f587044e14a5580776d5",
     "host/src/instrumented-block.mjs": "3f8c303c176bd6b6849ff3e9e3e8de7021547eae95b350c39e3406232797260f",
-    "host/src/branch-transcript.mjs": "f975da2e8c9ce9cc7763cdf454ff03e303708323cdff8383be22df64d3690adf"
+    "host/src/branch-transcript.mjs": "924378435697bc5b4d215b0d6eda02b08b0c99c1679340469a02ca0e61ab9732"
   },
   "packagingAuthoredFiles": [
     "core/src/index.mjs",
     "runtime/src/index.mjs",
     "host/src/index.mjs"
   ],
-  "notes": "Hashes identify canonical pre-packaging source separately from the current public derivative. Public adaptations localize imports, inject runBlock explicitly, simplify comments and error names, and rename the private typed-value brand symbol. The public host additionally requires explicit validation classification plus an unchanged state root before emitting pre-execution invalidation evidence. Serialized evidence schemas remain unchanged."
+  "notes": "Hashes identify canonical pre-packaging source separately from the current public derivative. Public adaptations localize imports, inject runBlock explicitly, simplify comments and error names, and rename the private typed-value brand symbol. Public host hardening requires explicit validation classification plus an unchanged state root before invalidation evidence, and exact integration-bundle projections, coverage, and transcript/root cross-bindings before self-commitments are accepted. Serialized core evidence schemas remain unchanged."
 }

@@ -27,7 +27,7 @@ The canonical qualification compared the predecessor execution projection with e
 
 ## Integrity is not authenticity
 
-The verifier establishes internal validity and commitment consistency. It does not identify the producer. Signatures, attestations, and trust-root distribution are outside this repository.
+Offline verification establishes transcript internal validity and state-binding consistency; it does not independently prove that the claimed execution was produced by a trusted EVM run. The verifier also does not identify the producer. Signatures, attestations, and trust-root distribution are outside this repository.
 
 ## Out of scope
 

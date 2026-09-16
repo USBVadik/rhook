@@ -5,7 +5,7 @@ RHOOK is in technical-review stage. Small, test-backed changes are preferred.
 ## Before opening a change
 
 ```bash
-npm install
+npm ci
 npm run check
 npm test
 npm run quickstart
