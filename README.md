@@ -1,5 +1,7 @@
 # RHOOK
 
+[![CI](https://github.com/USBVadik/rhook/actions/workflows/ci.yml/badge.svg)](https://github.com/USBVadik/rhook/actions/workflows/ci.yml)
+
 RHOOK is an explainable deterministic counterfactual execution substrate for onchain state machines.
 
 ```text
@@ -15,12 +17,12 @@ Change one declared historical input, then execute the remaining envelopes in or
 Requires Node.js 22 or newer.
 
 ```bash
-npm install
+npm ci
 npm test
 npm run quickstart
 ```
 
-`quickstart` inspects the included transcript, verifies it offline, then changes a nested endpoint, recomputes the public commitment, and confirms that the malformed record is rejected.
+`quickstart` executes both sides of the protocol-neutral branch fixture through the public host/runtime/core stack, writes a fresh transcript under the ignored `.rhook/` directory, verifies it in a separate process, then changes a nested endpoint, recomputes the public commitment, and confirms that the malformed record is rejected.
 
 ## Why replay instead of dependency analysis?
 

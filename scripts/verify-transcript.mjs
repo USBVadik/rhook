@@ -1,15 +1,16 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
 
 import {
   parseStrictEvidenceJson,
   verifyBranchEvidenceTranscriptJson,
 } from '../core/src/index.mjs'
 
-const text = await readFile(new URL('../examples/minimal/transcript.json', import.meta.url), 'utf8')
+const input = process.argv[2] ? resolve(process.cwd(), process.argv[2]) : new URL('../examples/minimal/transcript.json', import.meta.url)
+const text = await readFile(input, 'utf8')
 const fileSha256 = createHash('sha256').update(text).digest('hex')
-assert.equal(fileSha256, '3c13a90e29b4b52967418784b5ff544b2e7c209676550cd56acdc7d3f13bd373')
 const verification = verifyBranchEvidenceTranscriptJson(text)
 assert.equal(verification.valid, true, JSON.stringify(verification.findings))
 const transcript = parseStrictEvidenceJson(text)

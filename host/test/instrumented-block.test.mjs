@@ -84,7 +84,88 @@ test('evidence-disabled execution attaches no persistent listeners and reserved 
   )
 })
 
-test('a non-extensible execution error is rethrown unchanged rather than masked by sidecar attachment', async () => {
+const classifyNonceFailure = ({ error }) => error?.code === 'INVALID_NONCE'
+  ? { kind: 'PRE_EXECUTION_VALIDATION', classification: 'nonce mismatch' }
+  : null
+
+test('a classified validation failure attaches verified invalidation evidence when state is unchanged', async () => {
+  const input = fixture()
+  const original = Object.assign(new Error('nonce mismatch'), { code: 'INVALID_NONCE' })
+  const runBlock = async (vm) => {
+    await vm.events.emit('beforeTx', input.block.transactions[0])
+    throw original
+  }
+  await assert.rejects(
+    () => executeInstrumentedBlock({ ...input, runBlock, mode: 'ACTUAL', evidenceEnabled: true, classifyPreExecutionFailure: classifyNonceFailure }),
+    (error) => {
+      assert.equal(error, original)
+      assert.equal(error.runtimeEvidence.evidence.body.execution.lifecycle, 'PRE_EXECUTION_INVALIDATED')
+      assert.equal(error.runtimeEvidence.evidence.body.predecessorStateCommitment, error.runtimeEvidence.evidence.body.execution.successorStateCommitment)
+      assert.equal(verifyEnvelopeEvidence(error.runtimeEvidence.evidence).valid, true)
+      return true
+    },
+  )
+})
+
+test('an unknown runner failure is rethrown without invalidation evidence', async () => {
+  const input = fixture()
+  const original = Object.assign(new Error('internal engine failure'), { code: 'INTERNAL_ENGINE_FAILURE' })
+  const runBlock = async (vm) => {
+    await vm.events.emit('beforeTx', input.block.transactions[0])
+    throw original
+  }
+  await assert.rejects(
+    () => executeInstrumentedBlock({ ...input, runBlock, mode: 'ACTUAL', evidenceEnabled: true, classifyPreExecutionFailure: classifyNonceFailure }),
+    (error) => error === original && !Object.hasOwn(error, 'runtimeEvidence'),
+  )
+})
+
+test('a classified failure after state mutation is rethrown without invalidation evidence', async () => {
+  const input = fixture()
+  const original = Object.assign(new Error('nonce mismatch after mutation'), { code: 'INVALID_NONCE' })
+  const runBlock = async (vm) => {
+    await vm.events.emit('beforeTx', input.block.transactions[0])
+    vm.stateManager.root = bytes(9)
+    throw original
+  }
+  await assert.rejects(
+    () => executeInstrumentedBlock({ ...input, runBlock, mode: 'ACTUAL', evidenceEnabled: true, classifyPreExecutionFailure: classifyNonceFailure }),
+    (error) => error === original && !Object.hasOwn(error, 'runtimeEvidence'),
+  )
+})
+
+test('a classifier cannot attach invalidation evidence after mutating state', async () => {
+  const input = fixture()
+  const original = Object.assign(new Error('nonce mismatch'), { code: 'INVALID_NONCE' })
+  const runBlock = async (vm) => {
+    await vm.events.emit('beforeTx', input.block.transactions[0])
+    throw original
+  }
+  const mutatingClassifier = () => {
+    input.vm.stateManager.root = bytes(9)
+    return { kind: 'PRE_EXECUTION_VALIDATION', classification: 'nonce mismatch' }
+  }
+  await assert.rejects(
+    () => executeInstrumentedBlock({ ...input, runBlock, mode: 'ACTUAL', evidenceEnabled: true, classifyPreExecutionFailure: mutatingClassifier }),
+    (error) => error === original && !Object.hasOwn(error, 'runtimeEvidence'),
+  )
+})
+
+test('a classifier failure cannot mask the original runner error', async () => {
+  const input = fixture()
+  const original = Object.assign(new Error('nonce mismatch'), { code: 'INVALID_NONCE' })
+  const runBlock = async (vm) => {
+    await vm.events.emit('beforeTx', input.block.transactions[0])
+    throw original
+  }
+  const failingClassifier = () => { throw new Error('classifier failed') }
+  await assert.rejects(
+    () => executeInstrumentedBlock({ ...input, runBlock, mode: 'ACTUAL', evidenceEnabled: true, classifyPreExecutionFailure: failingClassifier }),
+    (error) => error === original && !Object.hasOwn(error, 'runtimeEvidence'),
+  )
+})
+
+test('a non-extensible validation error is rethrown unchanged rather than masked by sidecar attachment', async () => {
   const input = fixture()
   const original = Object.freeze(Object.assign(new Error('nonce mismatch'), { code: 'INVALID_NONCE' }))
   const runBlock = async (vm) => {
@@ -92,7 +173,7 @@ test('a non-extensible execution error is rethrown unchanged rather than masked 
     throw original
   }
   await assert.rejects(
-    () => executeInstrumentedBlock({ ...input, runBlock, mode: 'ACTUAL', evidenceEnabled: true }),
+    () => executeInstrumentedBlock({ ...input, runBlock, mode: 'ACTUAL', evidenceEnabled: true, classifyPreExecutionFailure: classifyNonceFailure }),
     (error) => error === original && !Object.hasOwn(error, 'runtimeEvidence'),
   )
 })

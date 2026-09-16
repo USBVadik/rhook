@@ -36,6 +36,8 @@ A native EVM state root is retained as a Keccak-256 value and bound to the SHA-2
 
 [`host/`](../host/) attaches evidence collection to a compatible `runBlock` function supplied by the caller. Evidence-enabled execution observes `beforeTx` and `afterTx`; evidence-disabled execution attaches no listeners. The host does not implement transaction semantics or duplicate verifier rules.
 
+Runner exceptions are not inferred to be validation failures. `PRE_EXECUTION_INVALIDATED` requires an explicit adapter classification, exactly one unmatched `beforeTx`, and a state root that remains equal to the captured predecessor root. Otherwise the original runner exception is rethrown without invalidation evidence.
+
 The canonical qualification used a frozen EthereumJS runner derivative. The public package keeps that execution port explicit instead of vendoring the private research apparatus.
 
 ## Verifier order

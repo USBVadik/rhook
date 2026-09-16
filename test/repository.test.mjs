@@ -16,7 +16,7 @@ const root = resolve(dirname(currentTestFile), '..')
 async function walk(directory) {
   const files = []
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if (entry.name === '.git' || entry.name === '.kiro' || entry.name === 'node_modules') continue
+    if (entry.name === '.git' || entry.name === '.kiro' || entry.name === '.rhook' || entry.name === 'node_modules') continue
     const path = join(directory, entry.name)
     if (entry.isDirectory()) files.push(...await walk(path))
     else files.push(path)
@@ -63,7 +63,11 @@ test('repository contains no local paths, credentials, agent residue, or environ
 
 test('repository tree is small and excludes research/archive clutter', async () => {
   const files = await walk(root)
-  const forbidden = files.filter((path) => /\.(?:patch|log|tgz|svg)$/i.test(path) || /(?:workflow|authorization|qualification|closure|checkpoint)/i.test(relative(root, path)))
+  const forbidden = files.filter((path) => {
+    const repositoryPath = relative(root, path)
+    if (repositoryPath === '.github/workflows/ci.yml') return false
+    return /\.(?:patch|log|tgz|svg)$/i.test(path) || /(?:workflow|authorization|qualification|closure|checkpoint)/i.test(repositoryPath)
+  })
   assert.deepEqual(forbidden, [])
   const oversized = []
   for (const path of files) if ((await stat(path)).size > 100_000) oversized.push(relative(root, path))
@@ -87,7 +91,7 @@ test('public host requires explicit execution injection and has no private runne
   assert.doesNotMatch(host, /alchemix|\/Users\/|run-block-forced-historical-envelope/)
   const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
   assert.deepEqual(pkg.dependencies, undefined)
-  assert.equal(pkg.scripts.quickstart, 'npm run inspect && npm run verify-transcript && npm run tamper-test')
+  assert.equal(pkg.scripts.quickstart, 'npm run demo:generate && npm run demo:inspect && npm run demo:verify && npm run demo:tamper')
 })
 
 test('adapted public source hashes match the reproducibility map', async () => {

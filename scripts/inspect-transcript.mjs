@@ -1,11 +1,13 @@
 import { readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
 
 import {
   parseStrictEvidenceJson,
   verifyBranchEvidenceTranscriptJson,
 } from '../core/src/index.mjs'
 
-const text = await readFile(new URL('../examples/minimal/transcript.json', import.meta.url), 'utf8')
+const input = process.argv[2] ? resolve(process.cwd(), process.argv[2]) : new URL('../examples/minimal/transcript.json', import.meta.url)
+const text = await readFile(input, 'utf8')
 const verification = verifyBranchEvidenceTranscriptJson(text)
 if (!verification.valid) throw new Error(`TRANSCRIPT_INVALID: ${JSON.stringify(verification.findings)}`)
 const transcript = parseStrictEvidenceJson(text)
