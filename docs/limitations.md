@@ -30,3 +30,14 @@
 ## License
 
 No software license has been granted yet. The code is visible for technical review, but reuse rights have not been specified.
+
+## Additional bounded real-chain example
+
+The separate [Robinhood v4 example](../examples/robinhood-v4/README.md) now
+qualifies the unchanged evidence/runtime stack with native Nitro on one frozen
+50-block case, including continuing past 13 pre-execution invalidations. Its
+[clean-checkout reproduction](../examples/robinhood-v4/REPRODUCIBILITY.md) is
+qualified on Linux arm64. The earlier synthetic and Alchemix qualification
+statements above retain their respective historical scope. This additional
+case does not establish general Nitro compatibility, a consensus-valid fork,
+LP payouts or attribution.
