@@ -24,4 +24,8 @@ Do not weaken strict verification to accept a producer-specific payload. Do not 
 
 Keep pull requests narrow. Describe the execution or verification invariant being changed, not just the files edited. Generated research archives, local traces, credentials, and private endpoints do not belong in this repository.
 
-There is no contributor license grant yet because the project has not selected a software license. Contributions should wait for that decision unless coordinated directly with the repository owner.
+Contributions to RHOOK-authored code are submitted under [Apache-2.0](LICENSE)
+unless explicitly stated otherwise, as described in its contribution terms.
+Preserve the [third-party license boundaries](THIRD_PARTY_NOTICES.md), including
+the LGPL-derived native adapter. Include the origin and applicable license
+when adding third-party material.

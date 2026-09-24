@@ -1,0 +1,9 @@
+{
+  "name": "rhook-robinhood-build-tools",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "solc": "0.8.30"
+  },
+  "license": "Apache-2.0"
+}

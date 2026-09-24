@@ -1,0 +1,52 @@
+{
+  "nitroRelease": "v3.11.4",
+  "sources": [
+    {
+      "name": "nitro",
+      "url": "https://codeload.github.com/OffchainLabs/nitro/tar.gz/7d5ac271b400f710f6267ad759c6afc3e12d7059",
+      "commit": "7d5ac271b400f710f6267ad759c6afc3e12d7059",
+      "sha256": "d7f5264202e2fa8671a70370196c6999721c4b9c400fdf24b01378bde302b757",
+      "bytes": 19460654,
+      "directory": "source/nitro"
+    },
+    {
+      "name": "geth",
+      "url": "https://codeload.github.com/OffchainLabs/go-ethereum/tar.gz/dff2aadcd2e75e33923b13acce6468d847477e79",
+      "commit": "dff2aadcd2e75e33923b13acce6468d847477e79",
+      "sha256": "aaef4d6b0c67940c06501fa3730cee0d5026798bd123750030c6f1764dc66c72",
+      "bytes": 22082064,
+      "directory": "source/nitro/go-ethereum"
+    },
+    {
+      "name": "brotli",
+      "url": "https://codeload.github.com/google/brotli/tar.gz/f4153a09f87cbb9c826d8fc12c74642bb2d879ea",
+      "commit": "f4153a09f87cbb9c826d8fc12c74642bb2d879ea",
+      "sha256": "6d6cacce05086b7debe75127415ff9c3661849f564fe2f5f3b0383d48aa4ed77",
+      "bytes": 512229,
+      "directory": "source/nitro/brotli"
+    },
+    {
+      "name": "wasmer",
+      "url": "https://codeload.github.com/OffchainLabs/wasmer/tar.gz/d145ce4369414c0474c1d76d1037b3e5740a86e0",
+      "commit": "d145ce4369414c0474c1d76d1037b3e5740a86e0",
+      "sha256": "6d48b54d56f186979e3b22340455be4d6f37e635b15c341464a15166f37d184b",
+      "bytes": 127416961,
+      "directory": "source/nitro/crates/tools/wasmer"
+    },
+    {
+      "name": "precompiles",
+      "url": "https://codeload.github.com/OffchainLabs/nitro-precompile-interfaces/tar.gz/7e88c8cc53c2e96201a23c638f1536557b9cb68b",
+      "commit": "7e88c8cc53c2e96201a23c638f1536557b9cb68b",
+      "sha256": "ada4f0770a5d9aeacfa7ba785d4e55453c1a40c15f0a7782be1ce569e5226912",
+      "bytes": 17918,
+      "directory": "source/nitro/contracts-local/src/precompiles"
+    }
+  ],
+  "go": "1.25.12",
+  "rust": "1.93.0",
+  "cbindgen": "0.29.2",
+  "solc": "0.8.30",
+  "rustFeatures": [
+    "cc_brotli"
+  ]
+}

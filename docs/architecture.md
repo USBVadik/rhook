@@ -58,3 +58,13 @@ Malformed data never reaches divergence derivation as trusted evidence.
 ## Two qualification tracks
 
 The historical Alchemix result and the protocol-neutral engineering fixture answer different questions. Alchemix demonstrates real branch regeneration. The minimal fixture qualifies typed evidence, observational instrumentation, and offline verification. Neither result substitutes for the other.
+
+## Bounded native Nitro example
+
+[The Robinhood v4 example](../examples/robinhood-v4/README.md) adds a pinned
+native execution adapter without changing these packages. ACTUAL uses the
+existing host runBlock port. Continuing counterfactual invalidations use the
+existing runtime evidence builders plus a case-local session sidecar, because
+the current host block bundle expects one receipt per envelope. This sidecar
+is not a new generic evidence schema. The native engine, adapter and initial
+checkpoint provenance remain trusted apparatus.

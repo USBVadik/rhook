@@ -36,6 +36,15 @@ npm run quickstart
 
 `quickstart` executes both sides of the protocol-neutral branch fixture through the public host/runtime/core stack, writes a fresh transcript under the ignored `.rhook/` directory, verifies it in a separate process, then changes a nested endpoint, recomputes the public commitment, and confirms that the malformed record is rejected.
 
+## Real-chain example
+
+With Docker, `npm run demo:robinhood` builds a pinned native Nitro runner and
+replays one Robinhood Chain v4 counterfactual over 50 continuous blocks.
+The analytical intervention changes native `Message.Data` while retaining the
+historical signed envelope for alignment and declared poster-cost accounting;
+it is not a re-signed transaction. See [the example](examples/robinhood-v4/README.md)
+for the exact fee-growth metric, fixed inputs, limits and reproduction status.
+
 ## Why replay instead of dependency analysis?
 
 Dependency analysis can identify which transitions may depend on `X`. It cannot determine whether a downstream transaction succeeds, reverts, becomes invalid, or produces a different state. RHOOK computes those transitions.
@@ -68,7 +77,7 @@ The Alchemix result supports sequential branch regeneration for that incident-le
 core/       typed evidence and strict plain-JSON verification
 runtime/    raw execution values -> typed evidence
 host/       observational execution integration and transcript assembly
-examples/   one minimal transcript and one historical case summary
+examples/   minimal demo, historical summary, explicit real-chain demo
 docs/       model, architecture, threat boundary, limitations, provenance
 scripts/    inspect, verify, and hostile-mutation commands
 test/       standalone packaging and public API checks
@@ -80,4 +89,8 @@ Read [`QUICKSTART.md`](QUICKSTART.md), then [`docs/architecture.md`](docs/archit
 
 Engineering conformance, not production certification. The current implementation is single-target, unauthenticated at the transcript layer, and not a liability, attribution, or recovery-policy system. See [`docs/limitations.md`](docs/limitations.md).
 
-No software license has been granted yet. Distribution is through this Git repository; `private: true` intentionally disables npm publication.
+RHOOK-authored code and documentation are licensed under [Apache-2.0](LICENSE).
+[Third-party boundaries](THIRD_PARTY_NOTICES.md) remain separate, including the
+LGPL-derived adapter and the native demo's Business Source License 1.1 Nitro
+dependencies. Distribution is through this Git repository; `private: true`
+intentionally disables npm publication.

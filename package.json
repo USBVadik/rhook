@@ -4,20 +4,22 @@
   "description": "Explainable deterministic counterfactual execution for onchain state machines.",
   "type": "module",
   "private": true,
-  "license": "UNLICENSED",
-  "engines": { "node": ">=22.0.0" },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "exports": {
     ".": "./core/src/index.mjs",
     "./runtime": "./runtime/src/index.mjs",
     "./host": "./host/src/index.mjs"
   },
   "scripts": {
-    "check": "for file in core/src/*.mjs runtime/src/*.mjs host/src/*.mjs host/test/*.mjs examples/minimal/*.mjs scripts/*.mjs test/*.mjs; do node --check \"$file\" || exit 1; done",
+    "check": "for file in core/src/*.mjs runtime/src/*.mjs host/src/*.mjs host/test/*.mjs examples/minimal/*.mjs scripts/*.mjs test/*.mjs examples/robinhood-v4/scripts/*.mjs examples/robinhood-v4/test/*.mjs; do node --check \"$file\" || exit 1; done",
     "test:core": "node --test --test-concurrency=1 core/test/*.test.mjs",
     "test:runtime": "node --test --test-concurrency=1 runtime/test/*.test.mjs",
     "test:host": "node --test --test-concurrency=1 host/test/*.test.mjs",
     "test:surface": "node --test --test-concurrency=1 test/*.test.mjs",
-    "test": "npm run test:core && npm run test:runtime && npm run test:host && npm run test:surface",
+    "test": "npm run test:core && npm run test:runtime && npm run test:host && npm run test:surface && npm run test:robinhood",
     "inspect": "node scripts/inspect-transcript.mjs",
     "verify-transcript": "node scripts/verify-transcript.mjs",
     "tamper-test": "node scripts/tamper-transcript.mjs",
@@ -25,9 +27,16 @@
     "demo:inspect": "node scripts/inspect-transcript.mjs .rhook/minimal-transcript.json",
     "demo:verify": "node scripts/verify-transcript.mjs .rhook/minimal-transcript.json",
     "demo:tamper": "node scripts/tamper-transcript.mjs .rhook/minimal-transcript.json",
-    "quickstart": "npm run demo:generate && npm run demo:inspect && npm run demo:verify && npm run demo:tamper"
+    "quickstart": "npm run demo:generate && npm run demo:inspect && npm run demo:verify && npm run demo:tamper",
+    "demo:robinhood": "node examples/robinhood-v4/scripts/demo.mjs",
+    "test:robinhood": "node --test examples/robinhood-v4/test/*.test.mjs"
   },
-  "repository": { "type": "git", "url": "git+https://github.com/USBVadik/rhook.git" },
-  "bugs": { "url": "https://github.com/USBVadik/rhook/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/USBVadik/rhook.git"
+  },
+  "bugs": {
+    "url": "https://github.com/USBVadik/rhook/issues"
+  },
   "homepage": "https://github.com/USBVadik/rhook#readme"
 }
