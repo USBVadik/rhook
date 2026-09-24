@@ -29,7 +29,11 @@
 
 ## License
 
-No software license has been granted yet. The code is visible for technical review, but reuse rights have not been specified.
+RHOOK-authored code is licensed under [Apache-2.0](../LICENSE). The
+[third-party boundaries](../THIRD_PARTY_NOTICES.md) remain applicable: the
+derived geth adapter retains LGPL-3.0-or-later, and the pinned Nitro/native
+dependencies include Business Source License 1.1 terms. The RHOOK license
+does not grant unrestricted production use of those dependencies.
 
 ## Additional bounded real-chain example
 

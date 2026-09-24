@@ -149,10 +149,10 @@ this pool. The historical Alchemix claims and their provenance are unchanged.
 changed inputs/results quickly; it does **not** replay Nitro. Full replay stays
 an explicit command, outside default CI.
 
-The repository remains **UNLICENSED**. No reuse/integration license is granted
-by this example. An explicit owner license decision is required before public
-merge. Upstream dependency notices remain applicable; source URLs and locked
-versions are in [dependencies.json](dependencies.json). The derived geth block
-orchestration retains its upstream copyright and [LGPL notice](notices/geth-COPYING.LESSER),
-with the accompanying [GPL terms](notices/geth-COPYING). This does not select a
-license for the rest of RHOOK.
+RHOOK-authored code is licensed under [Apache-2.0](../../LICENSE), with explicit
+[third-party boundaries](../../THIRD_PARTY_NOTICES.md). The derived geth block
+orchestration remains LGPL-3.0-or-later. Pinned Nitro and precompile dependencies
+retain **Business Source License 1.1**, not the root Apache-2.0 license. This is
+an offline analysis demo, not a general production-use grant for the native
+stack. Source URLs and locked versions are in [dependencies.json](dependencies.json);
+upstream license texts are retained in [notices](notices).

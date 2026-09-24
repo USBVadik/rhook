@@ -89,4 +89,8 @@ Read [`QUICKSTART.md`](QUICKSTART.md), then [`docs/architecture.md`](docs/archit
 
 Engineering conformance, not production certification. The current implementation is single-target, unauthenticated at the transcript layer, and not a liability, attribution, or recovery-policy system. See [`docs/limitations.md`](docs/limitations.md).
 
-No software license has been granted yet. Distribution is through this Git repository; `private: true` intentionally disables npm publication.
+RHOOK-authored code and documentation are licensed under [Apache-2.0](LICENSE).
+[Third-party boundaries](THIRD_PARTY_NOTICES.md) remain separate, including the
+LGPL-derived adapter and the native demo's Business Source License 1.1 Nitro
+dependencies. Distribution is through this Git repository; `private: true`
+intentionally disables npm publication.

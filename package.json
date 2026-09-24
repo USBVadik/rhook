@@ -4,7 +4,7 @@
   "description": "Explainable deterministic counterfactual execution for onchain state machines.",
   "type": "module",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "engines": {
     "node": ">=22.0.0"
   },

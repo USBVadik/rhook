@@ -32,6 +32,7 @@ RUN dpkg-query -W > build-info/debian-packages.txt && \
 
 FROM node-toolchain AS replay
 WORKDIR /repo
+COPY LICENSE NOTICE THIRD_PARTY_NOTICES.md ./
 COPY core/ core/
 COPY runtime/ runtime/
 COPY host/ host/

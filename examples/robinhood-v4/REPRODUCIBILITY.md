@@ -6,9 +6,14 @@ Qualified on 2026-09-24 from a fresh clone at
 and reproduce the result. There were no predecessor-workspace mounts, copied
 Go/Rust caches, local binaries or untracked source inputs.
 
-The later documentation update does not change execution inputs, native code,
-locks, scripts or test behavior. The qualified non-Markdown file-set SHA-256 is
+The qualified checkout's non-Markdown file-set SHA-256 is
 `cc240404332a795fbca2706b987feee7e28fe85a3739f843cd7482282566ae39`.
+Subsequent publication edits add licensing/notices and documentation, update
+only the project's own license metadata in npm manifests/locks, and copy root
+notices into the replay image. Native source, case inputs, dependency versions
+and integrity pins, build commands and replay/verifier scripts are unchanged.
+The measurements and image size below describe the qualified checkout;
+license files change the packaged image, not the frozen execution result.
 
 ## Environment and measurements
 
@@ -64,5 +69,6 @@ binaries are not claimed; exact case execution/evidence is the acceptance test.
 
 Default CI runs fast integrity/evidence checks through `npm test`. The full
 cold source build remains an explicit reviewer command. No remote CI run or
-Linux amd64 qualification is claimed. The repository remains UNLICENSED;
-an owner license decision is required before public merge.
+Linux amd64 qualification is claimed. RHOOK-authored code is now licensed
+under [Apache-2.0](../../LICENSE), with the
+[upstream license boundaries](../../THIRD_PARTY_NOTICES.md) preserved.
