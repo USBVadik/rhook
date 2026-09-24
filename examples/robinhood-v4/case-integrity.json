@@ -1,0 +1,35 @@
+{
+  "archive": {
+    "file": "case-data.json.gz",
+    "sha256": "387c5e1876a78b90abb330d6f49c17cc4fa9486a21f06ec79e4793d5b71debee",
+    "bytes": 6385784,
+    "uncompressedBytes": 16585670
+  },
+  "files": {
+    "inputs/session.json": {
+      "sha256": "fb2cf7a232138f280e8d3a38f9ae070610b386fc7d9a56c536892e98abdbdc11",
+      "bytes": 548318
+    },
+    "inputs/witness.json": {
+      "sha256": "1b5f7176081441655f1dbcf768ce8ae780eff6c21d797d9f14f37dd8b6420a1a",
+      "bytes": 15783521
+    },
+    "inputs/canonical-headers.json": {
+      "sha256": "badd66c37b3374c285f166274f67567ec0b48e00c8bf2b733166584bb8ab35eb",
+      "bytes": 88107
+    },
+    "target-case-manifest.json": {
+      "sha256": "ccf28bf5b10e61b883339a698910863efb0ec7f0d8341dfbe410d5cb8942f7f0",
+      "bytes": 71761
+    },
+    "intervention-manifest.json": {
+      "sha256": "5153559344d43842383269f9fee46b55fc2ad8a3c10156c998dd4b90e0a30bfe",
+      "bytes": 9001
+    }
+  },
+  "reference": {
+    "file": "reference.json.gz",
+    "bytes": 140974,
+    "sha256": "dc9dde06421d040024a59cf8c3e7fa803dfd1da6256871da74bd5950c91fdc21"
+  }
+}

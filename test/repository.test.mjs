@@ -5,6 +5,7 @@ import { promisify } from 'node:util'
 import { readFile, readdir, stat } from 'node:fs/promises'
 import { dirname, extname, join, relative, resolve } from 'node:path'
 import test from 'node:test'
+import { gunzipSync } from 'node:zlib'
 import { fileURLToPath } from 'node:url'
 
 import { verifyBranchEvidenceTranscriptJson } from '../core/src/index.mjs'
@@ -12,6 +13,10 @@ import { verifyBranchEvidenceTranscriptJson } from '../core/src/index.mjs'
 const run = promisify(execFile)
 const currentTestFile = fileURLToPath(import.meta.url)
 const root = resolve(dirname(currentTestFile), '..')
+const readSource = async (path) => {
+  const bytes = await readFile(path)
+  return (path.endsWith('.gz') ? gunzipSync(bytes, { maxOutputLength: 64 * 1024 * 1024 }) : bytes).toString('utf8')
+}
 
 async function walk(directory) {
   const files = []
@@ -55,7 +60,7 @@ test('all local Markdown links resolve inside the standalone repository', async 
 test('repository contains no local paths, credentials, agent residue, or environment files', async () => {
   const files = await walk(root)
   const textFiles = files.filter((path) => path !== currentTestFile && !path.endsWith('package-lock.json'))
-  const combined = (await Promise.all(textFiles.map((path) => readFile(path, 'utf8')))).join('\n')
+  const combined = (await Promise.all(textFiles.map(readSource))).join('\n')
   assert.doesNotMatch(combined, /\/Users\/|\/home\/|KIROCREW|Kiro Crew|agent prompt|workflow transcript/i)
   assert.doesNotMatch(combined, /AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9_]{20,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/)
   assert.equal(files.some((path) => /(^|\/)\.env(?:\.|$)/.test(relative(root, path))), false)
@@ -70,9 +75,13 @@ test('repository tree is small and excludes research/archive clutter', async () 
   })
   assert.deepEqual(forbidden, [])
   const oversized = []
-  for (const path of files) if ((await stat(path)).size > 100_000) oversized.push(relative(root, path))
+  for (const path of files) {
+    const name = relative(root, path)
+    const limit = name === 'examples/robinhood-v4/case-data.json.gz' ? 7_000_000 : name === 'examples/robinhood-v4/reference.json.gz' ? 200_000 : 100_000
+    if ((await stat(path)).size > limit) oversized.push(name)
+  }
   assert.deepEqual(oversized, [])
-  assert.equal(files.filter((path) => path.endsWith('.json') && !path.endsWith('package.json') && !path.endsWith('package-lock.json')).length, 2)
+  assert.equal(files.filter((path) => !relative(root, path).startsWith('examples/robinhood-v4/') && path.endsWith('.json') && !path.endsWith('package.json') && !path.endsWith('package-lock.json')).length, 2)
 })
 
 test('README explains the primitive in its first screen without inflated claims', async () => {
@@ -110,6 +119,6 @@ test('git-publishable files exclude local paths and ignored agent metadata', asy
   const paths = stdout.trim().split('\n').filter(Boolean)
   assert.ok(paths.length > 0)
   assert.equal(paths.some((path) => path === '.kiro' || path.startsWith('.kiro/')), false)
-  const text = (await Promise.all(paths.filter((path) => resolve(root, path) !== currentTestFile).map((path) => readFile(join(root, path), 'utf8')))).join('\n')
+  const text = (await Promise.all(paths.filter((path) => resolve(root, path) !== currentTestFile).map((path) => readSource(join(root, path))))).join('\n')
   assert.doesNotMatch(text, /\/Users\/|\/home\/|KIROCREW|Kiro Crew|agent prompt|workflow transcript/i)
 })
