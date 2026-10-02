@@ -1,0 +1,528 @@
+{
+  "kind": "curated-research-result",
+  "caseId": "robinhood-4663-50-block-heterogeneous-lifecycle",
+  "protocolVersion": "0.2",
+  "terminal": "A_B_BRANCHCLAIM_MATCH",
+  "publicationBaseCommit": "c6bf3e397864bb506100917c5b9a1aba6328132b",
+  "history": {
+    "chainId": "4663",
+    "poolId": "0xb4619c2502932d4c10623f1862982b477536c2788648b2fda718aaf05c748523",
+    "checkpointBlock": "70397226",
+    "initialRoot": "0x54f5f2ca37233825ecd60ea3ab44b0a9157d605cd306d8e65d83493c6b6ceb81",
+    "firstBlock": "70397227",
+    "lastBlock": "70397276",
+    "blocks": 50,
+    "originalArrivals": 321
+  },
+  "disclosedComponentBodies": {
+    "R": {
+      "profile": "rhook/robinhood-lifecycle/0.1",
+      "referenceSources": {
+        "nitro": "7d5ac271b400f710f6267ad759c6afc3e12d7059",
+        "geth": "dff2aadcd2e75e33923b13acce6468d847477e79",
+        "brotli": "f4153a09f87cbb9c826d8fc12c74642bb2d879ea",
+        "wasmer": "d145ce4369414c0474c1d76d1037b3e5740a86e0",
+        "precompiles": "7e88c8cc53c2e96201a23c638f1536557b9cb68b"
+      },
+      "sourceClosure": "ACCEPTED_REVISIONS_AND_THEIR_LOCKED_SOURCE_DEPENDENCIES",
+      "configuration": "INITIAL_AUTHENTICATED_ARBOS_CHAIN_CONFIG_REQUIRE_4663",
+      "transactionStep": "ACCEPTED_NATIVE_TRANSACTION_TO_MESSAGE_AND_APPLY_TRANSACTION",
+      "replayContext": "FRESH_NATIVE_MESSAGE_REPLAY_CONTEXT_PER_BLOCK_SHARED_BY_ARRIVALS",
+      "invalidation": {
+        "ordinaryTypes": [
+          "0",
+          "1",
+          "2",
+          "4"
+        ],
+        "nativeClasses": [
+          "core.ErrFeeCapTooLow",
+          "core.ErrFeeCapVeryHigh",
+          "core.ErrGasLimitReached",
+          "core.ErrInsufficientFunds",
+          "core.ErrNonceMax",
+          "core.ErrNonceTooHigh",
+          "core.ErrNonceTooLow",
+          "core.ErrSenderNoEOA",
+          "core.ErrTipAboveFeeCap",
+          "core.ErrTipVeryHigh"
+        ],
+        "guard": "PRECHECK_CLASS_NO_EXECUTION_STATE_OR_GAS_EFFECT",
+        "actualFailure": "STOP",
+        "qualifiedBranchFailure": "RETAIN_NO_TRANSITION_CONTINUE",
+        "unknownFailure": "STOP",
+        "systemFailure": "STOP"
+      },
+      "executionErrorLifecycle": "REVERT_FOR_ANY_NATIVE_EXECUTION_RESULT_ERROR",
+      "finalization": "ACCEPTED_ARBOS_ENGINE_FINALIZE_ON_OWN_STATE_EACH_BLOCK",
+      "stateMaterial": "INITIAL_ROOT_AUTHENTICATED_OR_LOCALLY_DERIVED_NEVER_CANONICAL_RESET",
+      "nativeLibraryReference": "ACCEPTED_LIBSTYLUS_SOURCE_RELATION_WITH_CC_BROTLI_OPTION"
+    },
+    "C": {
+      "arrivals": "ALL_321_FROZEN_ENVELOPES_IN_BLOCK_AND_TRANSACTION_ORDER",
+      "environment": "FIXED_SANITIZED_EXECUTION_HEADERS_WITH_HISTORICAL_PARENT_CONTEXT",
+      "l2GetHash": "ACCEPTED_NATIVE_GETHASH_FN_OVER_HISTORICAL_HEADERS_MISSING_HEADER_STOP",
+      "evmBlockHash": "ACCEPTED_NATIVE_ARBOS_L1_HISTORY_ON_OWN_BRANCH_STATE",
+      "l1HistoryGuard": "L1_NUMBER_AND_UP_TO_256_HISTORY_ENTRIES_MATCH_CONTROL_EACH_BLOCK",
+      "stateContinuation": "LOCAL_FINALIZED_SUCCESSOR_ONLY_ACROSS_EVERY_BLOCK_BOUNDARY",
+      "newArrivals": "NONE_FIXED_DOMAIN_NO_ADAPTIVE_RESUBMISSION",
+      "counterfactualHeaderFeedback": "NONE_NOT_A_CONSENSUS_FORK"
+    },
+    "I": {
+      "kind": "DERIVED_MESSAGE_DATA_ONLY",
+      "target": {
+        "blockNumber": "70397227",
+        "transactionIndex": "3",
+        "transactionHash": "0x5f82e30b8ad8ae0bd4e5b60cbde55a47702d2d4b90234ad0db58bd9b89a458db"
+      },
+      "expectedOriginalData": "0x3593564c000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000006ab39a8800000000000000000000000000000000000000000000000000000000000000011000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000380000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000003060c0e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000260000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d136b862ebbb1bd362a637ed67b7b0efe1052e7f00000000000000000000000000000000000000000000000000000000000009c400000000000000000000000000000000000000000000000000000000000000190000000000000000000000007c5d4a5c31b2d469b49d9a98175d79e9b9179000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000570ec808e2c4f63b21e600000000000000000000000000000000000000000000000002926c0a9ea5d2050000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000d136b862ebbb1bd362a637ed67b7b0efe1052e7f00000000000000000000000000000000000000000000570ec808e2c4f63b21e600000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c79bd57b0a52d3e51c9e299339d19bbffdd322250000000000000000000000000000000000000000000000000000000000000000",
+      "replacementData": "0x3593564c00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000006ab39a8800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "boundary": "AFTER_ORIGINAL_SENDER_MESSAGE_DERIVATION_BEFORE_APPLY",
+      "preservation": "EVERY_OTHER_MESSAGE_FIELD_INCLUDING_ORIGINAL_TX_AND_REPLAY_CONTEXT",
+      "posterCost": "ORIGINAL_SIGNED_MESSAGE_TX",
+      "intrinsicGasAndExecution": "REPLACEMENT_MESSAGE_DATA",
+      "sender": "DERIVED_FROM_ORIGINAL_SIGNED_ENVELOPE",
+      "envelopeIdentity": "HISTORICAL_FOR_ALIGNMENT_NOT_RESIGNED",
+      "cardinality": "1"
+    },
+    "subject": {
+      "chainId": "4663",
+      "blockNumber": "70397227",
+      "transactionIndex": "4",
+      "transactionHash": "0x14ce0aadfca7435e2735ea5eeb5533766059079a72a700edb0221559e066bf4e"
+    },
+    "P": {
+      "kind": "NATIVE_ENVELOPE_LIFECYCLE",
+      "phase": "AFTER_SELECTED_ENVELOPE",
+      "referenceDomain": "COMPLETE_DECLARED_50_BLOCK_DOMAIN",
+      "resultCodec": "LIFECYCLE_JSON_STRING_3"
+    },
+    "theta": {}
+  },
+  "excludedHistoryPreimage": {
+    "included": false,
+    "domain": "rhook/query-component/H/0.2",
+    "bytes": 646380,
+    "componentCommitment": "b22ddf71e2d82c2b2836e2ce457c12d171f91955e7c24c426a0f81945f82d0ba",
+    "note": "Complete ordered history is excluded. This pin alone does not authenticate H or reconstruct its body."
+  },
+  "selectedResult": {
+    "ACTUAL": "SUCCESS",
+    "BRANCH": "REVERT"
+  },
+  "claimIdentity": {
+    "queryCommitment": "65fc23b618fa5012e7c059c270e423b07782f140bb5ad262f88cb2ef5c129288",
+    "actualResultCommitment": "169f83dd2088f03b0aa26b9d613775fb05ac25b9a548e8d9180931f0f4bb7454",
+    "branchResultCommitment": "5170c68b9cd2853bf4495599d7b0263165418ddfa4ece0057feba957657bd44d",
+    "canonicalClaimByteCount": 304,
+    "canonicalClaimBytesSha256": "ee8331c7e4116fd6fce0335519aae5a31b5a9c15f6dc3ab61458bab19c0bec51",
+    "claimCommitment": "1cb8488e019b5550d32ea1169b6a7fac72af8f840314709672973661156c33f0"
+  },
+  "retainedComparison": {
+    "checksPassed": 34,
+    "checksTotal": 34,
+    "firstDivergence": null,
+    "checks": [
+      {
+        "surface": "intervention identity and exact declared transformation",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "semantic body H",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "canonical component preimage H",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 646380,
+        "BBytes": 646380,
+        "ASha256": "b22ddf71e2d82c2b2836e2ce457c12d171f91955e7c24c426a0f81945f82d0ba",
+        "BSha256": "b22ddf71e2d82c2b2836e2ce457c12d171f91955e7c24c426a0f81945f82d0ba",
+        "firstDivergence": null
+      },
+      {
+        "surface": "semantic body R",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "canonical component preimage R",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 1488,
+        "BBytes": 1488,
+        "ASha256": "160dd35740e5f0f0c0481c2d4c37db9926fb8eb4c835701831e8c6606c307d2c",
+        "BSha256": "160dd35740e5f0f0c0481c2d4c37db9926fb8eb4c835701831e8c6606c307d2c",
+        "firstDivergence": null
+      },
+      {
+        "surface": "semantic body C",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "canonical component preimage C",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 637,
+        "BBytes": 637,
+        "ASha256": "2d0cd3080f5d27228d2fcb50e94f6fbc46a16b5362c084d078525fe9bc9acc59",
+        "BSha256": "2d0cd3080f5d27228d2fcb50e94f6fbc46a16b5362c084d078525fe9bc9acc59",
+        "firstDivergence": null
+      },
+      {
+        "surface": "semantic body I",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "canonical component preimage I",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 3294,
+        "BBytes": 3294,
+        "ASha256": "83136c6fb75023087f43435cd4c0d06dbe0d32bcae392d778b2217324fbede7f",
+        "BSha256": "83136c6fb75023087f43435cd4c0d06dbe0d32bcae392d778b2217324fbede7f",
+        "firstDivergence": null
+      },
+      {
+        "surface": "semantic body subject",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "canonical component preimage subject",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 207,
+        "BBytes": 207,
+        "ASha256": "5736733ead91ca0eeed369883e5d22c4c590581f019cbed63670b8746b4adefb",
+        "BSha256": "5736733ead91ca0eeed369883e5d22c4c590581f019cbed63670b8746b4adefb",
+        "firstDivergence": null
+      },
+      {
+        "surface": "semantic body P",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "canonical component preimage P",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 212,
+        "BBytes": 212,
+        "ASha256": "64f4c9c13cf6aed7d436c1827bd0a842941f5309c632bf8e41347518102263a7",
+        "BSha256": "64f4c9c13cf6aed7d436c1827bd0a842941f5309c632bf8e41347518102263a7",
+        "firstDivergence": null
+      },
+      {
+        "surface": "semantic body theta",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "canonical component preimage theta",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 54,
+        "BBytes": 54,
+        "ASha256": "e245fbea36f92ba7f09d410575e55e9b0f181ffb863eff809299d25c3460741a",
+        "BSha256": "e245fbea36f92ba7f09d410575e55e9b0f181ffb863eff809299d25c3460741a",
+        "firstDivergence": null
+      },
+      {
+        "surface": "frozen subject",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "projection definition",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "projection parameters",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "ACTUAL lifecycle",
+        "kind": "projection",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "BRANCH lifecycle",
+        "kind": "projection",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "queryCommitment",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "actualResultCommitment",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "branchResultCommitment",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "claimCommitment",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "query fields/component commitments",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "claim fields",
+        "kind": "identity",
+        "equal": true,
+        "firstDivergence": null
+      },
+      {
+        "surface": "canonical query bytes",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 612,
+        "BBytes": 612,
+        "ASha256": "30327618670c4185e284e869fffebf7abda9e6bae3be2cb2dd91d213772e2bc2",
+        "BSha256": "30327618670c4185e284e869fffebf7abda9e6bae3be2cb2dd91d213772e2bc2",
+        "firstDivergence": null
+      },
+      {
+        "surface": "canonical BranchClaim bytes",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 304,
+        "BBytes": 304,
+        "ASha256": "ee8331c7e4116fd6fce0335519aae5a31b5a9c15f6dc3ab61458bab19c0bec51",
+        "BSha256": "ee8331c7e4116fd6fce0335519aae5a31b5a9c15f6dc3ab61458bab19c0bec51",
+        "firstDivergence": null
+      },
+      {
+        "surface": "query commitment preimage",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 655,
+        "BBytes": 655,
+        "ASha256": "65fc23b618fa5012e7c059c270e423b07782f140bb5ad262f88cb2ef5c129288",
+        "BSha256": "65fc23b618fa5012e7c059c270e423b07782f140bb5ad262f88cb2ef5c129288",
+        "firstDivergence": null
+      },
+      {
+        "surface": "actual-result commitment preimage",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 333,
+        "BBytes": 333,
+        "ASha256": "169f83dd2088f03b0aa26b9d613775fb05ac25b9a548e8d9180931f0f4bb7454",
+        "BSha256": "169f83dd2088f03b0aa26b9d613775fb05ac25b9a548e8d9180931f0f4bb7454",
+        "firstDivergence": null
+      },
+      {
+        "surface": "branch-result commitment preimage",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 332,
+        "BBytes": 332,
+        "ASha256": "5170c68b9cd2853bf4495599d7b0263165418ddfa4ece0057feba957657bd44d",
+        "BSha256": "5170c68b9cd2853bf4495599d7b0263165418ddfa4ece0057feba957657bd44d",
+        "firstDivergence": null
+      },
+      {
+        "surface": "claim commitment preimage",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 347,
+        "BBytes": 347,
+        "ASha256": "1cb8488e019b5550d32ea1169b6a7fac72af8f840314709672973661156c33f0",
+        "BSha256": "1cb8488e019b5550d32ea1169b6a7fac72af8f840314709672973661156c33f0",
+        "firstDivergence": null
+      },
+      {
+        "surface": "actual plain lifecycle JSON value",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 9,
+        "BBytes": 9,
+        "ASha256": "10855c7ff70842f1b5b4c20c4c059d0e356f11c7df96e1fd97c26eeb7d427423",
+        "BSha256": "10855c7ff70842f1b5b4c20c4c059d0e356f11c7df96e1fd97c26eeb7d427423",
+        "firstDivergence": null
+      },
+      {
+        "surface": "branch plain lifecycle JSON value",
+        "kind": "identity",
+        "equal": true,
+        "ABytes": 8,
+        "BBytes": 8,
+        "ASha256": "5348a5a1165452cf816e0a9aa3537179e453f6f4e30af891b1ef55463f1c8c95",
+        "BSha256": "5348a5a1165452cf816e0a9aa3537179e453f6f4e30af891b1ef55463f1c8c95",
+        "firstDivergence": null
+      }
+    ],
+    "recomputedByPublicArtifactCheck": false
+  },
+  "descriptiveAgreement": {
+    "pairedOriginalArrivals": 321,
+    "allIdentityMatches": true,
+    "actualLifecycleMatches": 321,
+    "branchLifecycleMatches": 321,
+    "downstreamLifecycleChanges": 16,
+    "ALifecycleChangeKinds": {
+      "SUCCESS -> REVERT": 3,
+      "SUCCESS -> PRE_EXECUTION_INVALIDATED": 13
+    },
+    "BLifecycleChangeKinds": {
+      "SUCCESS -> REVERT": 3,
+      "SUCCESS -> PRE_EXECUTION_INVALIDATED": 13
+    },
+    "actualEndpointRoots": {
+      "A": "0xd5b84a377ee7ed7b7bf04f88c98988ed0cb5fd0a4679670515a9bac2f0a90193",
+      "B": "0xd5b84a377ee7ed7b7bf04f88c98988ed0cb5fd0a4679670515a9bac2f0a90193"
+    },
+    "branchEndpointRoots": {
+      "A": "0x47601a8a2f7fb0e68778fab892470e7577169c1c2f041df95261f60abe5a5792",
+      "B": "0x47601a8a2f7fb0e68778fab892470e7577169c1c2f041df95261f60abe5a5792"
+    },
+    "actualEndpointRootMatches": true,
+    "branchEndpointRootMatches": true,
+    "fullNativeAccountingStateAndFinalizationConformance": "NOT_ESTABLISHED_BY_THIS_COMPARISON_ONLY_TASK"
+  },
+  "lifecycleTotalsBothPipelines": {
+    "ACTUAL": {
+      "SUCCESS": 303,
+      "REVERT": 18,
+      "PRE_EXECUTION_INVALIDATED": 0
+    },
+    "BRANCH": {
+      "SUCCESS": 287,
+      "REVERT": 21,
+      "PRE_EXECUTION_INVALIDATED": 13
+    }
+  },
+  "comparisonProvenance": {
+    "A": "Previously qualified Go/Nitro/geth historical execution; not rerun in reveal/comparison",
+    "B": "Qualified Rust/arb-revm ACTUAL50 then BRANCH50; independent native codec",
+    "BSealVerifiedBeforeAReveal": true,
+    "AOwnObservationsUsedWithoutBValuesOrTargetHash": true,
+    "AClaimFirstConstructedFromPreexistingProfile": true,
+    "AClaimSealedBeforeComparison": true,
+    "ASealedUtc": "2026-10-01T22:50:20.603357+00:00",
+    "comparisonStartedUtc": "2026-10-01T22:53:12.583907+00:00",
+    "historicalAStrictEvidenceVerified": 642,
+    "secondaryAEncoderVerification": "PASS",
+    "nativeRunsDuringRevealComparison": 0,
+    "rebuildsDuringRevealComparison": 0,
+    "witnessAcquisitionsDuringRevealComparison": 0,
+    "coordinatorHistoricalExposure": true,
+    "freshBlindAuthorship": false
+  },
+  "excludedArtifactPins": {
+    "note": "Provenance attestations for excluded local artifacts; no local paths or download availability are implied.",
+    "producerAOutput": {
+      "manifestSha256": "dfa9f956591640d52a2b04b95a4177c8615920485c5d0682422263af1779bdf3",
+      "freezeSha256": "5cb98f37ce6b1fbe8ee94f49b530f8d64faa8a60ed33da172fbfa4f9f28f0805",
+      "files": 35,
+      "bytes": 2311671
+    },
+    "producerBOutput": {
+      "manifestSha256": "a9c66a103205def97d9b5366acad0a946a9bbcc53c4a6db391c33522af52dbfe",
+      "freezeSha256": "a81ef4deb64b6e59de342f87bd7fa2daf3ab6348121b23329b90f87b642fa1e8",
+      "files": 40,
+      "bytes": 681865188
+    },
+    "comparisonOutput": {
+      "manifestSha256": "6d753acc5e67795d9df537b7057d5a3f71e19a7aad7ee44f75ac0d0f74b5b21e",
+      "freezeSha256": "cfa0dd03cf66f49211d35442c37244bc2986fcc1678bc964a61be39bf4a56a2f"
+    },
+    "comparisonRecordSha256": "b1b58ee4287b37c52667ac54d4b6bccf87a83a3829d93ce72d4661d763b5b241",
+    "descriptiveRecordSha256": "e48cfe326da4fc994314c4eb702ebe6ecd5443104d5b95942a59040086e0b97d",
+    "comparisonReportSha256": "6fd9794d7e8c7f1b5ab665b84eea69011afc0c4df5bc951d2bbe17c1773f5fc4",
+    "producerAObservationSha256": "df663b4ca4b1909eb928165399aff587e153f96b026cb1137c80f53d51a9cedf",
+    "producerAPreRevealProfileFreezeSha256": "ed823a0b53f32e1de3ff54c5e229e4d2a006aeb64557c448637f9c53a976422b",
+    "semanticInputsSha256": "addf1770fe83a933ffb15332cb7bd224fa0db44d66d074215a91959b400d9162",
+    "producerBQualifiedBinarySha256": "38d301b3eec951635e461efc5fc68dff479bf3fbe594268e37b398e5a2af22ad",
+    "producerBSourceFreezeSha256": "cf47af42d7a64eeb8e68f53ada384f4c4ddc728b08e0e8d2609e263bc75cdf3c",
+    "producerBInitialStoreSha256": "c2e89d61feeb43ef518142c011836ff66cabf6602d5f76a0c41484033dffc75f",
+    "fullProtocolCandidateSha256": "80b1dc97a65d4a030000ed4461ee47e90705965b04b618a534a485329ede9c0b",
+    "fullSemanticsDraftSha256": "6908ebb6630aee0faa284742356a799be1cc5346a7ce86c5f74655813533cc55"
+  },
+  "includedFiles": {
+    "docs/research/robinhood-heterogeneous/query.json": {
+      "bytes": 612,
+      "sha256": "30327618670c4185e284e869fffebf7abda9e6bae3be2cb2dd91d213772e2bc2"
+    },
+    "docs/research/robinhood-heterogeneous/claim.json": {
+      "bytes": 304,
+      "sha256": "ee8331c7e4116fd6fce0335519aae5a31b5a9c15f6dc3ab61458bab19c0bec51"
+    },
+    "docs/research/robinhood-heterogeneous/verify.mjs": {
+      "bytes": 5698,
+      "sha256": "f1807478fa46c3b115b020e56734fa84a5fdc996e936d6e49a013ddd96bf1ce4"
+    },
+    "docs/protocol/branch-protocol-0.2.md": {
+      "bytes": 6414,
+      "sha256": "1636706b7176d5ccad27158f31cb67c5606be6519741e2729462a3a17ee387ab"
+    },
+    "docs/protocol/branch-semantics-0.1.md": {
+      "bytes": 36219,
+      "sha256": "6453a1b86793c6ea9cbb6f0a49d094b50fb618d56402e24c5c6806c4f3d509b7"
+    },
+    "examples/robinhood-v4/reference.json.gz": {
+      "bytes": 140974,
+      "sha256": "dc9dde06421d040024a59cf8c3e7fa803dfd1da6256871da74bd5950c91fdc21"
+    }
+  },
+  "publicVerificationScope": {
+    "includedRawFilePins": true,
+    "canonicalQueryAndClaim": true,
+    "sixDisclosedComponentBindings": true,
+    "orientedProjectedResultBindings": true,
+    "nativeExecution": false,
+    "historyAuthentication": false,
+    "excludedArchives": false,
+    "fullHComponentReconstruction": false,
+    "retainedABComparisonRerun": false
+  },
+  "unsupportedClaims": [
+    "generic Nitro conformance",
+    "arbitrary-intervention equivalence",
+    "full intermediate native trace/accounting/state/header/finalization conformance",
+    "universal causal correctness",
+    "production safety",
+    "consensus-valid alternative chain",
+    "economic attribution",
+    "LP payout",
+    "cryptographic execution proof",
+    "fresh-blind authorship",
+    "product usefulness"
+  ]
+}

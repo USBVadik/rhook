@@ -40,6 +40,14 @@ test('standalone transcript and reviewer commands work without workspace depende
   const tamper = JSON.parse((await run(process.execPath, ['scripts/tamper-transcript.mjs'], { cwd: root })).stdout)
   assert.equal(tamper.status, 'EXPECTED_REJECTION')
   assert.ok(tamper.findings.some((finding) => finding.code === 'INVALID_SEMANTIC_ENDPOINT'))
+  const publication = JSON.parse((await run(process.execPath, ['docs/research/robinhood-heterogeneous/verify.mjs'], { cwd: root })).stdout)
+  assert.equal(publication.status, 'PUBLICATION_BINDINGS_PASS')
+  assert.equal(publication.canonicalClaimBytes, 304)
+  assert.equal(publication.claimCommitment, '1cb8488e019b5550d32ea1169b6a7fac72af8f840314709672973661156c33f0')
+  assert.equal(publication.nativeExecution, false)
+  assert.equal(publication.historyAuthentication, false)
+  assert.equal(publication.excludedArchivesVerified, false)
+  assert.equal(publication.retainedABComparisonRerun, false)
 })
 
 test('all local Markdown links resolve inside the standalone repository', async () => {
@@ -81,7 +89,14 @@ test('repository tree is small and excludes research/archive clutter', async () 
     if ((await stat(path)).size > limit) oversized.push(name)
   }
   assert.deepEqual(oversized, [])
-  assert.equal(files.filter((path) => !relative(root, path).startsWith('examples/robinhood-v4/') && path.endsWith('.json') && !path.endsWith('package.json') && !path.endsWith('package-lock.json')).length, 2)
+  const compactJsonFiles = files.filter((path) => !relative(root, path).startsWith('examples/robinhood-v4/') && path.endsWith('.json') && !path.endsWith('package.json') && !path.endsWith('package-lock.json')).map((path) => relative(root, path))
+  assert.deepEqual(compactJsonFiles, [
+    'docs/reproducibility/source-hashes.json',
+    'docs/research/robinhood-heterogeneous/claim.json',
+    'docs/research/robinhood-heterogeneous/query.json',
+    'docs/research/robinhood-heterogeneous/result.json',
+    'examples/minimal/transcript.json',
+  ])
 })
 
 test('README explains the primitive in its first screen without inflated claims', async () => {

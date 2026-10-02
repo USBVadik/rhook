@@ -45,6 +45,21 @@ historical signed envelope for alignment and declared poster-cost accounting;
 it is not a re-signed transaction. See [the example](examples/robinhood-v4/README.md)
 for the exact fee-growth metric, fixed inputs, limits and reproduction status.
 
+## Heterogeneous execution result
+
+For one frozen real 50-block historical counterfactual on Robinhood Chain,
+the native Go/Nitro/geth and qualified Rust/arb-revm pipelines produced the
+same selected ACTUAL/BRANCH lifecycle result (`SUCCESS` / `REVERT`) and
+identical Branch Protocol 0.2 claim bytes. The retained comparison passed
+34/34 exact checks.
+
+The [research report](docs/research/robinhood-heterogeneous/README.md) publishes
+the compact result, commitment bindings and candidate semantics/codec.
+Its offline check verifies the published artifacts; the experimental Rust
+runner and full research archives are excluded. This bounded result does not
+establish generic Nitro conformance, full native trace equivalence or economic
+attribution.
+
 ## Why replay instead of dependency analysis?
 
 Dependency analysis can identify which transitions may depend on `X`. It cannot determine whether a downstream transaction succeeds, reverts, becomes invalid, or produces a different state. RHOOK computes those transitions.
