@@ -4,6 +4,10 @@ For one frozen real 50-block historical counterfactual on Robinhood Chain,
 two heterogeneous execution pipelines produced the same oriented
 ACTUAL/BRANCH lifecycle result and identical Branch Protocol 0.2 claim.
 
+The later [six-case prospective comparison](prospective-conformance.md)
+passed 1410/1410 checks with a comparator frozen before execution. The
+single-case result and its comparison limits below retain their original scope.
+
 This publishes a completed research result. Producer A is the previously
 qualified native Go/Nitro/geth execution. Producer B is a separately qualified
 Rust/arb-revm execution. The comparison reused A's frozen observations; it

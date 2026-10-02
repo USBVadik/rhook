@@ -45,3 +45,11 @@ qualified on Linux arm64. The earlier synthetic and Alchemix qualification
 statements above retain their respective historical scope. This additional
 case does not establish general Nitro compatibility, a consensus-valid fork,
 LP payouts or attribution.
+
+The [prospective heterogeneous comparison](research/robinhood-heterogeneous/prospective-conformance.md)
+completed native validation for six fixed interventions on Chain 4663 with
+exact v011 and two frozen implementations. It compared execution surfaces
+and claims over the full 50-block / 321-arrival domain per case. This remains
+a bounded experiment, without universal backend neutrality, production
+certification or cryptographic execution proof. The full native apparatus
+and execution archives are not included in this repository.

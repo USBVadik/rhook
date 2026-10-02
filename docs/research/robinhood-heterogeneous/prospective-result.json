@@ -1,0 +1,319 @@
+{
+  "result": "PROSPECTIVE_DUAL_PRODUCER_SIX_CASE_CONFORMANCE_PASS_V011",
+  "network": 4663,
+  "branchProtocol": "0.2",
+  "storeVersion": "v011",
+  "cases": 6,
+  "blocksPerCase": 50,
+  "arrivalsPerCase": 321,
+  "domain": {
+    "checkpoint": 70397226,
+    "firstBlock": 70397227,
+    "lastBlock": 70397276,
+    "initialRoot": "0x54f5f2ca37233825ecd60ea3ab44b0a9157d605cd306d8e65d83493c6b6ceb81"
+  },
+  "checksPassed": 1410,
+  "checksTotal": 1410,
+  "comparisonGroupsPerCase": 15,
+  "comparisonGroupEvaluationsPassed": 90,
+  "comparisonGroupEvaluationsTotal": 90,
+  "comparatorInvocations": 1,
+  "suiteManifestSha256": "8c0cc5dc91b1a0ca364c77556b54e7dc47281595384f18ffbadca05713e9a7df",
+  "suiteFreezeSha256": "fcb833bfce972da55488c2e97e027790954f306d16508d0b9c71b0a65ff47989",
+  "suiteCommitment": "120ffb9914f435585f1260b40b55ebef99b490bb280d6b65175259e82f3170f4",
+  "comparatorSha256": "a616729b8cab2c50914f19fd3bd7ec0323ae7b2f4bf95932110fedcb8b715712",
+  "normalizationSha256": "b268c0c409dac6e7934732eea0845b2890e91e26bc5774fe408e02a27829c0f1",
+  "storeSha256": "065e94a3d3e66cb76f3e3eaba09a085451822003a138d16e300d3d0e56ed48c7",
+  "producers": {
+    "A": {
+      "implementation": "Go/Nitro/geth",
+      "binarySha256": "f17014655e50af7c1457f5d302ba047bca70cf0808b574da88e29ca6f5a4cdcc",
+      "admittedCases": 6,
+      "scientificInvocations": 6,
+      "sealedCases": 6,
+      "blocks": 300,
+      "arrivalObservations": 1926
+    },
+    "B": {
+      "implementation": "Rust/arb-revm",
+      "binarySha256": "bd2e869db8a1530bddf26d4b71acd3355387fdd597ba407e97fb09b7a672f86b",
+      "admittedCases": 6,
+      "scientificInvocations": 6,
+      "sealedCases": 6,
+      "blocks": 300,
+      "arrivalObservations": 1926
+    }
+  },
+  "counters": {
+    "extraProbes": 0,
+    "nativeRetries": 0,
+    "caseReplacements": 0,
+    "binaryRebuilds": 0,
+    "postSelectionApparatusChanges": 0,
+    "postExecutionRepairs": 0,
+    "witnessExpansions": 0,
+    "comparatorChanges": 0,
+    "normalizationChanges": 0,
+    "canonicalIntermediateResetsInCompletedCases": 0,
+    "suiteRegenerations": 0,
+    "suiteReorders": 0,
+    "suiteModifications": 0,
+    "producerSourceChanges": 0,
+    "recipeChanges": 0,
+    "codecPostprocessorChanges": 0
+  },
+  "caseResults": [
+    {
+      "caseId": "CASE_01",
+      "target": {
+        "blockNumber": "70397229",
+        "transactionIndex": "3",
+        "transactionHash": "0xc0600be80e9079efc9002c7e60261aae1238f273af1599bfde840524ec1efa77"
+      },
+      "subject": {
+        "chainId": "4663",
+        "blockNumber": "70397229",
+        "transactionIndex": "4",
+        "transactionHash": "0x22fc8960e0fda7f591e023cb691806e838945971968bfa31ce2c986b00c937d6"
+      },
+      "checksPassed": 235,
+      "checksTotal": 235,
+      "groupsPassed": 15,
+      "selectedResults": {
+        "ACTUAL": "SUCCESS",
+        "BRANCH": "SUCCESS"
+      },
+      "lifecycleChangesFromActual": 0,
+      "endpointDiffersFromActual": true,
+      "query": {
+        "format": "rhook/branch-query/0.2",
+        "HCommitment": "b22ddf71e2d82c2b2836e2ce457c12d171f91955e7c24c426a0f81945f82d0ba",
+        "RCommitment": "160dd35740e5f0f0c0481c2d4c37db9926fb8eb4c835701831e8c6606c307d2c",
+        "CCommitment": "2d0cd3080f5d27228d2fcb50e94f6fbc46a16b5362c084d078525fe9bc9acc59",
+        "ICommitment": "b50b558fb7cffc5d822f88fb5d673303730b4cd333719069bcfd2405620b8aad",
+        "subjectCommitment": "9edcb50f7f9b2c96654e79b14ee1c4fb08bf416b18f1749fc6cb711a74522b78",
+        "PCommitment": "64f4c9c13cf6aed7d436c1827bd0a842941f5309c632bf8e41347518102263a7",
+        "thetaCommitment": "e245fbea36f92ba7f09d410575e55e9b0f181ffb863eff809299d25c3460741a"
+      },
+      "claim": {
+        "format": "rhook/branch-claim/0.2",
+        "queryCommitment": "caebd58ac4e6a5ab7a25549323554b2393ae193ae5aac256732c25b52c87ef73",
+        "actualResultCommitment": "21444b037971b67193e864ad0c3b7ebbb348970af5491df727b2b97320cab6a7",
+        "branchResultCommitment": "21444b037971b67193e864ad0c3b7ebbb348970af5491df727b2b97320cab6a7"
+      },
+      "claimCommitment": "2870f68defacab66c4d90757d872ed282ef0505f897105ec5c503dd2543ef9de",
+      "canonicalClaimSha256": "2a8e7aacfae1d09e2cd2f419a4cac43a3c533c37ffe1ce27d8238d937ddd06a7",
+      "canonicalClaimByteCount": 304
+    },
+    {
+      "caseId": "CASE_02",
+      "target": {
+        "blockNumber": "70397229",
+        "transactionIndex": "4",
+        "transactionHash": "0x22fc8960e0fda7f591e023cb691806e838945971968bfa31ce2c986b00c937d6"
+      },
+      "subject": {
+        "chainId": "4663",
+        "blockNumber": "70397229",
+        "transactionIndex": "5",
+        "transactionHash": "0x22a6b338b4f4b4c7aaaa2c5fe548fa8f38c37dde45bf7dcfd053cebda22e7011"
+      },
+      "checksPassed": 235,
+      "checksTotal": 235,
+      "groupsPassed": 15,
+      "selectedResults": {
+        "ACTUAL": "SUCCESS",
+        "BRANCH": "SUCCESS"
+      },
+      "lifecycleChangesFromActual": 1,
+      "endpointDiffersFromActual": true,
+      "query": {
+        "format": "rhook/branch-query/0.2",
+        "HCommitment": "b22ddf71e2d82c2b2836e2ce457c12d171f91955e7c24c426a0f81945f82d0ba",
+        "RCommitment": "160dd35740e5f0f0c0481c2d4c37db9926fb8eb4c835701831e8c6606c307d2c",
+        "CCommitment": "2d0cd3080f5d27228d2fcb50e94f6fbc46a16b5362c084d078525fe9bc9acc59",
+        "ICommitment": "7182839bdbdfeedc4729ce3371303fd904c85d8496f8f3a7aad7e817a4e0fd3c",
+        "subjectCommitment": "58f4417bfb03c927dd977a7bcc2e82348508f60d946ed02c5c8c33cf2941112b",
+        "PCommitment": "64f4c9c13cf6aed7d436c1827bd0a842941f5309c632bf8e41347518102263a7",
+        "thetaCommitment": "e245fbea36f92ba7f09d410575e55e9b0f181ffb863eff809299d25c3460741a"
+      },
+      "claim": {
+        "format": "rhook/branch-claim/0.2",
+        "queryCommitment": "c28962fdec76f967df281613a024d66edc0e60351f58e367e7e5428ccfbba4a4",
+        "actualResultCommitment": "0ce75ca8a8b16a3986dc7e7951a3bd98a2722e36ff466c7d2f23e60c4401bf7b",
+        "branchResultCommitment": "0ce75ca8a8b16a3986dc7e7951a3bd98a2722e36ff466c7d2f23e60c4401bf7b"
+      },
+      "claimCommitment": "882e4b3ec94d43e0de2d2bf43be1ec90439e99ec001deabb93c50fc717bf1fd7",
+      "canonicalClaimSha256": "b7f5e128d15dfcede954f5a0f3f5bfd838fab8a275a299f589a15eba8a6343e6",
+      "canonicalClaimByteCount": 304
+    },
+    {
+      "caseId": "CASE_03",
+      "target": {
+        "blockNumber": "70397229",
+        "transactionIndex": "5",
+        "transactionHash": "0x22a6b338b4f4b4c7aaaa2c5fe548fa8f38c37dde45bf7dcfd053cebda22e7011"
+      },
+      "subject": {
+        "chainId": "4663",
+        "blockNumber": "70397229",
+        "transactionIndex": "6",
+        "transactionHash": "0x92d9b088b7cc1912348063c196e29e5e717c35ebfcd6a111c5a74b4f71aeee31"
+      },
+      "checksPassed": 235,
+      "checksTotal": 235,
+      "groupsPassed": 15,
+      "selectedResults": {
+        "ACTUAL": "SUCCESS",
+        "BRANCH": "SUCCESS"
+      },
+      "lifecycleChangesFromActual": 2,
+      "endpointDiffersFromActual": true,
+      "query": {
+        "format": "rhook/branch-query/0.2",
+        "HCommitment": "b22ddf71e2d82c2b2836e2ce457c12d171f91955e7c24c426a0f81945f82d0ba",
+        "RCommitment": "160dd35740e5f0f0c0481c2d4c37db9926fb8eb4c835701831e8c6606c307d2c",
+        "CCommitment": "2d0cd3080f5d27228d2fcb50e94f6fbc46a16b5362c084d078525fe9bc9acc59",
+        "ICommitment": "ddc9198cac2fb293145c40a5a7a3a866772bdbce3f0ad0e514cca03990bf50d7",
+        "subjectCommitment": "273f93b77d5183d0f4070c63cd8cf21ae1221f75225c032860a7d6efc055ed39",
+        "PCommitment": "64f4c9c13cf6aed7d436c1827bd0a842941f5309c632bf8e41347518102263a7",
+        "thetaCommitment": "e245fbea36f92ba7f09d410575e55e9b0f181ffb863eff809299d25c3460741a"
+      },
+      "claim": {
+        "format": "rhook/branch-claim/0.2",
+        "queryCommitment": "897eb5895f9075c716366010467a3d3575c00cd87242f023264f96f344d3a0f0",
+        "actualResultCommitment": "7087cdb1ea243dc3efbee33e1219edad34d8d99e3abb16e544374b5633a083d6",
+        "branchResultCommitment": "7087cdb1ea243dc3efbee33e1219edad34d8d99e3abb16e544374b5633a083d6"
+      },
+      "claimCommitment": "d34c2ca3269e54dae892732856a77c53df5307196991bef729504f44511041fa",
+      "canonicalClaimSha256": "aac465108fd1bdc9bd2cbd242d6cf125672375cb73426731514875ed097dc600",
+      "canonicalClaimByteCount": 304
+    },
+    {
+      "caseId": "CASE_04",
+      "target": {
+        "blockNumber": "70397229",
+        "transactionIndex": "6",
+        "transactionHash": "0x92d9b088b7cc1912348063c196e29e5e717c35ebfcd6a111c5a74b4f71aeee31"
+      },
+      "subject": {
+        "chainId": "4663",
+        "blockNumber": "70397229",
+        "transactionIndex": "7",
+        "transactionHash": "0x548eef9fe0e08910c565e6d0714e780adc0bfdd91fbff42b048afae236199c99"
+      },
+      "checksPassed": 235,
+      "checksTotal": 235,
+      "groupsPassed": 15,
+      "selectedResults": {
+        "ACTUAL": "SUCCESS",
+        "BRANCH": "SUCCESS"
+      },
+      "lifecycleChangesFromActual": 0,
+      "endpointDiffersFromActual": true,
+      "query": {
+        "format": "rhook/branch-query/0.2",
+        "HCommitment": "b22ddf71e2d82c2b2836e2ce457c12d171f91955e7c24c426a0f81945f82d0ba",
+        "RCommitment": "160dd35740e5f0f0c0481c2d4c37db9926fb8eb4c835701831e8c6606c307d2c",
+        "CCommitment": "2d0cd3080f5d27228d2fcb50e94f6fbc46a16b5362c084d078525fe9bc9acc59",
+        "ICommitment": "512dba41636adb8e48441f1005931ac55e58136c45f1bc51ad960e4408039aa6",
+        "subjectCommitment": "70b5a3722eee81b7c6b9cd1b209f5941bd689850d191dc396d852c566ef19a9b",
+        "PCommitment": "64f4c9c13cf6aed7d436c1827bd0a842941f5309c632bf8e41347518102263a7",
+        "thetaCommitment": "e245fbea36f92ba7f09d410575e55e9b0f181ffb863eff809299d25c3460741a"
+      },
+      "claim": {
+        "format": "rhook/branch-claim/0.2",
+        "queryCommitment": "7b604bfdd05548fb3781e0a44f76e6daf78a3245a62b188c095620f68b351967",
+        "actualResultCommitment": "80bd856d059053dfd496c10548893b48200cbbb38a231fce056deb07670c57fe",
+        "branchResultCommitment": "80bd856d059053dfd496c10548893b48200cbbb38a231fce056deb07670c57fe"
+      },
+      "claimCommitment": "b58b67f7349a48dd190e3ae06fcab4a67d4271d3f88fedc418a0af64605d7943",
+      "canonicalClaimSha256": "621133519692b0a1c9bb4121021db66d2eab1d4f9a6e3b1fabbd7ca7b5a726a7",
+      "canonicalClaimByteCount": 304
+    },
+    {
+      "caseId": "CASE_05",
+      "target": {
+        "blockNumber": "70397229",
+        "transactionIndex": "7",
+        "transactionHash": "0x548eef9fe0e08910c565e6d0714e780adc0bfdd91fbff42b048afae236199c99"
+      },
+      "subject": {
+        "chainId": "4663",
+        "blockNumber": "70397229",
+        "transactionIndex": "8",
+        "transactionHash": "0xf7aae6fda32f4eb3c503eb254a8f5707e7ec35c599ce7530b258cf39cfd2cf61"
+      },
+      "checksPassed": 235,
+      "checksTotal": 235,
+      "groupsPassed": 15,
+      "selectedResults": {
+        "ACTUAL": "SUCCESS",
+        "BRANCH": "SUCCESS"
+      },
+      "lifecycleChangesFromActual": 0,
+      "endpointDiffersFromActual": true,
+      "query": {
+        "format": "rhook/branch-query/0.2",
+        "HCommitment": "b22ddf71e2d82c2b2836e2ce457c12d171f91955e7c24c426a0f81945f82d0ba",
+        "RCommitment": "160dd35740e5f0f0c0481c2d4c37db9926fb8eb4c835701831e8c6606c307d2c",
+        "CCommitment": "2d0cd3080f5d27228d2fcb50e94f6fbc46a16b5362c084d078525fe9bc9acc59",
+        "ICommitment": "0befc3e176558a4cfa126f5569c747f43cfc0e9cbe05df4d4001e0c7b03b4e75",
+        "subjectCommitment": "7e3ce639a422a326fc137788c87b2753f558b38ed90d1d1b4a3c429c817bc45f",
+        "PCommitment": "64f4c9c13cf6aed7d436c1827bd0a842941f5309c632bf8e41347518102263a7",
+        "thetaCommitment": "e245fbea36f92ba7f09d410575e55e9b0f181ffb863eff809299d25c3460741a"
+      },
+      "claim": {
+        "format": "rhook/branch-claim/0.2",
+        "queryCommitment": "673f905bda86f243a7851388a5138aadbffe01f2d7f812facadaedad650bbb0c",
+        "actualResultCommitment": "fd5e09d7b3ee2690e8a960f64f89ffb1002f9da0017391c6f5aae90dc46f4016",
+        "branchResultCommitment": "fd5e09d7b3ee2690e8a960f64f89ffb1002f9da0017391c6f5aae90dc46f4016"
+      },
+      "claimCommitment": "3c481b5d31b7eff3206a774bb98a281b29f0e4544d5f8a7e1dfbc99d6c644403",
+      "canonicalClaimSha256": "c4e32f45ece2e41fcd728149c0edbcdd662d8db05882858a2a9a2374ed881b19",
+      "canonicalClaimByteCount": 304
+    },
+    {
+      "caseId": "CASE_06",
+      "target": {
+        "blockNumber": "70397229",
+        "transactionIndex": "8",
+        "transactionHash": "0xf7aae6fda32f4eb3c503eb254a8f5707e7ec35c599ce7530b258cf39cfd2cf61"
+      },
+      "subject": {
+        "chainId": "4663",
+        "blockNumber": "70397229",
+        "transactionIndex": "9",
+        "transactionHash": "0xfd5f03aeca57b298fdf771726909346d2b5bcb309854e210cf40d4001bfd79b8"
+      },
+      "checksPassed": 235,
+      "checksTotal": 235,
+      "groupsPassed": 15,
+      "selectedResults": {
+        "ACTUAL": "SUCCESS",
+        "BRANCH": "SUCCESS"
+      },
+      "lifecycleChangesFromActual": 0,
+      "endpointDiffersFromActual": true,
+      "query": {
+        "format": "rhook/branch-query/0.2",
+        "HCommitment": "b22ddf71e2d82c2b2836e2ce457c12d171f91955e7c24c426a0f81945f82d0ba",
+        "RCommitment": "160dd35740e5f0f0c0481c2d4c37db9926fb8eb4c835701831e8c6606c307d2c",
+        "CCommitment": "2d0cd3080f5d27228d2fcb50e94f6fbc46a16b5362c084d078525fe9bc9acc59",
+        "ICommitment": "3b781d97d5045cd2b6b12b415101c0623f9e9e459ddd867254bd34bca0008a5c",
+        "subjectCommitment": "d17c06d1d5a5f571ca61530ebafc2393fabe81a23681c63894fd21e6d2ffec9b",
+        "PCommitment": "64f4c9c13cf6aed7d436c1827bd0a842941f5309c632bf8e41347518102263a7",
+        "thetaCommitment": "e245fbea36f92ba7f09d410575e55e9b0f181ffb863eff809299d25c3460741a"
+      },
+      "claim": {
+        "format": "rhook/branch-claim/0.2",
+        "queryCommitment": "925d87248756a94a9504eb7e87a8013da967f768d4dfec7bd7f063e1a0d5a3fc",
+        "actualResultCommitment": "8d574d6c75f3c5838544da663a2a2511374a635dc8ba38601b752a1b52e47e94",
+        "branchResultCommitment": "8d574d6c75f3c5838544da663a2a2511374a635dc8ba38601b752a1b52e47e94"
+      },
+      "claimCommitment": "eb8c2c3b5c5a51d00647cb6e333969180f4adfb27a4579dea5d5a6804556102f",
+      "canonicalClaimSha256": "6aa4240d537dab0330d11b93409832ad62b2dd25ff82ff1e3949d116de036554",
+      "canonicalClaimByteCount": 304
+    }
+  ]
+}

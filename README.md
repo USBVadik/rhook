@@ -47,18 +47,22 @@ for the exact fee-growth metric, fixed inputs, limits and reproduction status.
 
 ## Heterogeneous execution result
 
-For one frozen real 50-block historical counterfactual on Robinhood Chain,
-the native Go/Nitro/geth and qualified Rust/arb-revm pipelines produced the
-same selected ACTUAL/BRANCH lifecycle result (`SUCCESS` / `REVERT`) and
-identical Branch Protocol 0.2 claim bytes. The retained comparison passed
-34/34 exact checks.
+Two frozen native implementations, Go/Nitro/geth and Rust/arb-revm,
+independently executed six prospectively selected historical interventions
+on Robinhood Chain 4663 and derived identical oriented Branch Protocol 0.2
+claims. The comparator was frozen before execution and run once after both
+implementations sealed all six cases. It passed 1410/1410 checks across
+90 required comparison group evaluations.
 
-The [research report](docs/research/robinhood-heterogeneous/README.md) publishes
-the compact result, commitment bindings and candidate semantics/codec.
-Its offline check verifies the published artifacts; the experimental Rust
-runner and full research archives are excluded. This bounded result does not
-establish generic Nitro conformance, full native trace equivalence or economic
-attribution.
+This result is limited to exact v011, the two tested implementations, the
+six interventions and the 50-block / 321-arrival domain per case. It does not
+establish universal backend neutrality or production readiness.
+
+The [prospective report](docs/research/robinhood-heterogeneous/prospective-conformance.md)
+records the procedure, compared surfaces and commitments. The
+[earlier single-case result](docs/research/robinhood-heterogeneous/README.md)
+and its offline artifact check remain available. The experimental Rust
+runner and full execution archives are not distributed here.
 
 ## Why replay instead of dependency analysis?
 
@@ -101,6 +105,9 @@ test/       standalone packaging and public API checks
 Read [`QUICKSTART.md`](QUICKSTART.md), then [`docs/architecture.md`](docs/architecture.md) and [`docs/threat-model.md`](docs/threat-model.md).
 
 ## Status
+
+Bounded prospective heterogeneous native validation is complete for the
+[six-case Robinhood suite](docs/research/robinhood-heterogeneous/prospective-conformance.md).
 
 Engineering conformance, not production certification. The current implementation is single-target, unauthenticated at the transcript layer, and not a liability, attribution, or recovery-policy system. See [`docs/limitations.md`](docs/limitations.md).
 
