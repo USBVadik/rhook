@@ -64,6 +64,28 @@ records the procedure, compared surfaces and commitments. The
 and its offline artifact check remain available. The experimental Rust
 runner and full execution archives are not distributed here.
 
+## Clean-room verifier interoperability
+
+A fresh-context implementer received the adopted 14-document verifier
+specification and selected evidence data without access to the qualified
+Reference 0.3 source, outputs, expected verdicts or prior findings. Before
+writing source, it completed a separate failure-boundary audit and judged
+the packet self-sufficient for the bounded task. It independently wrote a
+Python standard-library verifier and sealed its final outputs before the
+qualified JavaScript Reference 0.3 was invoked.
+
+All 86 compared rows, covering 12 positive packages and 74 hostile/parser
+inputs, were individually conformant and exactly equal as raw JSON values.
+No diagnostic normalization or permitted diagnostic variance was required.
+
+This completes the bounded internal clean-room verifier milestone. It does
+not establish external organizational independence, production readiness,
+universal verifier correctness, arbitrary-chain/intervention correctness or
+cryptographic execution proof. See the
+[report](docs/research/clean-room-verifier-interoperability.md),
+[machine-readable result](docs/research/clean-room-verifier-interoperability-result.json)
+and [research index](docs/research/README.md).
+
 ## Why replay instead of dependency analysis?
 
 Dependency analysis can identify which transitions may depend on `X`. It cannot determine whether a downstream transaction succeeds, reverts, becomes invalid, or produces a different state. RHOOK computes those transitions.
@@ -108,6 +130,9 @@ Read [`QUICKSTART.md`](QUICKSTART.md), then [`docs/architecture.md`](docs/archit
 
 Bounded prospective heterogeneous native validation is complete for the
 [six-case Robinhood suite](docs/research/robinhood-heterogeneous/prospective-conformance.md).
+The bounded internal specification self-sufficiency and clean-room verifier
+interoperability milestone is also complete, with
+[86/86 conformant, exactly matching observations](docs/research/clean-room-verifier-interoperability.md).
 
 Engineering conformance, not production certification. The current implementation is single-target, unauthenticated at the transcript layer, and not a liability, attribution, or recovery-policy system. See [`docs/limitations.md`](docs/limitations.md).
 

@@ -27,6 +27,24 @@
 - It does not establish general superiority over bespoke simulators.
 - No product demand, token mechanism, attribution rule, liability decision, or recovery amount is established.
 
+## Clean-room verifier result
+
+The [CR10 result](research/clean-room-verifier-interoperability.md) establishes
+interoperability for the adopted 14-document packet, two fixed deployment
+profiles, twelve positive packages and the selected hostile/parser corpus.
+Independence is fresh-context isolation within the research infrastructure,
+enforced through instructions and recorded access, rather than an OS sandbox
+or an external organization. Local development corrections preceded the
+independent seal; this is conformance of the final sealed source.
+
+Exact agreement on this finite corpus does not establish universal verifier
+correctness, exhaustive host-fault coverage, arbitrary-chain/intervention
+correctness, production readiness, producer authentication, canonical finality
+or cryptographic execution proof. CR10 reused frozen native evidence and
+performed no new native scientific execution. Consumer-accepted trust
+assumptions remain applicable. The complete packet, tested verifier sources
+and private qualification/campaign archives are not distributed here.
+
 ## License
 
 RHOOK-authored code is licensed under [Apache-2.0](../LICENSE). The

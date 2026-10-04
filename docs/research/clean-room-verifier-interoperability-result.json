@@ -1,0 +1,124 @@
+{
+  "result": "CLEAN_ROOM_VERIFIER_INTEROPERABILITY_PASS",
+  "campaign": "CR10",
+  "researchSummaryOnly": true,
+  "specification": {
+    "normativeDocumentCount": 14,
+    "consumerResultSurface": "0.2",
+    "selectedBeforeDispatch": true,
+    "normativeSelectionSha256": "45179da0737499ec29d27b5433633981bb92ba3c78dd9d7e02bbf1b874bb3df4"
+  },
+  "implementations": {
+    "independent": "Python 3.9.6 standard library, fresh context",
+    "reference": "Qualified JavaScript Reference 0.3"
+  },
+  "scope": {
+    "independence": "Internal research infrastructure; fresh context, instructions and recorded access",
+    "fixedDeploymentProfiles": 2,
+    "orientedClaims": 6,
+    "nativeEvidence": {
+      "chainId": 4663,
+      "storeVersion": "v011",
+      "blocksPerCase": 50,
+      "arrivalsPerCase": 321
+    },
+    "newPythonProductionProfileIdentityIssued": false
+  },
+  "procedure": {
+    "gate1": "PASS",
+    "gate2": "SPEC_SELF_SUFFICIENT",
+    "completeNormativeReadsBeforeSeparateFailureBoundaryAudit": true,
+    "separateFailureBoundaryAuditBeforeSource": true,
+    "referenceSourceOutputsExpectedVerdictsOrPriorFindingsSupplied": false,
+    "comparisonRulesFrozenBeforeDispatch": true,
+    "independentOutputsSealedBeforeEveryReferenceSemanticInvocation": true,
+    "finalSealedSourceConformanceNotFirstDraftTest": true
+  },
+  "results": {
+    "positivePackages": {
+      "passed": 12,
+      "total": 12
+    },
+    "hostileOrParserInputs": {
+      "passed": 74,
+      "total": 74
+    },
+    "comparisonRows": {
+      "total": 86,
+      "individuallyConformant": 86,
+      "semanticMatching": 86,
+      "exactChecksMatching": 86,
+      "rawJsonValuesExactlyEqual": 86,
+      "permittedDiagnosticVariationsUsed": 0
+    },
+    "observationKinds": {
+      "closedConsumerResults": 73,
+      "policyAdmissionExceptions": 4,
+      "standaloneParserExceptions": 9
+    },
+    "separateResultValidation": {
+      "passed": 13,
+      "total": 13,
+      "invalidCandidatesRejected": 12,
+      "optionalExternalMetadataControlsPassed": 1
+    },
+    "equality": "JSON values; object key insertion order immaterial; no serialized-byte equality claim"
+  },
+  "counters": {
+    "preIndependentSealSourceCorrectionEvents": 5,
+    "postIndependentSealSourceRepairs": 0,
+    "postIndependentSealVectorReplacements": 0,
+    "postRevealRepairs": 0,
+    "referenceRetries": 0,
+    "referenceSourceRepairs": 0,
+    "specificationChanges": 0,
+    "comparisonRuleChangesAfterDispatch": 0,
+    "normalizationChanges": 0,
+    "rawReasonsRewrites": 0,
+    "comparisonRuns": 1,
+    "referenceBatches": 1,
+    "nativeScientificExecutions": 0
+  },
+  "provenance": {
+    "campaignArchive": {
+      "manifestSha256": "5fffe26866c3573913e2d838b429078dce86c4022315bd2d0acd764951a8e64e",
+      "freezeSha256": "23e8307eb6a1a38b5c6c5fb3968ef4c4a7b5b3364241c682883182a4120e326a",
+      "sealedUTC": "2026-10-04T21:18:22.317636+00:00",
+      "contentFiles": 1760,
+      "totalFiles": 1762,
+      "finalReportSha256": "a7833919d353dd7dbb3c696c5e0c671b5ea07c7ea6761672324dbac15e566203",
+      "finalStatusSha256": "02dafcbaa2454df488456ad78b59a86a68a36f4c9299a8c21f52fb4c2ee242ab",
+      "comparisonRecordSha256": "e9fcbb0f2209f15498ff483401b68a3d9cbe0e8c736c0c0831f65501ca7472f7"
+    },
+    "reference03": {
+      "manifestSha256": "bead712992d0100b426698d45a69ee5ab9c3ef422da3e758d3223693e8adf274",
+      "freezeSha256": "52253bac867d7cc058a68e29d118f12f007f19227b387b13e1cab160b02b554b",
+      "manifestListedContentFiles": 152,
+      "qualificationFreezeSha256": "662dff473641b7ff1f1bacd306560ff60997d911517de69dee202a09079d4290"
+    },
+    "independentOutput": {
+      "manifestSha256": "2634eaee9fcaaa92b888f5d53bcb783525f9793d1a5e2d2cebc1034887faccbf",
+      "freezeSha256": "a413cb3f1d72b0b7f0cae9de45ff5f438e315ef08d88dddffc53fb2ddd2954b8",
+      "finalSourceSha256": "094efe6c57400b0c0ff7c5875456add8e3aaad91b1dce3163287e8ca0d334cc3"
+    },
+    "inputPacket": {
+      "manifestSha256": "8e9aa359d4015e26775ad9acf95c87c8bd7177621f756f294b4eea882b778731",
+      "freezeSha256": "bca10a55b3a9a98d7859781aa795f961213e129ffd12a9b7a96f7fe5888c8a82",
+      "contentFiles": 126,
+      "totalFiles": 128
+    },
+    "comparisonPlanSha256": "a50ff56bf9a1868accdc7653c3ba83c16707b4e34f48ed2599c4608b41f1a7d0",
+    "fullArchivesPacketAndVerifierSourcesIncluded": false,
+    "hashesIdentifyInternalRecordsNotPublicReproductionEvidence": true
+  },
+  "limitations": [
+    "Bounded internal clean-room result, not external organizational independence.",
+    "Instruction/record-level isolation, not an OS sandbox.",
+    "Finite selected corpus, not universal verifier correctness or exhaustive host-fault coverage.",
+    "No production readiness or arbitrary-chain/intervention correctness established.",
+    "No producer authentication, canonical finality or cryptographic execution proof established.",
+    "Consumer-accepted trust assumptions remain unchanged.",
+    "Qualified reference review-record limits remain applicable.",
+    "Summary alone cannot reproduce CR10 or authenticate unavailable archive contents."
+  ]
+}

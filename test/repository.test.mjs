@@ -92,6 +92,7 @@ test('repository tree is small and excludes research/archive clutter', async () 
   const compactJsonFiles = files.filter((path) => !relative(root, path).startsWith('examples/robinhood-v4/') && path.endsWith('.json') && !path.endsWith('package.json') && !path.endsWith('package-lock.json')).map((path) => relative(root, path))
   assert.deepEqual(compactJsonFiles, [
     'docs/reproducibility/source-hashes.json',
+    'docs/research/clean-room-verifier-interoperability-result.json',
     'docs/research/robinhood-heterogeneous/claim.json',
     'docs/research/robinhood-heterogeneous/prospective-result.json',
     'docs/research/robinhood-heterogeneous/query.json',
