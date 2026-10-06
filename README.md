@@ -86,6 +86,23 @@ cryptographic execution proof. See the
 [machine-readable result](docs/research/clean-room-verifier-interoperability-result.json)
 and [research index](docs/research/README.md).
 
+## Real-history counterfactual application
+
+On Chain 4663, at target `70397229:5`, derived Message.Data was replaced from 68 bytes to 0x.
+The original transaction was retained. For downstream subject `70397229:10`,
+ACTUAL was `SUCCESS` and BRANCH was `REVERT`; two heterogeneous native
+implementations agreed. The portable RHOOK Claim was verified with
+`ESTABLISHED_UNDER_PROFILE`, yielding `DOES_NOT_SURVIVE`.
+
+The declared replay domain contains 50 blocks and 321 arrivals in total,
+including arrivals before the intervention. ACTUAL uses retained
+authenticated controls; A/B BRANCH results come from fresh, previously
+authorized executions. This is a bounded known-case integration, without
+arbitrary-chain/intervention support, production readiness, cryptographic
+execution proof, canonical finality or protocol-level producer authentication.
+See the [canonical milestone](docs/research/real-history-counterfactual-application.md)
+for commitments and limits.
+
 ## Why replay instead of dependency analysis?
 
 Dependency analysis can identify which transitions may depend on `X`. It cannot determine whether a downstream transaction succeeds, reverts, becomes invalid, or produces a different state. RHOOK computes those transitions.
@@ -133,6 +150,9 @@ Bounded prospective heterogeneous native validation is complete for the
 The bounded internal specification self-sufficiency and clean-room verifier
 interoperability milestone is also complete, with
 [86/86 conformant, exactly matching observations](docs/research/clean-room-verifier-interoperability.md).
+The [bounded real-history application milestone](docs/research/real-history-counterfactual-application.md)
+is complete: verified `SUCCESS` → `REVERT` for subject `70397229:10`, with
+`ESTABLISHED_UNDER_PROFILE` and `DOES_NOT_SURVIVE`.
 
 Engineering conformance, not production certification. The current implementation is single-target, unauthenticated at the transcript layer, and not a liability, attribution, or recovery-policy system. See [`docs/limitations.md`](docs/limitations.md).
 

@@ -93,6 +93,7 @@ test('repository tree is small and excludes research/archive clutter', async () 
   assert.deepEqual(compactJsonFiles, [
     'docs/reproducibility/source-hashes.json',
     'docs/research/clean-room-verifier-interoperability-result.json',
+    'docs/research/real-history-counterfactual-application-result.json',
     'docs/research/robinhood-heterogeneous/claim.json',
     'docs/research/robinhood-heterogeneous/prospective-result.json',
     'docs/research/robinhood-heterogeneous/query.json',

@@ -1,0 +1,78 @@
+{
+  "result": "REAL_HISTORY_COUNTERFACTUAL_APPLICATION_PASS",
+  "researchSummaryOnly": true,
+  "domain": {
+    "chainId": 4663,
+    "blocks": 50,
+    "totalArrivals": 321,
+    "arrivalCountScope": "Entire declared replay domain, including arrivals before the intervention"
+  },
+  "intervention": {
+    "target": {
+      "blockNumber": "70397229",
+      "transactionHash": "0x22a6b338b4f4b4c7aaaa2c5fe548fa8f38c37dde45bf7dcfd053cebda22e7011",
+      "transactionIndex": "5"
+    },
+    "kind": "DERIVED_MESSAGE_DATA_ONLY",
+    "description": "derived Message.Data was replaced from 68 bytes to 0x",
+    "originalDataBytes": 68,
+    "replacementData": "0x",
+    "replacementDataBytes": 0,
+    "transactionRetained": true,
+    "otherDeclaredMessageFieldsRetained": true
+  },
+  "subject": {
+    "blockNumber": "70397229",
+    "chainId": "4663",
+    "transactionHash": "0x776f3e6bcf35583985168c0f1ded0b0ef0b6c09d54ad73a503510eec20be5d68",
+    "transactionIndex": "10"
+  },
+  "nativeObservations": {
+    "actualOrigin": "Retained authenticated ACTUAL controls",
+    "branchOrigin": "Fresh, previously authorized A/B BRANCH executions",
+    "heterogeneousImplementations": 2,
+    "actualAgreement": true,
+    "branchAgreement": true,
+    "nativeExecutionsDuringApplicationContinuation": 0
+  },
+  "application": {
+    "actual": "SUCCESS",
+    "branch": "REVERT",
+    "changed": true,
+    "consumerResult": "DOES_NOT_SURVIVE"
+  },
+  "verification": {
+    "accepted": true,
+    "assurance": "ESTABLISHED_UNDER_PROFILE",
+    "claimBound": true,
+    "envelopeValid": true,
+    "profileAdmitted": true,
+    "payloadBound": true,
+    "coverageObligationsDischargedUnderProfile": 9,
+    "canonicalFinalityEstablished": false,
+    "producerAuthenticated": false,
+    "cryptographicExecutionProof": false
+  },
+  "commitments": {
+    "queryCommitment": "c2a841334d35593db31324a22edad98082272731d6634d577ea64a49e88f60a3",
+    "claimCommitment": "df5c13faf5059bfddc3de485a2dff88937aa5c31cf6784eecd5e612ed22c48c7",
+    "envelopeCommitment": "416fd64755d60b9cac8271111a48608fb20d84e2c1a3e133477f57fcd5af1fe0"
+  },
+  "provenance": {
+    "canonicalSourceManifestSha256": "cee2a180e76fe3baacc5b3da3f372d2ea6063a2f78d6cc8da03878bcf97d758a",
+    "canonicalSourceFreezeSha256": "0e93c9abcb3cbfc8b4382636224b2c8e224dc35d49e5bb2d45c76e821ecda980",
+    "fullArchiveAndNativeSidecarEvidenceIncluded": false,
+    "summaryAloneReproducesMilestone": false
+  },
+  "limitations": [
+    "Bounded known-case integration for the exact admitted history, profiles, subject and Data-only intervention.",
+    "Retained authenticated ACTUAL controls; fresh, previously authorized A/B BRANCH executions.",
+    "Not prospective unseen-case discovery or external organizational independence.",
+    "No arbitrary-chain/intervention or subject support established.",
+    "No production readiness established.",
+    "No cryptographic execution proof established.",
+    "No canonical-finality or protocol-level producer-authentication claim.",
+    "Consumer-accepted historical control, native runner and running-host trust premises remain applicable.",
+    "No asset-recovery or revocation claim."
+  ]
+}
