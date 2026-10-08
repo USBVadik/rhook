@@ -103,6 +103,24 @@ execution proof, canonical finality or protocol-level producer authentication.
 See the [canonical milestone](docs/research/real-history-counterfactual-application.md)
 for commitments and limits.
 
+## Bounded Generic Native Branch
+
+The bounded native provider completed continuity and previously unseen-world
+generativity on the same Chain 4663 history. Each of two declared Data-only
+interventions acquired a fresh A/B BRANCH pair with heterogeneous agreement,
+then issued a `BranchHandle` for subsequent questions. ACTUAL remained the
+retained authenticated control.
+
+The continuity case produced an ordinary verified `SUCCESS` → `REVERT` Claim.
+The previously unseen intervention produced a complete downstream lifecycle
+map with **0 CHANGED / 298 UNCHANGED / 0 UNRESOLVED**; no replacement case or
+Claim was selected. UNCHANGED describes lifecycle only.
+
+See the [capability result and measured API](docs/research/bounded-generic-native-branch.md)
+for `summary()`, `impact()`, `compare()` and `claim()`, commitments and limits.
+The native deployment remains private; this checkpoint records its bounded
+result without adding those SDK exports to the public checkout.
+
 ## Why replay instead of dependency analysis?
 
 Dependency analysis can identify which transitions may depend on `X`. It cannot determine whether a downstream transaction succeeds, reverts, becomes invalid, or produces a different state. RHOOK computes those transitions.
@@ -153,6 +171,10 @@ interoperability milestone is also complete, with
 The [bounded real-history application milestone](docs/research/real-history-counterfactual-application.md)
 is complete: verified `SUCCESS` → `REVERT` for subject `70397229:10`, with
 `ESTABLISHED_UNDER_PROFILE` and `DOES_NOT_SURVIVE`.
+The [bounded Generic Native Branch capability](docs/research/bounded-generic-native-branch.md)
+is complete: continuity and previously unseen-world generativity both passed,
+with two established worlds and two BranchHandles. Its scope remains the
+declared history, fixed native profiles and tested Data-only interventions.
 
 Engineering conformance, not production certification. The current implementation is single-target, unauthenticated at the transcript layer, and not a liability, attribution, or recovery-policy system. See [`docs/limitations.md`](docs/limitations.md).
 

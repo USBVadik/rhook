@@ -45,6 +45,26 @@ performed no new native scientific execution. Consumer-accepted trust
 assumptions remain applicable. The complete packet, tested verifier sources
 and private qualification/campaign archives are not distributed here.
 
+## Bounded Generic Native Branch
+
+The [capability result](research/bounded-generic-native-branch.md) establishes
+continuity and previously unseen-world acquisition for two declared Data-only
+interventions on the fixed Chain 4663 H/v011 domain. Fresh heterogeneous A/B
+BRANCH executions use retained authenticated ACTUAL controls. The lifecycle
+projection and admitted profile remain bounded; target admission is not a
+promise that fixed witness material can establish every requested branch.
+
+The new intervention's 298 downstream rows were lifecycle-UNCHANGED. That
+does not assert state, gas, fee, log or execution-result equality. Inspection
+maps have local SDK authority; selected portable Claims require full ordinary
+verification and the matching consumer-admitted context/profile.
+
+This checkpoint publishes a result/API record, not the private bounded native
+deployment or new public SDK exports. It establishes no arbitrary-chain/history/
+intervention support, universal generativity, production readiness, cryptographic
+execution proof, canonical finality, protocol-level producer authentication or
+external consumer integration.
+
 ## License
 
 RHOOK-authored code is licensed under [Apache-2.0](../LICENSE). The

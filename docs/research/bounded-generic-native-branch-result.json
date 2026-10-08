@@ -1,0 +1,194 @@
+{
+  "result": "BOUNDED_GENERIC_NATIVE_BRANCH_CAPABILITY_PASS",
+  "researchSummaryOnly": true,
+  "domain": {
+    "chainId": 4663,
+    "blocks": 50,
+    "totalArrivals": 321,
+    "arrivalCountScope": "Entire declared replay domain, including prefix, target and downstream arrivals",
+    "witnessVersion": "v011"
+  },
+  "actualOrigin": "Retained authenticated ACTUAL controls",
+  "branchOrigin": "Fresh authorized A/B BRANCH executions",
+  "continuity": {
+    "status": "PASS",
+    "purpose": "KNOWN_CASE_CONTINUITY",
+    "target": "70397229:5",
+    "kind": "DERIVED_MESSAGE_DATA_ONLY",
+    "description": "derived Message.Data was replaced from 68 bytes to 0x",
+    "originalDataBytes": 68,
+    "replacementData": "0x",
+    "transactionRetained": true,
+    "nonDataFieldsRetained": true,
+    "requestCommitment": "08a1c130f98cb6fa395d19dc69d933ab0bf8925b1944f003093c8e9be4f6fd15",
+    "worldId": "e68bb793a95f6a433c880998306169f5fb8b84ddc5255b083ab064ca9aef78ca",
+    "branchContextId": "3c9fe7b50c909513ccab31e5a69a9edfe5cbe70a016b8dfaaaeac8df3946aa62",
+    "partition": {
+      "total": 321,
+      "prefix": 15,
+      "target": 1,
+      "downstream": 305
+    },
+    "nativeBranchInvocations": {
+      "A": 1,
+      "B": 1
+    },
+    "freshActualInvocations": 0,
+    "completeBlocksPerImplementation": 50,
+    "completeArrivalsPerImplementation": 321,
+    "heterogeneousAgreement": true,
+    "worldEstablished": true,
+    "impact": {
+      "scope": "downstream",
+      "projection": "lifecycle",
+      "authority": "SDK_LOCAL_INSPECTION_ONLY",
+      "counts": {
+        "changed": 1,
+        "unchanged": 304,
+        "unresolved": 0
+      },
+      "unchangedMeaning": "LIFECYCLE_ONLY",
+      "mapFrozenBeforeSubjectSelection": true,
+      "completeChangedRows": [
+        {
+          "ordinal": 20,
+          "subject": {
+            "chainId": "4663",
+            "blockNumber": "70397229",
+            "transactionIndex": "10",
+            "transactionHash": "0x776f3e6bcf35583985168c0f1ded0b0ef0b6c09d54ad73a503510eec20be5d68"
+          },
+          "position": "DOWNSTREAM",
+          "classification": "CHANGED",
+          "actual": "SUCCESS",
+          "branch": "REVERT"
+        }
+      ]
+    }
+  },
+  "generativity": {
+    "status": "PASS",
+    "purpose": "PREVIOUSLY_UNSEEN_INTERVENTION",
+    "target": "70397230:1",
+    "kind": "DERIVED_MESSAGE_DATA_ONLY",
+    "description": "derived Message.Data was replaced from 484 bytes to 0x01",
+    "originalDataBytes": 484,
+    "replacementData": "0x01",
+    "transactionRetained": true,
+    "nonDataFieldsRetained": true,
+    "requestCommitment": "b820718190d00ca94abcc2d2bc08bedeaf837e0565699ec4852ae829907d35c4",
+    "worldId": "b9a6ef182364d11cc0a034dec46b7e6ec98d6e54e7e1e2720288181b51a486a3",
+    "branchContextId": "5f5640b9425cbdff709e97c57c8d2ce6023badcd30395407f2af22f714650c3b",
+    "partition": {
+      "total": 321,
+      "prefix": 22,
+      "target": 1,
+      "downstream": 298
+    },
+    "nativeBranchInvocations": {
+      "A": 1,
+      "B": 1
+    },
+    "freshActualInvocations": 0,
+    "completeBlocksPerImplementation": 50,
+    "completeArrivalsPerImplementation": 321,
+    "heterogeneousAgreement": true,
+    "worldEstablished": true,
+    "impact": {
+      "scope": "downstream",
+      "projection": "lifecycle",
+      "authority": "SDK_LOCAL_INSPECTION_ONLY",
+      "counts": {
+        "changed": 0,
+        "unchanged": 298,
+        "unresolved": 0
+      },
+      "unchangedMeaning": "LIFECYCLE_ONLY",
+      "mapFrozenBeforeSubjectSelection": true,
+      "completeChangedRows": []
+    },
+    "scientificOutcomeBeforeExecution": "UNKNOWN",
+    "previousNativeA": 0,
+    "previousNativeB": 0,
+    "previousWorld": null,
+    "ordinaryClaimSelected": false
+  },
+  "ordinaryClaim": {
+    "subject": {
+      "chainId": "4663",
+      "blockNumber": "70397229",
+      "transactionIndex": "10",
+      "transactionHash": "0x776f3e6bcf35583985168c0f1ded0b0ef0b6c09d54ad73a503510eec20be5d68"
+    },
+    "comparison": {
+      "claimCommitment": "3fde5ae06636c3c1c27af2a144f9a5610320c34865d9c6a8461969fd31cdf11f",
+      "actual": "SUCCESS",
+      "branch": "REVERT",
+      "changed": true
+    },
+    "commitments": {
+      "queryCommitment": "d2e6e7121d0b26d7146776afa7193b66d37b33d11f010fa8a5d16e7a9fa28b90",
+      "claimCommitment": "3fde5ae06636c3c1c27af2a144f9a5610320c34865d9c6a8461969fd31cdf11f",
+      "payloadCommitment": "87431e47f6a04d05b47b260183484c94ad2e65127782211c4e48c659186f76b9",
+      "verifierProfileCommitment": "ba09405360a6426dd69f6468950a3300c78b27a772ab3caa230a5967b177dcbf"
+    },
+    "verification": {
+      "accepted": true,
+      "assurance": "ESTABLISHED_UNDER_PROFILE",
+      "claimBound": true,
+      "envelopeValid": true,
+      "profileAdmitted": true,
+      "payloadBound": true
+    },
+    "coverageObligationsDischargedUnderProfile": 9,
+    "portablePacketSha256": "5d583ab093bcc93e65869d76be349337fad2d7abb0ee35e4fa42a7b3257b903e"
+  },
+  "deploymentCommitments": {
+    "providerProfileCommitment": "191bff333443916ded3422e6e5ee308807f06a55874bb6018d4f512f0af8165f",
+    "verifierProfileCommitment": "ba09405360a6426dd69f6468950a3300c78b27a772ab3caa230a5967b177dcbf",
+    "modelSemanticsCommitment": "869286a55fa46c3b2ec8fcee3e48d2c4a6ee1221d2caf16ef661cee86f253bda"
+  },
+  "totals": {
+    "freshNativeA": 2,
+    "freshNativeB": 2,
+    "freshNativeActual": 0,
+    "establishedWorldPairs": 2,
+    "BranchHandles": 2,
+    "ordinaryVerifiedClaims": 1
+  },
+  "counters": {
+    "nativeRetries": 0,
+    "repairs": 0,
+    "nativeRebuilds": 0,
+    "fallbacks": 0,
+    "witnessExpansion": 0,
+    "statePatch": 0,
+    "newInterventionSelections": 0,
+    "environmentChangesAfterFreeze": 0,
+    "resourcePolicyChangesAfterFreeze": 0,
+    "grantsChangedAfterFreeze": 0
+  },
+  "provenance": {
+    "sealedSourceFreezeSha256": "4b7cb79d9de4a97b4947762816cb2518af76452fd340c5cb202b4d173fa9037d",
+    "sealedSourceManifestSha256": "db6bf297bd6ca26567841438878ee4b6eea12fbd3e0c91a311836fad8160c9b3",
+    "contentFiles": 1001,
+    "exactFiles": 1003,
+    "fullArchiveIncluded": false,
+    "summaryAloneReproducesMilestone": false
+  },
+  "distribution": {
+    "boundedNativeDeploymentIncluded": false,
+    "publicSdkExportsAdded": false
+  },
+  "limitations": [
+    "Bounded to two declared Data-only interventions in the admitted Chain 4663 H/v011 domain, fixed implementations/profiles and lifecycle projection.",
+    "Retained authenticated ACTUAL controls; only A/B BRANCH are fresh executions.",
+    "UNCHANGED means lifecycle unchanged only; downstream impact excludes the intervention target.",
+    "Target grammar admission does not promise execution for every target or replacement with fixed witness material.",
+    "Local SDK inspection maps are distinct from ordinary verified portable Claims and genuine comparison receipts.",
+    "Portable evidence requires the matching consumer-admitted context/profile and running-host trust assumptions.",
+    "No arbitrary-chain/history/intervention support or universal generativity established.",
+    "No production readiness, cryptographic execution proof, canonical finality or protocol-level producer authentication established.",
+    "No external consumer integration established."
+  ]
+}
