@@ -1,0 +1,116 @@
+{
+  "result": "NOVEL_DEVELOPER_INTERVENTION_NATIVE_EXECUTION_PASS",
+  "researchSummaryOnly": true,
+  "domain": {
+    "chainId": 4663,
+    "blocks": 50,
+    "totalArrivals": 321,
+    "prefixArrivals": 41,
+    "targetArrivals": 1,
+    "downstreamArrivals": 279,
+    "arrivalCountScope": "Entire declared replay domain, including arrivals before the intervention"
+  },
+  "intervention": {
+    "target": {
+      "chainId": "4663",
+      "blockNumber": "70397233",
+      "transactionHash": "0x76dd75c882c881337da7fb4569ade2bde0bcee7cbb00af5b8c6fcdf057d1ff57",
+      "transactionIndex": "4"
+    },
+    "kind": "DERIVED_MESSAGE_DATA_ONLY",
+    "originalDataBytes": 68,
+    "replacementDataBytes": 68,
+    "replacementData": "0x095ea7b300000000000000000000000065050a9b7e5075a2ba5ced7b1b64ee66262c40dc0000000000000000000000000000000000000000000000000000000000000000",
+    "amountWord": {
+      "actual": "233905240858889562587707",
+      "branch": "0"
+    },
+    "transactionRetained": true,
+    "nonDataFieldsRetained": true
+  },
+  "subject": {
+    "chainId": "4663",
+    "blockNumber": "70397233",
+    "transactionIndex": "5",
+    "transactionHash": "0x0ca25674de4611a9e4537cd7e41371f693d45bc1119562818336d3389039a5c0"
+  },
+  "nativeObservations": {
+    "actualOrigin": "Retained authenticated ACTUAL controls",
+    "branchOrigin": "One fresh authorized A and one fresh authorized B BRANCH execution",
+    "nativeInvocations": {
+      "A": 1,
+      "B": 1,
+      "ACTUAL": 0
+    },
+    "heterogeneousImplementations": 2,
+    "heterogeneousAgreement": true
+  },
+  "selectedLifecycle": {
+    "claimCommitment": "a804abfd61784a8209ac7298d3c200415772061ee39eb04449390f11a3fc4978",
+    "actual": "SUCCESS",
+    "branch": "REVERT",
+    "changed": true
+  },
+  "verification": {
+    "accepted": true,
+    "assurance": "ESTABLISHED_UNDER_PROFILE",
+    "claimBound": true,
+    "envelopeValid": true,
+    "profileAdmitted": true,
+    "payloadBound": true,
+    "coverageObligationsDischargedUnderProfile": 9,
+    "cryptographicExecutionProof": false,
+    "canonicalFinalityEstablished": false,
+    "producerAuthenticated": false
+  },
+  "impact": {
+    "scope": "downstream",
+    "authority": "SDK_LOCAL_INSPECTION_ONLY",
+    "counts": {
+      "changed": 1,
+      "unchanged": 278,
+      "unresolved": 0
+    },
+    "ordinaryRecordedClaims": 1,
+    "otherRows": "NO_RECORDED_CLAIM",
+    "unchangedMeaning": "Lifecycle only"
+  },
+  "commitments": {
+    "request": "566c2922b8ad77ee1bd83b7f9056bcfc06ab961403f084bedf743ed1ca869f7b",
+    "query": "e7030e8d5ff7c02a63d79edce567d4532073963a19129aa3267d150b11f7f57a",
+    "claim": "a804abfd61784a8209ac7298d3c200415772061ee39eb04449390f11a3fc4978",
+    "payload": "70a38c0ce2c179c91e7df473b98beae4cc5f5d762ecddd79aa77163e7c770b7d",
+    "verifierProfile": "ba09405360a6426dd69f6468950a3300c78b27a772ab3caa230a5967b177dcbf"
+  },
+  "worldId": "1b7ad048983eb4bc7bc42e41a4d93903660e354206915e7d882272510b6314e1",
+  "branchContextId": "83f2d9c9e8098ace069cb4313d7e5c9397dd432bb63de9f585933cc84ef5055e",
+  "provenance": {
+    "sourceFreezeSha256": "aa50cac11490ff2f328f47d4a4d896b7c1f7ec96e16782ee708e151c5a8968c7",
+    "sourceManifestSha256": "6b74c78a2ade3efb1b71b661bff10a4ad16daee5416505ebbe02080babb7813d",
+    "sealedAt": "2026-10-11T20:12:13.615445+00:00",
+    "excludedPacket": {
+      "sha256": "4c0b629f159770587a779eb32d8cef98104fc949a196c835a677187a35a26f84",
+      "bytes": 650698
+    },
+    "publicExport": {
+      "url": "https://robinhook.tech/assets/counterfactual/data/recorded.json",
+      "bytes": 122324,
+      "sha256": "d0556d16ffbd6bdfedd99b2111b64e5bfc303087c4913e8f608b854cdb75be15",
+      "standaloneVerificationPackage": false
+    },
+    "fullNativeArchiveIncluded": false
+  },
+  "limits": [
+    "One exact new Data-only request in the existing 50-block / 321-total-arrival Chain4663 domain",
+    "Retained authenticated ACTUAL controls, not a fresh ACTUAL replay",
+    "Fixed v011 sufficiency demonstrated only for this exact request; no universal 220-target coverage claim",
+    "Impact counts are supported lifecycle inspection; only one ordinary Claim was requested and verified",
+    "Approve-shaped encoding does not establish deployed ERC20 compliance or a specific revert cause",
+    "Not arbitrary-chain/history/intervention support",
+    "Not production readiness",
+    "Not cryptographic execution proof",
+    "No canonical-finality or protocol-level producer-authentication claim",
+    "No independently imported acquired-world context or organizationally independent review of this run",
+    "Monitored guards are not a completed supervisor custody guarantee"
+  ]
+}

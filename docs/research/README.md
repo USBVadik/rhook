@@ -12,6 +12,7 @@ bounded native acquisition of a previously unseen alternate world.
 | [Clean-room verifier interoperability](clean-room-verifier-interoperability.md) | A fresh-context Python implementation written from the adopted specification matched qualified JavaScript Reference 0.3: 86/86 individually conformant observations, all exactly equal as raw JSON values. |
 | [Real-history counterfactual application](real-history-counterfactual-application.md) | A verified portable Claim establishes `SUCCESS` → `REVERT` for subject `70397229:10` under one exact calldata intervention on Chain 4663, yielding `DOES_NOT_SURVIVE`. ACTUAL uses retained authenticated controls; fresh, previously authorized A/B BRANCH executions agree. |
 | [Bounded Generic Native Branch](bounded-generic-native-branch.md) | Continuity and previously unseen-world generativity both passed. Two fresh heterogeneous A/B BRANCH pairs issued BranchHandles. The continuity Claim verified `SUCCESS` → `REVERT`; the new intervention's downstream lifecycle map contained 0 CHANGED, 298 UNCHANGED and 0 UNRESOLVED. |
+| [Novel amount-zero intervention](novel-counterfactual-intervention.md) | A new Data-only request at `70397233:4` produced an agreeing A/B BRANCH pair and one accepted lifecycle Claim for `70397233:5`: `SUCCESS` → `REVERT`. The 279 downstream inspection rows contain 1 changed lifecycle. A public recorded demo displays the result. |
 
 The clean-room milestone reuses sealed native evidence from the execution
 lineage. Its verifier comparison is a separate experiment. The public

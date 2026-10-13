@@ -65,6 +65,24 @@ intervention support, universal generativity, production readiness, cryptographi
 execution proof, canonical finality, protocol-level producer authentication or
 external consumer integration.
 
+## Novel amount-zero recorded demo
+
+The [new intervention](research/novel-counterfactual-intervention.md) establishes
+one exact Data-only branch in the same bounded Chain4663 domain: retained
+authenticated ACTUAL control, one fresh authorized A/B BRANCH pair, and one
+accepted lifecycle Claim. The 279 downstream rows have local inspection
+authority; only the selected subject has the recorded ordinary Claim.
+UNCHANGED concerns lifecycle, not state, balance, log, gas or fee equality.
+
+The website displays recordings and checks export integrity. It performs
+no fresh native execution or independent protocol verification. The public
+export omits the original Packet and acquired-world context. The private
+native SDK is not installed by cloning this repository. This case does not
+establish exact revert causality, ERC-20 compliance, universal witness
+sufficiency, arbitrary-chain/intervention support, production readiness,
+cryptographic execution proof, canonical finality or protocol-level producer
+authentication. Consumer-accepted host/profile/control trust remains material.
+
 ## License
 
 RHOOK-authored code is licensed under [Apache-2.0](../LICENSE). The

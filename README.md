@@ -121,6 +121,24 @@ for `summary()`, `impact()`, `compare()` and `claim()`, commitments and limits.
 The native deployment remains private; this checkpoint records its bounded
 result without adding those SDK exports to the public checkout.
 
+## Recorded counterfactual demo
+
+[Explore the demo](https://robinhook.tech/counterfactual): one earlier encoded
+amount was set to zero in a recorded alternative of real Robinhood Chain
+history. The next transaction changed from `SUCCESS` to `REVERT`. The real
+chain stayed untouched.
+
+For this new Data-only request, two heterogeneous native BRANCH executions
+agreed, and one selected lifecycle Claim was accepted under the pinned
+profile. Of 279 downstream arrivals, one lifecycle changed and 278 were
+unchanged. The full domain contains 50 blocks / 321 total arrivals. ACTUAL
+uses retained authenticated controls. Opening the page performs no fresh
+replay or independent verification; the public export is inspection data,
+not a standalone verification package or a public native SDK.
+
+See the [exact case, commitments and limits](docs/research/novel-counterfactual-intervention.md)
+and [machine-readable result](docs/research/novel-counterfactual-intervention-result.json).
+
 ## Why replay instead of dependency analysis?
 
 Dependency analysis can identify which transitions may depend on `X`. It cannot determine whether a downstream transaction succeeds, reverts, becomes invalid, or produces a different state. RHOOK computes those transitions.
