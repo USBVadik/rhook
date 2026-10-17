@@ -94,6 +94,7 @@ test('repository tree is small and excludes research/archive clutter', async () 
     'docs/reproducibility/source-hashes.json',
     'docs/research/bounded-generic-native-branch-result.json',
     'docs/research/clean-room-verifier-interoperability-result.json',
+    'docs/research/developer-amount27-native-pilot-result.json',
     'docs/research/novel-counterfactual-intervention-result.json',
     'docs/research/real-history-counterfactual-application-result.json',
     'docs/research/robinhood-heterogeneous/claim.json',

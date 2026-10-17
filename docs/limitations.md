@@ -83,6 +83,25 @@ sufficiency, arbitrary-chain/intervention support, production readiness,
 cryptographic execution proof, canonical finality or protocol-level producer
 authentication. Consumer-accepted host/profile/control trust remains material.
 
+## Integrated developer workflow: amount27
+
+The [amount27 pilot](research/developer-amount27-native-pilot.md) establishes
+one exact intervention through the frozen Build06 workflow and exact Build07
+input. ACTUAL is the retained authenticated control; only A/B BRANCH
+executions were fresh. There is one accepted lifecycle Claim; the other
+downstream rows are inspection, not separately verified Claims. Agreement on
+lifecycle does not establish equal balances, gas, fees, logs or all state.
+
+The later mutable Impact Discovery SDK was tested separately on an archive
+and was not the SDK used for this execution. Neither SDK is added to the
+public package. The public summary does not import the private acquired-world
+context or independently verify the Claim. Consumer-accepted historical
+control, native runner, host and profile trust remain applicable. This is
+not external integration qualification, arbitrary-chain/intervention support,
+production readiness, cryptographic execution proof, canonical finality or
+protocol-level producer authentication. No economic threshold or exact
+internal revert cause is established.
+
 ## License
 
 RHOOK-authored code is licensed under [Apache-2.0](../LICENSE). The
