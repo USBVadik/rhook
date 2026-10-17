@@ -1,0 +1,99 @@
+{
+  "result": "DIRECT_AMOUNT27_NATIVE_RESULT_ESTABLISHED",
+  "researchSummaryOnly": true,
+  "domain": {
+    "chainId": 4663,
+    "history": "robinhood-4663-window-01",
+    "blocks": 50,
+    "totalArrivals": 321,
+    "prefixArrivals": 41,
+    "targetArrivals": 1,
+    "downstreamArrivals": 279,
+    "arrivalCountScope": "Entire declared replay domain, including arrivals before the intervention"
+  },
+  "workflow": {
+    "executedSDK": "Frozen Build06 Developer SDK",
+    "input": "Exact Build07 input",
+    "laterImpactDiscoverySDKUsedForNativePilot": false,
+    "laterImpactDiscoveryScope": "Separately tested authenticated archive workflow",
+    "publicSDKRelease": false,
+    "externalIntegrationQualificationEstablished": false
+  },
+  "intervention": {
+    "target": "70397233:4",
+    "kind": "DERIVED_MESSAGE_DATA_ONLY",
+    "originalDataBytes": 68,
+    "replacementDataBytes": 68,
+    "replacementAmount": "27",
+    "replacementData": "0x095ea7b300000000000000000000000065050a9b7e5075a2ba5ced7b1b64ee66262c40dc000000000000000000000000000000000000000000000000000000000000001b",
+    "transactionRetained": true,
+    "otherDeclaredMessageAndContextFieldsRetained": true
+  },
+  "nativeObservations": {
+    "actualOrigin": "Retained authenticated ACTUAL controls",
+    "branchOrigin": "One fresh authorized A and one fresh authorized B BRANCH execution, sequentially",
+    "nativeInvocations": {"A": 1, "B": 1, "ACTUAL": 0},
+    "heterogeneousAgreement": "PASS",
+    "continuity": "PASS",
+    "matchingLifecycleAndStateRootObservations": 321
+  },
+  "selectedLifecycle": {
+    "subject": "70397233:5",
+    "preselectedBeforeExecution": true,
+    "actual": "SUCCESS",
+    "A_branch": "REVERT",
+    "B_branch": "REVERT",
+    "ordinaryVerifiedClaims": 1
+  },
+  "recordedVerification": {
+    "accepted": true,
+    "assurance": "ESTABLISHED_UNDER_PROFILE",
+    "bindingFlagsPassed": 4,
+    "obligationsDischargedUnderProfile": 9,
+    "independentlyReverifiedByThisSummary": false,
+    "cryptographicExecutionProof": false,
+    "canonicalFinalityEstablished": false,
+    "producerAuthenticated": false
+  },
+  "impact": {
+    "scope": "downstream",
+    "authority": "SDK_LOCAL_INSPECTION_ONLY",
+    "counts": {"changed": 1, "unchanged": 278, "unresolved": 0},
+    "onlyChangedSubject": "70397233:5",
+    "unchangedMeaning": "Lifecycle only"
+  },
+  "executionCounters": {
+    "retry": 0,
+    "rebuild": 0,
+    "witnessExpansion": 0,
+    "interventionSubstitution": 0,
+    "subjectSubstitution": 0,
+    "sourceRepair": 0,
+    "postExecutionRepair": 0
+  },
+  "commitments": {
+    "query": "ff0c4d2749714621bf8b067f8968c923f6a71340c517379746175e1fbe1b1e99",
+    "claim": "c2ff0c94e2bc3abe6c65c0786a6f01c502b0fe99eb1b293ce79e7a52fba791d4",
+    "envelope": "d84f6dade6f6699a54a033b8f634bc67793b111510d6d458180dcb3ae6dc2ae7",
+    "payload": "3d486945fa5ccba3fad9a4d92d363fe173e11785e945afa61d14b2a6ab91d0fc",
+    "verifierProfile": "ba09405360a6426dd69f6468950a3300c78b27a772ab3caa230a5967b177dcbf"
+  },
+  "provenance": {
+    "sourceFreezeSha256": "1a33b9833e9cca00cd3a6c6185b41ea3e483e971b4ab3ec4cecdb1de1b83d2c4",
+    "sourceManifestSha256": "5053a02b2cf718df07da1fcb50762e3f54663c1f5112b6cefc106eb93589f209",
+    "fullNativeArchiveIncluded": false,
+    "acquiredWorldContextIncluded": false,
+    "summaryAloneReproducesMilestone": false
+  },
+  "limits": [
+    "One exact amount27 intervention in the fixed Chain 4663 domain",
+    "Retained authenticated ACTUAL; only A/B BRANCH executions were fresh",
+    "One verified lifecycle Claim; the downstream map has local inspection authority",
+    "No amount-dependent economic threshold or exact internal revert cause established",
+    "No arbitrary-chain/history/intervention support or universal verifier correctness established",
+    "No production readiness, cryptographic execution proof, canonical finality or protocol-level producer authentication established",
+    "Consumer-accepted historical control, native runner, running host, checker and admitted profile trust remain applicable",
+    "No external acquired-world context import or external integration qualification established",
+    "Private SDKs and the separate local Portable Evidence Consumer are not distributed in this update"
+  ]
+}

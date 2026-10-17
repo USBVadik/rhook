@@ -139,6 +139,22 @@ not a standalone verification package or a public native SDK.
 See the [exact case, commitments and limits](docs/research/novel-counterfactual-intervention.md)
 and [machine-readable result](docs/research/novel-counterfactual-intervention-result.json).
 
+## Integrated developer workflow: amount27
+
+A separate native pilot used the frozen Build06 Developer SDK workflow and
+exact Build07 input to set the encoded amount at `70397233:4` to `27`.
+One fresh A BRANCH and one fresh B BRANCH ran sequentially and agreed;
+retained authenticated ACTUAL was `SUCCESS`, while BRANCH was `REVERT`
+for the preselected subject `70397233:5`.
+
+One lifecycle Claim was accepted with `ESTABLISHED_UNDER_PROFILE`, four
+binding flags and nine discharged obligations. The domain was 50 blocks /
+321 total arrivals, including 279 downstream inspection rows. No retry,
+rebuild or repair occurred. The later Impact Discovery SDK was tested
+separately on an archive and did not execute this pilot. This records a
+bounded private workflow result, not a public SDK release or external
+integration qualification. See the [amount27 report](docs/research/developer-amount27-native-pilot.md).
+
 ## Why replay instead of dependency analysis?
 
 Dependency analysis can identify which transitions may depend on `X`. It cannot determine whether a downstream transaction succeeds, reverts, becomes invalid, or produces a different state. RHOOK computes those transitions.
@@ -193,6 +209,9 @@ The [bounded Generic Native Branch capability](docs/research/bounded-generic-nat
 is complete: continuity and previously unseen-world generativity both passed,
 with two established worlds and two BranchHandles. Its scope remains the
 declared history, fixed native profiles and tested Data-only interventions.
+The [amount27 integrated developer workflow](docs/research/developer-amount27-native-pilot.md)
+also completed one fresh heterogeneous BRANCH acquisition and one accepted
+lifecycle Claim. Its SDK and acquired-world verification context remain private.
 
 Engineering conformance, not production certification. The current implementation is single-target, unauthenticated at the transcript layer, and not a liability, attribution, or recovery-policy system. See [`docs/limitations.md`](docs/limitations.md).
 
