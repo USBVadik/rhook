@@ -11,12 +11,19 @@ import {
   exceptionRevert,
   isBranchEvidenceTranscriptVerified,
   isEnvelopeEvidenceVerified,
+  makeEndpoint,
   makeEnvelopeIdentity,
+  makeExtraction,
   makeGasAndFee,
+  parseAddress,
   parseBlockNumber,
   parseDigest,
   parseHash32,
+  parseHexBytes,
   parseQuantity,
+  present,
+  sourceReturnWord,
+  sourceStorageSlot,
   validationValid,
   verifyBranchEvidenceTranscript,
   verifyEnvelopeEvidence,
@@ -62,6 +69,39 @@ test('branch builder preserves transcript semantics and strictly verifies its ou
   assert.equal(transcript.body.divergence.stateCommitment.envelopeIndex, 0)
   assert.equal(transcript.body.divergence.lifecycle.envelopeIndex, 1)
   assert.equal(branchEvidenceTranscriptHash(transcript), transcript.transcriptCommitment.digest)
+})
+
+test('branch builder orders semantic records the way the strict verifier requires', () => {
+  const actual = [envelope({ index: 0, successor: digest('22') })]
+  const counterfactual = [envelope({ index: 0, successor: digest('24') })]
+  const address = parseAddress(`0x${'86'.repeat(20)}`)
+  const extraction = (endpoint, source, postState, word) => makeExtraction({
+    endpoint,
+    postState: parseDigest(postState),
+    recordIdentity: createCommitment(digest('51'), 'semantic-record'),
+    source,
+    presence: present(parseHash32(hash32(word))),
+  })
+  const pair = (endpoint, source) => ({
+    envelopeIndex: parseQuantity('0'),
+    actual: extraction(endpoint, source, digest('22'), '01'),
+    counterfactual: extraction(endpoint, source, digest('24'), '02'),
+  })
+  // '#0x|' (a raw storage read) and '#0x70a08231|' (a call) order differently under
+  // String#localeCompare and under the code-unit order the verifier checks.
+  const storage = pair(makeEndpoint(address, parseHexBytes('0x')), sourceStorageSlot(parseHash32(hash32('00'))))
+  const call = pair(makeEndpoint(address, parseHexBytes('0x70a08231')), sourceReturnWord(parseHash32(hash32('00'))))
+  const transcript = buildBranchEvidenceTranscript({
+    branches: { actual: createCommitment(digest('aa'), 'actual-branch'), counterfactual: createCommitment(digest('bb'), 'counterfactual-branch') },
+    intervention: { kind: 'REPLACE_COMMITTED_INPUT', target: identity(0) },
+    actualEnvelopes: actual,
+    counterfactualEnvelopes: counterfactual,
+    semanticPairs: [storage, call],
+  })
+  const slots = transcript.body.semanticEvidence.map((item) => item.slot)
+  assert.deepEqual(slots, [...slots].sort())
+  assert.equal(isBranchEvidenceTranscriptVerified(verifyBranchEvidenceTranscript(transcript)), true)
+  assert.equal(transcript.body.divergence.semantic.slot, slots[0])
 })
 
 test('branch builder refuses malformed input even with a recomputed receipt', () => {

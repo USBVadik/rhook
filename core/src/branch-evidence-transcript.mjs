@@ -87,6 +87,10 @@ function firstSemantic(semantic) {
   return item ? { status: 'DIVERGED', envelopeIndex: item.envelopeIndex, slot: item.slot, verdict: item.verdict } : semantic.some((entry) => entry.verdict === DIFF.NOT_COMPARABLE) ? { status: 'UNDETERMINED' } : { status: 'NONE' }
 }
 
+// The strict verifier orders slots by UTF-16 code unit (Array#sort); localeCompare is
+// locale-dependent and orders punctuation such as '|' before digits.
+const compareCodeUnits = (left, right) => (left < right ? -1 : left > right ? 1 : 0)
+
 export function buildBranchEvidenceTranscript({ branches, intervention, actualEnvelopes, counterfactualEnvelopes, semanticPairs, limitations = REQUIRED_LIMITATIONS }) {
   requireCondition(branches && typeof branches === 'object', 'INVALID_BRANCH_TRANSCRIPT', 'branch identities are required')
   const actualBranch = commitment(branches.actual, 'actual branch')
@@ -125,7 +129,7 @@ export function buildBranchEvidenceTranscript({ branches, intervention, actualEn
     requireCondition(pair.actual.postStateDigest === actualEnvelopes[index].body.execution.successorStateCommitment, 'SEMANTIC_STATE_BINDING_MISMATCH', `actual semantic pair ${pairIndex} is not bound to envelope successor state`)
     requireCondition(pair.counterfactual.postStateDigest === counterfactualEnvelopes[index].body.execution.successorStateCommitment, 'SEMANTIC_STATE_BINDING_MISMATCH', `counterfactual semantic pair ${pairIndex} is not bound to envelope successor state`)
     return Object.freeze({ envelopeIndex: index, slot: extractionSlotKey(pair.actual), verdict: verdict.verdict, actual: extractionSummary(pair.actual), counterfactual: extractionSummary(pair.counterfactual) })
-  }).sort((a, b) => a.envelopeIndex - b.envelopeIndex || a.slot.localeCompare(b.slot))
+  }).sort((a, b) => a.envelopeIndex - b.envelopeIndex || compareCodeUnits(a.slot, b.slot))
 
   requireCondition(Array.isArray(limitations), 'INVALID_BRANCH_TRANSCRIPT', 'limitations must be an array')
   const normalizedLimitations = [...new Set(limitations.map((item) => cleanToken(item, 'limitation')))].sort()
