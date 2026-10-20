@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'none'; connect-src 'none'; img-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>RHOOK · A real Hookr counterfactual</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="#main" class="skip">Skip to the result</a>
+<header>
+<div class="wrap header-inner">
+<div class="wordmark">RHOOK<small>Recorded experiment</small>
+</div>
+<nav aria-label="Case navigation">
+<a href="#comparison">Comparison</a>
+<a href="#evidence">Evidence</a>
+<span class="private-label">Read-only case</span>
+</nav>
+</div>
+</header>
+<main id="main" class="wrap">
+<section class="hero" aria-label="Experiment result">
+<p class="eyebrow">Hookr · Block <span data-metric="block" data-format="group" class="">93,251,803</span> · Block date: <time datetime="2026-10-20T06:42:33Z">20 Oct 2026 UTC</time></p>
+<div class="hero-grid">
+<div>
+<h1>
+<span>Same block.</span>
+<span>One LP parameter changed.</span>
+</h1>
+<p class="intro">Seven ordered arrivals. One LP Rewards parameter changed in the checkpoint. The recorded branch delivered more RHOOK to the buyer.</p>
+</div>
+<div class="result">
+<div data-metric="delta.outputPercent" data-format="percent" class="result-number">+1.0088%</div>
+<p>
+<strong>Buyer output in the branch</strong>
+<br>Compared with the canonical ACTUAL receipt.</p>
+</div>
+</div>
+<div class="boundary">
+<strong>Go/Nitro observation. Independent Rust replay pending.</strong>
+<span>Recorded result · No live execution · Saved case only</span>
+</div>
+</section>
+<section id="comparison" class="case" aria-label="ACTUAL and BRANCH comparison">
+<div class="parent-line">
+<p>
+<strong>One original parent</strong>
+<br>
+<small>Chain <span data-metric="chainId" data-format="plain" class="">4663</span> · Parent <span data-metric="checkpoint.blockNumber" data-format="group" class="">93,251,802</span> · Input <span data-metric="inputWei" data-format="eth" class="">0.01 ETH</span>
+</small>
+</p>
+<p>
+<small>Both worlds replay all <span data-metric="arrivals" data-format="plain" class="">7</span> arrivals in order.</small>
+<br>
+<small>LP Rewards: 100 → 0 bps. Other rules remain present.</small>
+</p>
+</div>
+<div class="worlds">
+<article class="world " aria-label="Recorded ACTUAL">
+      <div class="world-title">
+<h2>ACTUAL</h2>
+<span>Original canonical replay</span>
+</div>
+      <p class="rule">
+<code>RulesConfig.lpBps = 100</code>
+</p>
+      <p class="output-label">Buyer RHOOK output · exact base units</p>
+      <div data-metric="worlds.ACTUAL.outputBaseUnits" data-format="group" class="output">291,469,365,928,126,821,002,944</div>
+      <p class="source-line">
+<a href="summary.json">Inspect ACTUAL summary</a>
+</p>
+      <dl class="world-footer">
+<div>
+<dt>Outer Swap fee</dt>
+<dd>
+<span data-metric="worlds.ACTUAL.feePips" data-format="fee" class="">1.1048%</span>
+</dd>
+</div>
+<div>
+<dt>Transaction gas</dt>
+<dd>
+<span data-metric="worlds.ACTUAL.subjectGas" data-format="group" class="">1,483,206</span>
+</dd>
+</div>
+</dl>
+    </article>
+<article class="world branch" aria-label="Recorded BRANCH">
+      <div class="world-title">
+<h2>BRANCH</h2>
+<span>Hypothetical checkpoint branch</span>
+</div>
+      <p class="rule">
+<code>RulesConfig.lpBps = 0</code>
+</p>
+      <p class="output-label">Buyer RHOOK output · exact base units</p>
+      <div data-metric="worlds.BRANCH.outputBaseUnits" data-format="group" class="output">294,409,762,269,997,223,561,475</div>
+      <p class="source-line">
+<a href="summary.json">Inspect BRANCH summary</a>
+</p>
+      <dl class="world-footer">
+<div>
+<dt>Outer Swap fee</dt>
+<dd>
+<span data-metric="worlds.BRANCH.feePips" data-format="fee" class="">0.3048%</span>
+</dd>
+</div>
+<div>
+<dt>Transaction gas</dt>
+<dd>
+<span data-metric="worlds.BRANCH.subjectGas" data-format="group" class="">1,480,996</span>
+</dd>
+</div>
+</dl>
+    </article>
+</div>
+<p class="context-note">Token decimals were not independently confirmed. Values above are exact RHOOK base units, without a token-decimals assumption.</p>
+</section>
+<section class="section" id="canonical">
+<h2>The original world matches.</h2>
+<p>ACTUAL reproduced the pinned stateRoot, receiptsRoot and blockHash before BRANCH was allowed to start.</p>
+<div class="reading">
+<div>
+<h3>Canonical commitments: 3 of 3</h3>
+<p>Seven arrivals were processed from parent <span data-metric="checkpoint.blockNumber" data-format="group" class="">93,251,802</span>. Both recorded subject receipts have status <span data-metric="worlds.ACTUAL.status" data-format="plain" class="">1</span>.</p>
+<p>The original saved pair ran once per world: one ACTUAL and one BRANCH. No Rust replay was performed for this case. Viewing this page performs no replay or provider request.</p>
+</div>
+<div><h3>SDK Alpha workflow passed.</h3><p>The saved case also passed doctor → prepare → replay → verify through Developer SDK Alpha v2 on one Mac.</p><p><a href="../sdk-alpha-v2-status.md">Read the SDK status</a>. Sources and native binaries remain private; this page does not run the SDK.</p><p>Next milestone: official Hookr SDK integration. Root/Rules ABI compatibility with 1.1.1 is confirmed; the TypeScript adapter is not implemented. Historical swap-builder compatibility is not established.</p></div>
+</div>
+<details>
+<summary>Inspect commitments and the original checkpoint</summary>
+<div class="table-scroll">
+<table class="hash-table">
+<caption>Pinned canonical values = recorded ACTUAL</caption>
+<thead>
+<tr>
+<th>Commitment</th>
+<th>Expected and observed</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>stateRoot</td>
+<td>
+<code data-metric="worlds.ACTUAL.stateRoot" data-format="plain" class="">0xd4ea0fe6f558cbc4a6b4161e3afc41ee4b7709001c170e32bc2144e64bdeb10b</code>
+</td>
+<td class="match">MATCH</td>
+</tr>
+<tr>
+<td>receiptsRoot</td>
+<td>
+<code data-metric="worlds.ACTUAL.receiptsRoot" data-format="plain" class="">0x920c08cb6953014f0800587bbe2c0f8db5a7855ddb9f6263d5b4e230edeba98f</code>
+</td>
+<td class="match">MATCH</td>
+</tr>
+<tr>
+<td>blockHash</td>
+<td>
+<code data-metric="worlds.ACTUAL.blockHash" data-format="plain" class="">0xc73ef372869ad5bf2a664bc1bc4cbe411c3adeb1938f349dd7686d82425398cd</code>
+</td>
+<td class="match">MATCH</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="pins">
+<p>Original parent block hash <code data-metric="checkpoint.blockHash" data-format="plain" class="">0x991db6ee40bd7056cfabff012763a1b75995979e5023dc010553dbc304c16016</code>
+</p>
+<p>Original parent stateRoot <code data-metric="checkpoint.stateRoot" data-format="plain" class="">0x9c63ad5d9c6ba4fd19c301ea35264cec28dd1ad0e951a5f5578af8a32131baa6</code>
+</p>
+</div>
+<div class="table-scroll">
+<table class="hash-table">
+<caption>Produced hypothetical BRANCH commitments</caption>
+<thead>
+<tr>
+<th>Commitment</th>
+<th>Observed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>stateRoot</td>
+<td>
+<code data-metric="worlds.BRANCH.stateRoot" data-format="plain" class="">0x0e39240c97555e6f1830bc0ed2533ee9c4602ff17ec145f94e3842bec512bffd</code>
+</td>
+</tr>
+<tr>
+<td>receiptsRoot</td>
+<td>
+<code data-metric="worlds.BRANCH.receiptsRoot" data-format="plain" class="">0xabf4cb269d15136d2cfa7a97d5296364ffac4489b81dd9443d6e492a7ea058d7</code>
+</td>
+</tr>
+<tr>
+<td>blockHash</td>
+<td>
+<code data-metric="worlds.BRANCH.blockHash" data-format="plain" class="">0xbda19230c6f807d5b5da9f73f73b7c13f0e5709df7e2855c70cafab14577b471</code>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="context-note">BRANCH.matched=false compares the changed world to the original canonical block. Both executions completed without a terminal error.</p>
+</details>
+</section>
+<section class="section">
+<h2>What changed for the buyer.</h2>
+<div class="reading">
+<div>
+<h3>
+<span data-metric="delta.gas" data-format="abs-group" class="">2,210</span> gas saved</h3>
+<p>At the same input of <span data-metric="inputWei" data-format="eth" class="">0.01 ETH</span>, the buyer's receipt shows <span data-metric="delta.outputBaseUnits" data-format="group" class="">2,940,396,341,870,402,558,531</span> additional RHOOK base units.</p>
+<p>The outer Swap fee changed from <span data-metric="worlds.ACTUAL.feePips" data-format="fee" class="">1.1048%</span> to <span data-metric="worlds.BRANCH.feePips" data-format="fee" class="">0.3048%</span>. It is the observed fee, not an assumption that all fees disappear.</p>
+</div>
+<div>
+<h3>Some economics stayed the same.</h3>
+<p>The three internal arbitrage Swap events and successful native-value CALL edges were unchanged. HookFee.refund and HookFee.burned remained zero.</p>
+<p>Token output is derived from the RHOOK Transfer events to the exact buyer. A separate token-storage balance snapshot was not captured.</p>
+</div>
+</div>
+<details>
+<summary>Inspect exact fees and outcomes</summary>
+<div class="table-scroll">
+<table>
+<caption>Exact values regenerated in the recorded pair</caption>
+<thead>
+<tr>
+<th>Measure</th>
+<th class="number">ACTUAL</th>
+<th class="number">BRANCH</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HookFee.earned</td>
+<td class="number">
+<span data-metric="worlds.ACTUAL.hookFeeWei" data-format="eth" class="">0.00002011 ETH</span>
+</td>
+<td class="number">
+<span data-metric="worlds.BRANCH.hookFeeWei" data-format="eth" class="">0.00000011 ETH</span>
+</td>
+</tr>
+<tr>
+<td>HookFee.refund</td>
+<td class="number">
+<span data-metric="worlds.ACTUAL.refundWei" data-format="eth" class="">0 ETH</span>
+</td>
+<td class="number">
+<span data-metric="worlds.BRANCH.refundWei" data-format="eth" class="">0 ETH</span>
+</td>
+</tr>
+<tr>
+<td>HookFee.burned, base units</td>
+<td class="number">
+<span data-metric="worlds.ACTUAL.burnedBaseUnits" data-format="group" class="">0</span>
+</td>
+<td class="number">
+<span data-metric="worlds.BRANCH.burnedBaseUnits" data-format="group" class="">0</span>
+</td>
+</tr>
+<tr>
+<td>Whole-block gas</td>
+<td class="number">
+<span data-metric="worlds.ACTUAL.blockGas" data-format="group" class="">1,819,539</span>
+</td>
+<td class="number">
+<span data-metric="worlds.BRANCH.blockGas" data-format="group" class="">1,817,329</span>
+</td>
+</tr>
+<tr>
+<td>Subject receipt status</td>
+<td class="number">
+<span data-metric="worlds.ACTUAL.status" data-format="plain" class="">1</span>
+</td>
+<td class="number">
+<span data-metric="worlds.BRANCH.status" data-format="plain" class="">1</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="context-note">One semantic initial write; no administrative transaction was inserted. The branch removes the LP Rewards add-on and its associated protocol share. It does not disable an entire Hook Block. Base and dynamic fees and recapture remain. This preview publishes only a curated summary.</p>
+</details>
+</section>
+<section class="section" id="transactions">
+<h2>All seven arrivals stayed in order.</h2>
+<p>Ordinal 3 is the selected purchase. The other six retain their statuses, individual gas use and log contents.</p>
+<div class="transaction-line" aria-label="Original transaction order, ordinals zero through six">
+<a class="arrival " href="#transactions">
+<b>0</b>
+<small>Original</small>
+</a>
+<a class="arrival " href="#transactions">
+<b>1</b>
+<small>Original</small>
+</a>
+<a class="arrival " href="#transactions">
+<b>2</b>
+<small>Original</small>
+</a>
+<a class="arrival subject" href="#transactions">
+<b>3</b>
+<small>Selected buy</small>
+</a>
+<a class="arrival " href="#transactions">
+<b>4</b>
+<small>Original</small>
+</a>
+<a class="arrival " href="#transactions">
+<b>5</b>
+<small>Original</small>
+</a>
+<a class="arrival " href="#transactions">
+<b>6</b>
+<small>Original</small>
+</a>
+</div>
+<details>
+<summary>Inspect transaction identity and per-arrival gas</summary>
+<div class="pins">
+<p>Selected transaction <code data-metric="subject" data-format="plain" class="">0xbdc353fe6485a1e4e14e6d6fa358d9e7cdd333a986ce0440e7a76fcdb09aa41c</code>
+</p>
+</div>
+<div class="table-scroll">
+<table>
+<caption>Original ordinals; log comparison ignores changed block metadata</caption>
+<thead>
+<tr>
+<th>Ordinal</th>
+<th class="number">ACTUAL gas</th>
+<th class="number">BRANCH gas</th>
+<th class="number">Delta</th>
+<th>Log contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="">
+<td>
+<span data-metric="transactions.0.ordinal" data-format="plain" class="">0</span>
+</td>
+<td class="number">
+<span data-metric="transactions.0.actualGas" data-format="group" class="">0</span>
+</td>
+<td class="number">
+<span data-metric="transactions.0.branchGas" data-format="group" class="">0</span>
+</td>
+<td class="number">
+<span data-metric="transactions.0.gasDelta" data-format="group" class="">0</span>
+</td>
+<td>Identical</td>
+</tr>
+<tr class="">
+<td>
+<span data-metric="transactions.1.ordinal" data-format="plain" class="">1</span>
+</td>
+<td class="number">
+<span data-metric="transactions.1.actualGas" data-format="group" class="">26,755</span>
+</td>
+<td class="number">
+<span data-metric="transactions.1.branchGas" data-format="group" class="">26,755</span>
+</td>
+<td class="number">
+<span data-metric="transactions.1.gasDelta" data-format="group" class="">0</span>
+</td>
+<td>Identical</td>
+</tr>
+<tr class="">
+<td>
+<span data-metric="transactions.2.ordinal" data-format="plain" class="">2</span>
+</td>
+<td class="number">
+<span data-metric="transactions.2.actualGas" data-format="group" class="">26,755</span>
+</td>
+<td class="number">
+<span data-metric="transactions.2.branchGas" data-format="group" class="">26,755</span>
+</td>
+<td class="number">
+<span data-metric="transactions.2.gasDelta" data-format="group" class="">0</span>
+</td>
+<td>Identical</td>
+</tr>
+<tr class="selected">
+<td>
+<span data-metric="transactions.3.ordinal" data-format="plain" class="">3</span> · buy</td>
+<td class="number">
+<span data-metric="transactions.3.actualGas" data-format="group" class="">1,483,206</span>
+</td>
+<td class="number">
+<span data-metric="transactions.3.branchGas" data-format="group" class="">1,480,996</span>
+</td>
+<td class="number">
+<span data-metric="transactions.3.gasDelta" data-format="group" class="">-2,210</span>
+</td>
+<td>Changed</td>
+</tr>
+<tr class="">
+<td>
+<span data-metric="transactions.4.ordinal" data-format="plain" class="">4</span>
+</td>
+<td class="number">
+<span data-metric="transactions.4.actualGas" data-format="group" class="">183,531</span>
+</td>
+<td class="number">
+<span data-metric="transactions.4.branchGas" data-format="group" class="">183,531</span>
+</td>
+<td class="number">
+<span data-metric="transactions.4.gasDelta" data-format="group" class="">0</span>
+</td>
+<td>Identical</td>
+</tr>
+<tr class="">
+<td>
+<span data-metric="transactions.5.ordinal" data-format="plain" class="">5</span>
+</td>
+<td class="number">
+<span data-metric="transactions.5.actualGas" data-format="group" class="">47,353</span>
+</td>
+<td class="number">
+<span data-metric="transactions.5.branchGas" data-format="group" class="">47,353</span>
+</td>
+<td class="number">
+<span data-metric="transactions.5.gasDelta" data-format="group" class="">0</span>
+</td>
+<td>Identical</td>
+</tr>
+<tr class="">
+<td>
+<span data-metric="transactions.6.ordinal" data-format="plain" class="">6</span>
+</td>
+<td class="number">
+<span data-metric="transactions.6.actualGas" data-format="group" class="">51,939</span>
+</td>
+<td class="number">
+<span data-metric="transactions.6.branchGas" data-format="group" class="">51,939</span>
+</td>
+<td class="number">
+<span data-metric="transactions.6.gasDelta" data-format="group" class="">0</span>
+</td>
+<td>Identical</td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
+</section>
+<section class="section" id="evidence">
+<h2>Inspect the recorded result.</h2>
+<p>This is a curated summary of a saved execution pair. Raw receipts, witness, runtime archives and the private verification package are not included.</p>
+<div class="evidence-grid">
+<div class="verify-box">
+<h3>Canonical ACTUAL, then a branch.</h3>
+<p>The original pair processed the seven arrivals from the same parent. ACTUAL matched the canonical state root, receipts root and block hash before the LP Rewards branch ran.</p>
+<p class="note">The summary exposes selected figures and source hashes. Checking these figures is not independent EVM replay or verification of the complete private evidence.</p>
+</div>
+<ul class="evidence-links">
+<li>
+<a href="../hookr-pair03.md">Read the case study</a>
+<span>Exact intervention, result and limitations</span>
+</li>
+<li>
+<a href="summary.json">Inspect the result summary</a>
+<span>Exact base units, commitments and per-arrival gas</span>
+</li>
+<li>
+<a href="../sdk-alpha-v2-status.md">Developer SDK Alpha status</a>
+<span>Tested workflow and availability boundary</span>
+</li>
+</ul>
+</div>
+</section>
+<section class="section" id="limits">
+<h2>What this result establishes.</h2>
+<p>A real saved block completed in two Go/Nitro worlds, with one declared checkpoint change and a different observed buyer output.</p>
+<ul class="limitations">
+<li>This is an exploratory, posthoc saved-block case. It makes no global-firstness or arbitrary-block replay claim.</li>
+<li>Independent Rust/arb-revm execution has not run. Heterogeneous agreement remains <strong>NOT_EVALUATED</strong>.</li>
+<li>Economic assurance remains <strong>UNRESOLVED</strong>. Receipt event nets are not separate token-storage snapshots or a full state diff.</li>
+<li>This page displays selected recorded results. It includes no native runner, raw evidence, witness or replay command. SDK Alpha sources and binaries are not distributed here.</li>
+</ul>
+<p class="terminal">Recorded terminal: <code data-metric="terminal" data-format="plain" class="">GO_HOOKR_PAIR_OBSERVED_UNQUALIFIED</code>
+</p>
+</section>
+</main>
+<footer>
+<div class="wrap footer-inner">
+<span>RHOOK · Hookr Pair03 · One recorded Go/Nitro pair</span>
+<span>Read-only summary · No execution on this page</span>
+</div>
+</footer>
+</body>
+</html>
