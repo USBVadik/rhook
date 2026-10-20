@@ -1,0 +1,179 @@
+{
+  "chainId": 4663,
+  "block": 93251803,
+  "arrivals": 7,
+  "subjectOrdinal": 3,
+  "subject": "0xbdc353fe6485a1e4e14e6d6fa358d9e7cdd333a986ce0440e7a76fcdb09aa41c",
+  "token": "0x3c022d43a9f826cd206c2ba60bc753d8b36185c4",
+  "checkpoint": {
+    "chainId": 4663,
+    "blockNumber": 93251802,
+    "blockHash": "0x991db6ee40bd7056cfabff012763a1b75995979e5023dc010553dbc304c16016",
+    "stateRoot": "0x9c63ad5d9c6ba4fd19c301ea35264cec28dd1ad0e951a5f5578af8a32131baa6"
+  },
+  "delta": {
+    "outputBaseUnits": "2940396341870402558531",
+    "outputPercent": "1.008818313549792519459394583679423315337822544636462903551028544874200",
+    "gas": -2210,
+    "feePips": -8000,
+    "hookFeeWei": "-20000000000000"
+  },
+  "inputWei": "10000000000000000",
+  "nativeInvocations": {
+    "ACTUAL": 1,
+    "BRANCH": 1,
+    "B": 0
+  },
+  "terminal": "GO_HOOKR_PAIR_OBSERVED_UNQUALIFIED",
+  "economicAssurance": "UNRESOLVED",
+  "heterogeneousAgreement": "NOT_EVALUATED",
+  "qualifiedClaims": 0,
+  "sourceManifest": "cebe9e45ac25e6c14f8f112f0a6dfe0019cf3536833dfad2c7d924040a03dbd8",
+  "sourceFreeze": "7b5fcc7876c19dddd96e7eee5903603c1e2a6744f66aa576af0f86b05cd71444",
+  "format": "rhook/public-hookr-pair03-summary/1",
+  "scope": "Curated recorded-result summary. No raw execution evidence, witness or standalone execution verifier is distributed.",
+  "intervention": {
+    "pool": "0x94d1a318a67449c1fd850f354b4694be69483a6e94148787659e487ecb8c6780",
+    "parameter": "RulesConfig.lpBps",
+    "oldBps": 100,
+    "newBps": 0,
+    "bitRange": [
+      160,
+      175
+    ],
+    "semanticInitialWrites": 1,
+    "meaning": "Removes the LP Rewards add-on and its associated protocol share; base/dynamic fees and recapture remain. Does not disable an entire Hook Block."
+  },
+  "worlds": {
+    "ACTUAL": {
+      "outputBaseUnits": "291469365928126821002944",
+      "subjectGas": 1483206,
+      "blockGas": 1819539,
+      "feePips": 11048,
+      "hookFeeWei": "20110000000000",
+      "refundWei": "0",
+      "burnedBaseUnits": "0",
+      "status": 1,
+      "stateRoot": "0xd4ea0fe6f558cbc4a6b4161e3afc41ee4b7709001c170e32bc2144e64bdeb10b",
+      "receiptsRoot": "0x920c08cb6953014f0800587bbe2c0f8db5a7855ddb9f6263d5b4e230edeba98f",
+      "blockHash": "0xc73ef372869ad5bf2a664bc1bc4cbe411c3adeb1938f349dd7686d82425398cd"
+    },
+    "BRANCH": {
+      "outputBaseUnits": "294409762269997223561475",
+      "subjectGas": 1480996,
+      "blockGas": 1817329,
+      "feePips": 3048,
+      "hookFeeWei": "110000000000",
+      "refundWei": "0",
+      "burnedBaseUnits": "0",
+      "status": 1,
+      "stateRoot": "0x0e39240c97555e6f1830bc0ed2533ee9c4602ff17ec145f94e3842bec512bffd",
+      "receiptsRoot": "0xabf4cb269d15136d2cfa7a97d5296364ffac4489b81dd9443d6e492a7ea058d7",
+      "blockHash": "0xbda19230c6f807d5b5da9f73f73b7c13f0e5709df7e2855c70cafab14577b471"
+    }
+  },
+  "transactions": [
+    {
+      "ordinal": 0,
+      "actualGas": 0,
+      "branchGas": 0,
+      "gasDelta": 0,
+      "actualStatus": 1,
+      "branchStatus": 1,
+      "sameLogs": true
+    },
+    {
+      "ordinal": 1,
+      "actualGas": 26755,
+      "branchGas": 26755,
+      "gasDelta": 0,
+      "actualStatus": 1,
+      "branchStatus": 1,
+      "sameLogs": true
+    },
+    {
+      "ordinal": 2,
+      "actualGas": 26755,
+      "branchGas": 26755,
+      "gasDelta": 0,
+      "actualStatus": 1,
+      "branchStatus": 1,
+      "sameLogs": true
+    },
+    {
+      "ordinal": 3,
+      "actualGas": 1483206,
+      "branchGas": 1480996,
+      "gasDelta": -2210,
+      "actualStatus": 1,
+      "branchStatus": 1,
+      "sameLogs": false
+    },
+    {
+      "ordinal": 4,
+      "actualGas": 183531,
+      "branchGas": 183531,
+      "gasDelta": 0,
+      "actualStatus": 1,
+      "branchStatus": 1,
+      "sameLogs": true
+    },
+    {
+      "ordinal": 5,
+      "actualGas": 47353,
+      "branchGas": 47353,
+      "gasDelta": 0,
+      "actualStatus": 1,
+      "branchStatus": 1,
+      "sameLogs": true
+    },
+    {
+      "ordinal": 6,
+      "actualGas": 51939,
+      "branchGas": 51939,
+      "gasDelta": 0,
+      "actualStatus": 1,
+      "branchStatus": 1,
+      "sameLogs": true
+    }
+  ],
+  "sourceEvidence": {
+    "pair03ManifestSha256": "cebe9e45ac25e6c14f8f112f0a6dfe0019cf3536833dfad2c7d924040a03dbd8",
+    "pair03FreezeSha256": "7b5fcc7876c19dddd96e7eee5903603c1e2a6744f66aa576af0f86b05cd71444",
+    "actualRecordSha256": "a6858c4bc1fd7bb50b6ffc328d8351eae90f90c6747781405caff3bf31704953",
+    "branchRecordSha256": "9871f2eaba6e01b2e57287795c1d0888b2e685c3c251729c471b329c6857940e",
+    "acceptance03ManifestSha256": "eacc39179c65493e52b7f99301485ecf8e9248955a733fa4ccaf9f7a2c4282eb",
+    "acceptance03FreezeSha256": "f008136d2cacee8811fe48fd24308e4ee127b774eeb20f17dad1d68204323f31"
+  },
+  "sdkAlphaV2": {
+    "workflow": {
+      "doctor": "PASS",
+      "prepare": "PASS",
+      "replay": "PASS",
+      "verify": "PASS"
+    },
+    "sameSavedCaseMatchesOriginal": true,
+    "testedPlatform": "macOS arm64 on one Mac",
+    "nativeInvocations": {
+      "ACTUAL": 1,
+      "BRANCH": 1,
+      "B": 0
+    },
+    "independentRustReplay": false,
+    "sourcesAndBinariesPubliclyDistributed": false
+  },
+  "hookrCompatibility": {
+    "generation": "hookr-1",
+    "rulesCore": "standard",
+    "applicableAbiSdkVersion": "1.1.1",
+    "rootRuntimeKeccak256": "0xd336de325837e60a74cea11d87b5ebd1cc8961911f611f38de0508d23b6e779f",
+    "rulesRuntimeKeccak256": "0x4b6d50b40981b8082f3ee5a7ebf57e48489f71c94c2a3b94032a1d1a382b515b",
+    "officialRuntimePinsMatch": true,
+    "nextDevelopmentMilestone": "Official Hookr SDK integration",
+    "typescriptAdapterImplemented": false,
+    "historicalExternalRouterIsCurrentHookrRouter": false,
+    "historicalSwapBuilderCompatibility": "NOT_ESTABLISHED"
+  },
+  "blockTimestampUnix": 1792478553,
+  "blockTimestampUTC": "2026-10-20T06:42:33Z"
+}

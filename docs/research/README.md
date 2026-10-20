@@ -9,6 +9,7 @@ frozen developer workflow, separate from later archive-based SDK development.
 
 | Result | What was established |
 |---|---|
+| [Hookr Pair03](hookr-pair03.md) | One saved Hookr block, seven arrivals, canonical Go/Nitro ACTUAL and LP Rewards 100→0 BRANCH: +1.0088% receipt-derived buyer output. Single-engine observation; Rust qualification pending. [SDK Alpha v2 workflow status](sdk-alpha-v2-status.md). |
 | [Initial heterogeneous execution](robinhood-heterogeneous/README.md) | Go/Nitro/geth and Rust/arb-revm agreed on one frozen Robinhood case and its oriented Branch Protocol 0.2 claim. Selected public artifacts have an offline check. |
 | [Prospective six-case conformance](robinhood-heterogeneous/prospective-conformance.md) | Two frozen native implementations agreed on six prospectively selected interventions: 1410/1410 checks and 90/90 required group evaluations. |
 | [Clean-room verifier interoperability](clean-room-verifier-interoperability.md) | A fresh-context Python implementation written from the adopted specification matched qualified JavaScript Reference 0.3: 86/86 individually conformant observations, all exactly equal as raw JSON values. |

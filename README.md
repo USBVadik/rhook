@@ -4,25 +4,24 @@
 
 RHOOK is an explainable deterministic counterfactual execution substrate for onchain state machines.
 
+**[Hookr Pair03: a real pool replay](docs/research/hookr-pair03.md).** Seven arrivals,
+canonical ACTUAL, `RulesConfig.lpBps: 100 → 0`, and **1.0088% more RHOOK** for the
+selected buyer. One Go/Nitro case; independent Rust replay is pending.
+
 ```text
 ACTUAL          A -> B -> X  -> C  -> D  -> E
 COUNTERFACTUAL  A -> B -> X′ -> C′ -> D′ -> E′
                               ^ regenerate downstream execution
 ```
 
-Change one declared historical input, then execute the remaining envelopes in order against the state produced by the changed branch. RHOOK records enough evidence to explain the first lifecycle, state, and semantic divergence without rerunning the branch.
-
-## What stays fixed and what regenerates
+Change one declared historical input and execute the remaining envelopes in
+order against the changed state. Inspect the resulting lifecycle, state and
+semantic differences.
 
 | Fixed inputs | Regenerated outputs |
 |---|---|
-| Parent checkpoint and historical domain | Envelope validity |
-| One declared intervention | `SUCCESS`, `REVERT`, or pre-execution invalidation |
-| Canonical envelope identities and order | Gas, fees, logs, and execution-result commitments |
-| Historical block-context policy | Successor state commitments |
-| Evaluation endpoint and semantic query | State-bound semantic value |
-
-See [`docs/counterfactual-model.md`](docs/counterfactual-model.md) for the exact boundary.
+| Parent checkpoint, history and arrival order | Successor state, validity and execution results |
+| Declared intervention and block-context policy | Gas, fees, logs and state-bound semantic values |
 
 ## Try it
 
@@ -34,152 +33,57 @@ npm test
 npm run quickstart
 ```
 
-`quickstart` executes both sides of the protocol-neutral branch fixture through the public host/runtime/core stack, writes a fresh transcript under the ignored `.rhook/` directory, verifies it in a separate process, then changes a nested endpoint, recomputes the public commitment, and confirms that the malformed record is rejected.
+The quickstart runs the [protocol-neutral fixture](examples/minimal/transcript.json)
+through host, runtime and core,
+writes a transcript under ignored `.rhook/`, verifies it in a separate process,
+and checks that a malformed semantic endpoint is rejected.
+See [QUICKSTART.md](QUICKSTART.md) for the commands and expected output.
 
-## Real-chain example
+## Hookr Pair03
 
-With Docker, `npm run demo:robinhood` builds a pinned native Nitro runner and
-replays one Robinhood Chain v4 counterfactual over 50 continuous blocks.
-The analytical intervention changes native `Message.Data` while retaining the
-historical signed envelope for alignment and declared poster-cost accounting;
-it is not a re-signed transaction. See [the example](examples/robinhood-v4/README.md)
-for the exact fee-growth metric, fixed inputs, limits and reproduction status.
+The [case study](docs/research/hookr-pair03.md) and
+[static visual](docs/research/hookr-pair03/index.html) describe saved block
+93251803. ACTUAL matched its canonical state root, receipts root and block hash.
+The alternative changed the LP Rewards parameter, preserving base/dynamic fees
+and recapture. The visual displays recorded results; opening it does not replay
+the block. Its files can be opened locally after downloading the repository.
 
-## Heterogeneous execution result
+[SDK Alpha v2's local workflow](docs/research/sdk-alpha-v2-status.md) passed for
+this saved case on one Mac. Alpha sources and binaries remain private. Official
+Hookr SDK integration is the next development milestone; ABI compatibility is
+confirmed, but the TypeScript adapter is not implemented.
 
-Two frozen native implementations, Go/Nitro/geth and Rust/arb-revm,
-independently executed six prospectively selected historical interventions
-on Robinhood Chain 4663 and derived identical oriented Branch Protocol 0.2
-claims. The comparator was frozen before execution and run once after both
-implementations sealed all six cases. It passed 1410/1410 checks across
-90 required comparison group evaluations.
+## Native example and research
 
-This result is limited to exact v011, the two tested implementations, the
-six interventions and the 50-block / 321-arrival domain per case. It does not
-establish universal backend neutrality or production readiness.
+With Docker, `npm run demo:robinhood` builds a pinned Nitro runner and replays a
+50-block Robinhood Chain v4 example. Its analytical intervention replaces native
+`Message.Data` while retaining the historical signed envelope. See the
+[example](examples/robinhood-v4/README.md) for inputs, accounting and limits.
+This command does not run the private Hookr Alpha case.
 
-The [prospective report](docs/research/robinhood-heterogeneous/prospective-conformance.md)
-records the procedure, compared surfaces and commitments. The
-[earlier single-case result](docs/research/robinhood-heterogeneous/README.md)
-and its offline artifact check remain available. The experimental Rust
-runner and full execution archives are not distributed here.
+Earlier public demo: [recorded Robinhood counterfactual](https://robinhook.tech/counterfactual).
+It displays a separate case; viewing it performs no replay.
 
-## Clean-room verifier interoperability
+Separate Go/Nitro/geth and Rust/arb-revm experiments agreed on six prospectively
+selected cases, with 1410/1410 checks. Those cases have their own frozen profiles;
+they do not supply Rust qualification for Hookr Pair03. The
+[research index](docs/research/README.md) links those results, the clean-room
+verifier comparison and the later developer-workflow pilots.
 
-A fresh-context implementer received the adopted 14-document verifier
-specification and selected evidence data without access to the qualified
-Reference 0.3 source, outputs, expected verdicts or prior findings. Before
-writing source, it completed a separate failure-boundary audit and judged
-the packet self-sufficient for the bounded task. It independently wrote a
-Python standard-library verifier and sealed its final outputs before the
-qualified JavaScript Reference 0.3 was invoked.
+The [Alchemix study](examples/alchemix/README.md) is a separate historical result.
+The protocol-neutral evidence stack has not been scientifically rerun on Alchemix.
 
-All 86 compared rows, covering 12 positive packages and 74 hostile/parser
-inputs, were individually conformant and exactly equal as raw JSON values.
-No diagnostic normalization or permitted diagnostic variance was required.
+## Verification boundary
 
-This completes the bounded internal clean-room verifier milestone. It does
-not establish external organizational independence, production readiness,
-universal verifier correctness, arbitrary-chain/intervention correctness or
-cryptographic execution proof. See the
-[report](docs/research/clean-room-verifier-interoperability.md),
-[machine-readable result](docs/research/clean-room-verifier-interoperability-result.json)
-and [research index](docs/research/README.md).
+The verifier checks nested types, ordering, cross-references and divergence claims
+rather than accepting matching hashes alone. The current public implementation
+is single-target and unauthenticated at the transcript layer. Engineering
+conformance does not establish production certification, universal backend
+neutrality, canonical finality or cryptographic execution proof.
 
-## Real-history counterfactual application
-
-On Chain 4663, at target `70397229:5`, derived Message.Data was replaced from 68 bytes to 0x.
-The original transaction was retained. For downstream subject `70397229:10`,
-ACTUAL was `SUCCESS` and BRANCH was `REVERT`; two heterogeneous native
-implementations agreed. The portable RHOOK Claim was verified with
-`ESTABLISHED_UNDER_PROFILE`, yielding `DOES_NOT_SURVIVE`.
-
-The declared replay domain contains 50 blocks and 321 arrivals in total,
-including arrivals before the intervention. ACTUAL uses retained
-authenticated controls; A/B BRANCH results come from fresh, previously
-authorized executions. This is a bounded known-case integration, without
-arbitrary-chain/intervention support, production readiness, cryptographic
-execution proof, canonical finality or protocol-level producer authentication.
-See the [canonical milestone](docs/research/real-history-counterfactual-application.md)
-for commitments and limits.
-
-## Bounded Generic Native Branch
-
-The bounded native provider completed continuity and previously unseen-world
-generativity on the same Chain 4663 history. Each of two declared Data-only
-interventions acquired a fresh A/B BRANCH pair with heterogeneous agreement,
-then issued a `BranchHandle` for subsequent questions. ACTUAL remained the
-retained authenticated control.
-
-The continuity case produced an ordinary verified `SUCCESS` → `REVERT` Claim.
-The previously unseen intervention produced a complete downstream lifecycle
-map with **0 CHANGED / 298 UNCHANGED / 0 UNRESOLVED**; no replacement case or
-Claim was selected. UNCHANGED describes lifecycle only.
-
-See the [capability result and measured API](docs/research/bounded-generic-native-branch.md)
-for `summary()`, `impact()`, `compare()` and `claim()`, commitments and limits.
-The native deployment remains private; this checkpoint records its bounded
-result without adding those SDK exports to the public checkout.
-
-## Recorded counterfactual demo
-
-[Explore the demo](https://robinhook.tech/counterfactual): one earlier encoded
-amount was set to zero in a recorded alternative of real Robinhood Chain
-history. The next transaction changed from `SUCCESS` to `REVERT`. The real
-chain stayed untouched.
-
-For this new Data-only request, two heterogeneous native BRANCH executions
-agreed, and one selected lifecycle Claim was accepted under the pinned
-profile. Of 279 downstream arrivals, one lifecycle changed and 278 were
-unchanged. The full domain contains 50 blocks / 321 total arrivals. ACTUAL
-uses retained authenticated controls. Opening the page performs no fresh
-replay or independent verification; the public export is inspection data,
-not a standalone verification package or a public native SDK.
-
-See the [exact case, commitments and limits](docs/research/novel-counterfactual-intervention.md)
-and [machine-readable result](docs/research/novel-counterfactual-intervention-result.json).
-
-## Integrated developer workflow: amount27
-
-A separate native pilot used the frozen Build06 Developer SDK workflow and
-exact Build07 input to set the encoded amount at `70397233:4` to `27`.
-One fresh A BRANCH and one fresh B BRANCH ran sequentially and agreed;
-retained authenticated ACTUAL was `SUCCESS`, while BRANCH was `REVERT`
-for the preselected subject `70397233:5`.
-
-One lifecycle Claim was accepted with `ESTABLISHED_UNDER_PROFILE`, four
-binding flags and nine discharged obligations. The domain was 50 blocks /
-321 total arrivals, including 279 downstream inspection rows. No retry,
-rebuild or repair occurred. The later Impact Discovery SDK was tested
-separately on an archive and did not execute this pilot. This records a
-bounded private workflow result, not a public SDK release or external
-integration qualification. See the [amount27 report](docs/research/developer-amount27-native-pilot.md).
-
-## Why replay instead of dependency analysis?
-
-Dependency analysis can identify which transitions may depend on `X`. It cannot determine whether a downstream transaction succeeds, reverts, becomes invalid, or produces a different state. RHOOK computes those transitions.
-
-## Evidence per envelope
-
-- canonical envelope identity;
-- predecessor and successor state commitments;
-- validation and `SUCCESS / REVERT / PRE_EXECUTION_INVALIDATED` lifecycle;
-- exception classification, gas, fees, logs, and execution-result commitments;
-- semantic values bound to the exact successor state from which they were read.
-
-The verifier treats the transcript producer as untrusted. Matching hashes are not enough; nested types, ordering, cross-references, presence/value rules, and divergence claims are checked independently.
-
-## Pinned historical result
-
-A separate frozen Alchemix study regenerated 36,847 historical transactions after replacing one declared call:
-
-| Result | Count |
-|---|---:|
-| Historical-control divergences | 0 |
-| Downstream `SUCCESS -> REVERT` changes | 93 |
-| Pre-execution invalidations | 3 |
-
-The Alchemix result supports sequential branch regeneration for that incident-level question. It does not establish general superiority over bespoke simulators. This repository's evidence stack is qualified separately on the protocol-neutral fixture in [`examples/minimal/transcript.json`](examples/minimal/transcript.json); it has not been scientifically rerun on Alchemix.
+Read the [counterfactual model](docs/counterfactual-model.md),
+[architecture](docs/architecture.md), [threat model](docs/threat-model.md) and
+[limitations](docs/limitations.md) for the full boundary.
 
 ## Repository map
 
@@ -187,33 +91,10 @@ The Alchemix result supports sequential branch regeneration for that incident-le
 core/       typed evidence and strict plain-JSON verification
 runtime/    raw execution values -> typed evidence
 host/       observational execution integration and transcript assembly
-examples/   minimal demo, historical summary, explicit real-chain demo
-docs/       model, architecture, threat boundary, limitations, provenance
-scripts/    inspect, verify, and hostile-mutation commands
-test/       standalone packaging and public API checks
+examples/   fixtures and the explicit real-chain demo
+docs/       protocol, architecture, limitations and research records
+scripts/    inspect, verify and tamper-check commands
 ```
-
-Read [`QUICKSTART.md`](QUICKSTART.md), then [`docs/architecture.md`](docs/architecture.md) and [`docs/threat-model.md`](docs/threat-model.md).
-
-## Status
-
-Bounded prospective heterogeneous native validation is complete for the
-[six-case Robinhood suite](docs/research/robinhood-heterogeneous/prospective-conformance.md).
-The bounded internal specification self-sufficiency and clean-room verifier
-interoperability milestone is also complete, with
-[86/86 conformant, exactly matching observations](docs/research/clean-room-verifier-interoperability.md).
-The [bounded real-history application milestone](docs/research/real-history-counterfactual-application.md)
-is complete: verified `SUCCESS` → `REVERT` for subject `70397229:10`, with
-`ESTABLISHED_UNDER_PROFILE` and `DOES_NOT_SURVIVE`.
-The [bounded Generic Native Branch capability](docs/research/bounded-generic-native-branch.md)
-is complete: continuity and previously unseen-world generativity both passed,
-with two established worlds and two BranchHandles. Its scope remains the
-declared history, fixed native profiles and tested Data-only interventions.
-The [amount27 integrated developer workflow](docs/research/developer-amount27-native-pilot.md)
-also completed one fresh heterogeneous BRANCH acquisition and one accepted
-lifecycle Claim. Its SDK and acquired-world verification context remain private.
-
-Engineering conformance, not production certification. The current implementation is single-target, unauthenticated at the transcript layer, and not a liability, attribution, or recovery-policy system. See [`docs/limitations.md`](docs/limitations.md).
 
 RHOOK-authored code and documentation are licensed under [Apache-2.0](LICENSE).
 [Third-party boundaries](THIRD_PARTY_NOTICES.md) remain separate, including the
