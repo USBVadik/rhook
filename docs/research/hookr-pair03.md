@@ -4,6 +4,8 @@ On Robinhood Chain **4663**, RHOOK replayed saved block **93251803** from its or
 
 [Open the read-only visual](hookr-pair03/index.html) · [Inspect the summary](hookr-pair03/summary.json) · [SDK Alpha status](sdk-alpha-v2-status.md)
 
+Follow-up experiment: [native replay with LP Rewards 100 → 50](hookr-pair03-100-to-50.md). It records a separate branch with +0.5040100829% buyer Transfer-event net; the visual and summary linked above remain the original 100 → 0 result.
+
 The HTML is a local static page with no scripts or remote assets. Download the repository and open `docs/research/hookr-pair03/index.html` with its adjacent CSS. GitHub's file viewer displays its source. This change does not deploy a website.
 
 The authenticated saved header records block time **2026-10-20 06:42:33 UTC**.
