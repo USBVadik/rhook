@@ -28,7 +28,7 @@
     "core/src/port-results.mjs": "bfe1139dab6bb421df6b93cd28386e8eee66ec73314544ca3524cfa6ff08fab0",
     "core/src/semantic-extraction.mjs": "0684fb3a1e138018afcf064968346e4fb18b9b3b790c9abdcc500643fcd2d2c3",
     "core/src/envelope-evidence.mjs": "e4319d95ecbbd5bad4642f57c9728bd4dd0e917aeae4b77405d14dbc1020c9e6",
-    "core/src/branch-evidence-transcript.mjs": "5e31972f95b87741ed4fbbf126fd9e77dbe04bc682f41add429f8d40e446ae76",
+    "core/src/branch-evidence-transcript.mjs": "f3a14ef66dbce9a25c810af2f070f2ab59119f0165dabdee6079c342413d2919",
     "core/src/strict-common.mjs": "44be01a38a7c04e404b1a1fa1c5b9299518b5242b90ebd051aa9ea57dd8945fe",
     "core/src/strict-json.mjs": "8b0e1fed8e0ab50f218c4075dbbf23a9549ba21b5438c83f81e6404b4063627a",
     "core/src/strict-envelope.mjs": "1b0c7eba92672ffc1daafe06a3aa378a9ecd98f2198907a1e354cd51d35c99b1",
@@ -46,5 +46,5 @@
     "runtime/src/index.mjs",
     "host/src/index.mjs"
   ],
-  "notes": "Hashes identify canonical pre-packaging source separately from the current public derivative. Public adaptations localize imports, inject runBlock explicitly, simplify comments and error names, and rename the private typed-value brand symbol. Public host hardening requires explicit validation classification plus an unchanged state root before invalidation evidence, and exact integration-bundle projections, coverage, and transcript/root cross-bindings before self-commitments are accepted. Serialized core evidence schemas remain unchanged."
+  "notes": "Hashes identify canonical pre-packaging source separately from the current public derivative. Public adaptations localize imports, inject runBlock explicitly, simplify comments and error names, and rename the private typed-value brand symbol. Public host hardening requires explicit validation classification plus an unchanged state root before invalidation evidence, and exact integration-bundle projections, coverage, and transcript/root cross-bindings before self-commitments are accepted. Serialized core evidence schemas remain unchanged. The public branch builder orders semantic records by envelope index and UTF-16 code units to match the unchanged strict verifier."
 }
