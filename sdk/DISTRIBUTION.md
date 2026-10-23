@@ -10,24 +10,27 @@ Accepted worker SHA-256:
 authorize an upload or new execution.
 
 The existing inventory covers 222 outer kit files plus 12,338 nested entries.
-Existing exact notices and dependency locks are reused. Remaining release work:
+Original RHOOK-owned SDK source and documentation are covered by Apache-2.0;
+see [license scope](LICENSE_SCOPE.md). That source decision does not clear the
+combined executable or historical data. Existing notices and dependency locks
+are retained. Remaining executable release work:
 
-1. Approve the RHOOK-owned source license and contributor scope.
-2. Review the actual Nitro/geth/CGO/libstylus combination and fulfill the
-   applicable corresponding-source/application-relink route. A companion can
-   be assembled from retained authenticated inputs. Packaging alone is neither
-   legal clearance nor proof of a successful relink.
-3. Retain exact notices, including Node's composite notice. Accepted Node's
+1. Review the actual Nitro/geth/CGO/libstylus combination and fulfill the
+   applicable corresponding-source/application-relink route. A local companion
+   has been assembled and authenticated from retained inputs; its build-only
+   recipes have not been executed. Packaging alone is neither legal clearance
+   nor proof of a successful relink.
+2. Retain exact notices, including Node's composite notice. Accepted Node's
    unsigned content matches the official pinned release; signing bytes differ.
    Do not silently substitute a different binary.
-4. Resolve exact witness/data-sharing rights and approve public disclosure.
+3. Resolve exact witness/data-sharing rights and approve public disclosure.
    On-chain visibility and provider names establish neither blanket permission
    nor blanket prohibition.
-5. Review original engine source-path disclosure, needed by the accepted
+4. Review original engine source-path disclosure, needed by the accepted
    runtime. Sanitized public source cannot impersonate its source commitment.
-6. Approve exact final assets/checksums before release and validate the relink
+5. Approve exact final assets/checksums before release and validate the relink
    route before claiming it works. No relink or new native test is run here.
 
 Pinned [Nitro terms](../examples/robinhood-v4/notices/nitro-LICENSE.md) and
 [geth LGPL terms](../examples/robinhood-v4/notices/geth-COPYING.LESSER) remain
-separate from any future RHOOK license. No general production grant is claimed.
+separate from the RHOOK source license. No general production grant is claimed.

@@ -92,8 +92,8 @@ stack has not been scientifically rerun on Alchemix.
 ## Contributing and licensing
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Alpha notes](sdk/RELEASE_NOTES.md).
-Existing protocol-neutral code remains under [Apache-2.0](LICENSE), with
-[third-party exceptions](THIRD_PARTY_NOTICES.md). The newly imported SDK has a
-separate [license decision pending](sdk/LICENSE_SCOPE.md). The root license does
-not automatically extend to that import or relicense Nitro/geth. This candidate
-is not an open-source SDK release until its project-owned license is approved.
+Original RHOOK code and documentation, including the Developer SDK, use
+[Apache-2.0](LICENSE). The [SDK license scope](sdk/LICENSE_SCOPE.md) and
+[third-party notices](THIRD_PARTY_NOTICES.md) preserve the separate terms for
+Nitro/geth and other third-party material. This source license does not grant
+rights to the historical witness or clear the combined executable for release.

@@ -18,7 +18,9 @@ The accepted binary, historical evidence and commitments are unchanged.
 Offline tests cover input, consent, tamper, timeout and cleanup boundaries
 using synthetic data and mocked native dispatch.
 
-Binary availability and project-owned licensing are pending. Arbitrary blocks,
-remote execution, universal Linux support, Windows installation, current
-HookrRouter swap building and independent Rust Pair03 verification are absent.
+Original RHOOK-owned source and documentation use Apache-2.0, with the explicit
+exceptions in [LICENSE_SCOPE.md](LICENSE_SCOPE.md). Binary availability remains
+pending. Arbitrary blocks, remote execution, universal Linux support, Windows
+installation, current HookrRouter swap building and independent Rust Pair03
+verification are absent.
 See [compatibility](COMPATIBILITY.md) and [distribution](DISTRIBUTION.md).

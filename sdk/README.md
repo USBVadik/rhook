@@ -14,6 +14,11 @@ python3 -B sdk/tools/test_offline.py
 This starts no worker, sensor or network client. See [QUICKSTART.md](QUICKSTART.md)
 for the real CLI/API workflow with approved runtime inputs.
 
+Source entry points: [CLI](rhook_alpha/cli.py), [Python API](rhook_alpha/api.py),
+[installer](install_alpha.py), and [Hookr example](examples/execute_hookr.py).
+The example defaults to planning. A public clone provides source and offline
+tests; it is not a self-contained native kit.
+
 `rhook_alpha/` is the installed API. `developer/` authenticates and installs the
 pinned runtime. `engine/case_sdk/` implements plans and the canonical ACTUAL gate.
 The remaining engine modules are retained dependencies and historical reference
@@ -32,3 +37,7 @@ The accepted binary is unchanged. No native acceptance of this adapted public
 installer is claimed; offline installation/planning checks are reported separately.
 Read [compatibility](COMPATIBILITY.md), [licensing](LICENSE_SCOPE.md) and
 [distribution requirements](DISTRIBUTION.md).
+
+Original RHOOK-owned SDK source and documentation use the existing root
+[Apache-2.0 license](../LICENSE), with the explicit third-party/data exceptions
+in [LICENSE_SCOPE.md](LICENSE_SCOPE.md). Executable availability remains pending.

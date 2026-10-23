@@ -29,11 +29,11 @@ unsupported input, a focused regression, compatibility impact and any required
 schema/domain version change. Do not weaken strict verification to accommodate
 one producer. Retain third-party origin and license notices.
 
-Licensing for the SDK import is pending. Discuss contributions before submitting
-material that would complicate that decision; no CLA or new license grant is
-implied. Existing public code retains its current license and exceptions.
-Contributions to that existing RHOOK-authored code remain under Apache-2.0
-unless explicitly stated otherwise, as described in its contribution terms.
+Contributions to original RHOOK code and documentation, including the Developer
+SDK, are submitted under [Apache-2.0](LICENSE) unless explicitly stated otherwise,
+as described in its contribution terms. Only contribute material you have the
+right to license. Preserve the [third-party exceptions](THIRD_PARTY_NOTICES.md)
+and identify the origin and applicable terms of added third-party material.
 
 Proposed topics, to apply only after publication approval: `counterfactual-execution`,
 `ethereum`, `evm`, `arbitrum-nitro`, `hookr`, `python`, `developer-tools`, `experimental`.
