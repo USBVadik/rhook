@@ -1,5 +1,7 @@
 # Hookr Pair03: native replay with LP Rewards 100 → 50
 
+Publication snapshot: the figures and provenance below are unchanged. The later installed SDK acceptance and current source availability are described in [Developer Alpha](../../sdk/README.md).
+
 RHOOK replayed a saved Hookr block on Robinhood Chain, verified the original execution against its canonical commitments, then ran the same seven ordered arrivals with `RulesConfig.lpBps` changed from 100 to 50. The selected buyer's receipt-derived RHOOK output increased by **0.5040100829%**. Both worlds completed in native Go/Nitro with no RPC or state hydration during replay.
 
 Lower LP Rewards can suggest the direction of a fee change without executing a block. This experiment measured the consequences by running the historical transactions again: contract calls, receipts, gas and final commitments. The counterfactual figures below come from that execution.

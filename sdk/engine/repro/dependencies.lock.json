@@ -1,0 +1,421 @@
+{
+  "format": "rhook/pair03-build-only-lock/1",
+  "target": "darwin-arm64",
+  "sourceCheckpoint": "4c07186b8823a2ef3e8bfd7bade51fb4f8e87c3e",
+  "sources": [
+    {
+      "name": "nitro",
+      "commit": "7d5ac271b400f710f6267ad759c6afc3e12d7059",
+      "archiveUrl": "https://codeload.github.com/OffchainLabs/nitro/tar.gz/7d5ac271b400f710f6267ad759c6afc3e12d7059",
+      "sha256": "d7f5264202e2fa8671a70370196c6999721c4b9c400fdf24b01378bde302b757",
+      "bytes": 19460654,
+      "destination": "nitro"
+    },
+    {
+      "name": "geth",
+      "commit": "dff2aadcd2e75e33923b13acce6468d847477e79",
+      "archiveUrl": "https://codeload.github.com/OffchainLabs/go-ethereum/tar.gz/dff2aadcd2e75e33923b13acce6468d847477e79",
+      "sha256": "aaef4d6b0c67940c06501fa3730cee0d5026798bd123750030c6f1764dc66c72",
+      "bytes": 22082064,
+      "destination": "nitro/go-ethereum"
+    },
+    {
+      "name": "brotli",
+      "commit": "f4153a09f87cbb9c826d8fc12c74642bb2d879ea",
+      "archiveUrl": "https://codeload.github.com/google/brotli/tar.gz/f4153a09f87cbb9c826d8fc12c74642bb2d879ea",
+      "sha256": "6d6cacce05086b7debe75127415ff9c3661849f564fe2f5f3b0383d48aa4ed77",
+      "bytes": 512229,
+      "destination": "nitro/brotli"
+    },
+    {
+      "name": "wasmer",
+      "commit": "d145ce4369414c0474c1d76d1037b3e5740a86e0",
+      "archiveUrl": "https://codeload.github.com/OffchainLabs/wasmer/tar.gz/d145ce4369414c0474c1d76d1037b3e5740a86e0",
+      "sha256": "6d48b54d56f186979e3b22340455be4d6f37e635b15c341464a15166f37d184b",
+      "bytes": 127416961,
+      "destination": "nitro/crates/tools/wasmer"
+    },
+    {
+      "name": "precompiles",
+      "commit": "7e88c8cc53c2e96201a23c638f1536557b9cb68b",
+      "archiveUrl": "https://codeload.github.com/OffchainLabs/nitro-precompile-interfaces/tar.gz/7e88c8cc53c2e96201a23c638f1536557b9cb68b",
+      "sha256": "ada4f0770a5d9aeacfa7ba785d4e55453c1a40c15f0a7782be1ce569e5226912",
+      "bytes": 17918,
+      "destination": "nitro/contracts-local/src/precompiles"
+    }
+  ],
+  "go": {
+    "url": "https://go.dev/dl/go1.25.12.darwin-arm64.tar.gz",
+    "sha256": "fa2c88bbcf64bd3b2aef355f026cfec6d3a4a01c132f999c8f8c964eb767164f",
+    "bytes": 58121109,
+    "version": "go1.25.12"
+  },
+  "rust": {
+    "version": "1.93.0",
+    "manifestSha256": "beb6ba4e41c84e9c11c80e6804a007497d0c8ba0810cd403fabc8f4a9c45b1f8",
+    "components": [
+      {
+        "name": "rustc",
+        "url": "https://static.rust-lang.org/dist/2026-01-22/rustc-1.93.0-aarch64-apple-darwin.tar.xz",
+        "sha256": "092be03c02b44c405dab1232541c84f32b2d9e8295747568c3d531dd137221dc"
+      },
+      {
+        "name": "cargo",
+        "url": "https://static.rust-lang.org/dist/2026-01-22/cargo-1.93.0-aarch64-apple-darwin.tar.xz",
+        "sha256": "6443909350322ad07f09bb5edfd9ff29268e6fe88c7d78bfba7a5e254248dc25"
+      },
+      {
+        "name": "rust-std",
+        "url": "https://static.rust-lang.org/dist/2026-01-22/rust-std-1.93.0-aarch64-apple-darwin.tar.xz",
+        "sha256": "8603c63715349636ed85b4fe716c4e827a727918c840e54aff5b243cedadf19b"
+      }
+    ]
+  },
+  "cbindgen": "0.29.2",
+  "solc": "0.8.30",
+  "fixture": {
+    "bytes": 1417029,
+    "sha256": "b55ba3a6d70bd081148966f3b447135a098a26c18bae0c773f065beda807bda3",
+    "inputCommitment": "d8e00b18493247235f25bc4d0804449b3918763909c25dd03353e3df6cf135b2",
+    "witnessCommitment": "8cc51fe2215ec68af17e0735ee5fbe1e21c71e26de05a68ea85099373cede615"
+  },
+  "sourceFiles": [
+    {
+      "path": "native/prestate/bridge.go",
+      "bytes": 10034,
+      "sha256": "1b692c04d83ffefe4b68d36c8d93f0eeb5454991116566d40f380ee6b5da0512"
+    },
+    {
+      "path": "native/prestate/bridge_test.go",
+      "bytes": 6803,
+      "sha256": "a34ac6f33cbcfd62ca12aedbd272b8c4a52479b1c8d716d351c5aaa4880e4ef9"
+    },
+    {
+      "path": "native/prestate/cmd/admit/main.go",
+      "bytes": 609,
+      "sha256": "f486db02be248703ca8f0e0184f130fe9211848c417384fef4338e331a358a33"
+    },
+    {
+      "path": "native/prestate/cmd/calibrate/main.go",
+      "bytes": 3402,
+      "sha256": "710e5497e3f1b6ea71c5940eacba921fa2605ad7106bae5f5067cbc39bca280f"
+    },
+    {
+      "path": "native/prestate/cmd/eventwatch/main.go",
+      "bytes": 4310,
+      "sha256": "085999891cca09781fb447dab6a746d9eabc0f42ac13dede62c892a6a474a958"
+    },
+    {
+      "path": "native/prestate/cmd/hookr/main.go",
+      "bytes": 8490,
+      "sha256": "89eda90ccd6c7a5546d68df4237584f0f9c033d1c3ba3bc80a699646e8d658f2"
+    },
+    {
+      "path": "native/prestate/cmd/prospective/main.go",
+      "bytes": 5135,
+      "sha256": "4d74e863b1705b804087c9678e2e8178ee93c7388564658a4bfa814e8a47eef1"
+    },
+    {
+      "path": "native/prestate/cmd/supervision-fixture/main.go",
+      "bytes": 1084,
+      "sha256": "91870614a1abbb0609e0af51e15bb5b746f3874eacc32add89a470e492316155"
+    },
+    {
+      "path": "native/prestate/coverage_probe.go",
+      "bytes": 7997,
+      "sha256": "27baaedf02bec61ffbb60fe5f67fc923426cb2834291086ebcaff9de3dd8bfb5"
+    },
+    {
+      "path": "native/prestate/deadline_test.go",
+      "bytes": 744,
+      "sha256": "7bb7cf15b4ab70972739eb86c8905c09dd81be316603d259af516bff3c03dfbd"
+    },
+    {
+      "path": "native/prestate/economics.go",
+      "bytes": 12985,
+      "sha256": "d1a269d71e537641c44c7cdad38c677e9c7389eed770bf43acab5feee3fe0c5d"
+    },
+    {
+      "path": "native/prestate/economics_test.go",
+      "bytes": 6332,
+      "sha256": "9ecee9cb98d6eddeff6c65580a09eb03a3e5447b831bb8a4e9788d510378b755"
+    },
+    {
+      "path": "native/prestate/event_capture.go",
+      "bytes": 8883,
+      "sha256": "5429801ddec0769b0a27d8dd9f67249e7546deed5d806aec4fb3dd7af76d1bbe"
+    },
+    {
+      "path": "native/prestate/event_controller.go",
+      "bytes": 10684,
+      "sha256": "62cdb932869f424eb841eb59afdde0f24f2e88fe6f8cdc22ef0781436c4547fe"
+    },
+    {
+      "path": "native/prestate/event_integration_test.go",
+      "bytes": 25962,
+      "sha256": "6fc52b71e0ad34a680ed702b892a5c4183123a534a6703a2a6d15ae00ed5ea74"
+    },
+    {
+      "path": "native/prestate/event_journal.go",
+      "bytes": 17879,
+      "sha256": "c3828ce3b9b80bb032717469a035bccc14161a03380f7f4ed103807689465c4e"
+    },
+    {
+      "path": "native/prestate/event_transport.go",
+      "bytes": 10448,
+      "sha256": "3691e79f02016760d14b269551e61765e791f159b3b2086c353bf44711dba0ec"
+    },
+    {
+      "path": "native/prestate/event_watch.go",
+      "bytes": 19215,
+      "sha256": "4d131f89555c958b57d3bc889977d5b47dbbe184fc9036fc8bfdb2af6fcdefeb"
+    },
+    {
+      "path": "native/prestate/evm_test.go",
+      "bytes": 2856,
+      "sha256": "24214fb677f45f571ae74e2f56a2ba65ebf7e477f4cb61695e83085253ce0300"
+    },
+    {
+      "path": "native/prestate/go.mod",
+      "bytes": 10530,
+      "sha256": "9eb9850aa0bac21c78b794bf62bb9b0af7522d98a33247f48a0cf13810961c55"
+    },
+    {
+      "path": "native/prestate/go.sum",
+      "bytes": 74554,
+      "sha256": "2ebf8b2d412f7b0c63bee72db833115ddb64ed30a368c11ce8c4d4c06e4d663e"
+    },
+    {
+      "path": "native/prestate/hookr.go",
+      "bytes": 1918,
+      "sha256": "f7e1cf3efd4ec35c6f967b52daa0bf1202bbc3f506cab7f75f50e0d3220fa728"
+    },
+    {
+      "path": "native/prestate/hookr_prospective.go",
+      "bytes": 11583,
+      "sha256": "cfeaeb25a213b70900d1c9d73b9a9b227ecfd8ad7c3f692584fca9444bb9ba64"
+    },
+    {
+      "path": "native/prestate/hookr_selection_test.go",
+      "bytes": 2741,
+      "sha256": "fdeee2ebe72dc700aa8d20125c1f3702ef7d86b6594acb194dd7f4ac317633bf"
+    },
+    {
+      "path": "native/prestate/importer.go",
+      "bytes": 7110,
+      "sha256": "7abcc90f229e182c87da8240f48b856a18a9863ecf20366a00469114341c745a"
+    },
+    {
+      "path": "native/prestate/importer_test.go",
+      "bytes": 3145,
+      "sha256": "04157aa6fd49cd1dcefbc36e500d4c8244d86da0cf4ecd2856d4a5169ebd3ef7"
+    },
+    {
+      "path": "native/prestate/internal/controllersafety/watch.go",
+      "bytes": 2161,
+      "sha256": "d3e26f0f52ed45e78c19414181946e98c4a0991254df0145fb649ade3b73f407"
+    },
+    {
+      "path": "native/prestate/internal/controllersafety/watch_test.go",
+      "bytes": 1513,
+      "sha256": "3be5bff8c3d58f18e5ed2ff5cd20f37512ed4f6ad9ebbedbc48a3ed54aaa9998"
+    },
+    {
+      "path": "native/prestate/live_hydration_test.go",
+      "bytes": 9122,
+      "sha256": "d4bd97d4194f36341b964a17c63aa4286128f6081f9cc6adac1ee58563bbf019"
+    },
+    {
+      "path": "native/prestate/lp_branch.go",
+      "bytes": 5250,
+      "sha256": "341f27d85edf31aa4193ec2aca4ce01c1b57378934d8e5548573eb730d229bb9"
+    },
+    {
+      "path": "native/prestate/lp_branch_test.go",
+      "bytes": 2245,
+      "sha256": "8ed5b493c1b9ce4abd934e76613cad322c172a727be1d6f47b5ece7e629d312f"
+    },
+    {
+      "path": "native/prestate/monitor_cu.go",
+      "bytes": 3726,
+      "sha256": "29b46850925327ec6eb510089f8b0fd8c0a9a776929b49184471d6c50aaebdee"
+    },
+    {
+      "path": "native/prestate/monitor_cu_test.go",
+      "bytes": 4521,
+      "sha256": "c76e62693873a93e70fbb25af1ef6e2aef7306d69d2e7c6f4490dbea8229adfa"
+    },
+    {
+      "path": "native/prestate/monitor_frozen_baseline_test.go",
+      "bytes": 6485,
+      "sha256": "221149dafdc1468ee446867f52b1e7a2e7e8ebd12660428a9fa4672c64b6daa1"
+    },
+    {
+      "path": "native/prestate/monitor_selector.go",
+      "bytes": 12492,
+      "sha256": "d16901b44d985e5bec3d85d0a86e062d86d509651f606f2cb78c8b9e77fc99b6"
+    },
+    {
+      "path": "native/prestate/monitor_selector_test.go",
+      "bytes": 12277,
+      "sha256": "946213dde7b621c6871b7682e34e9e2f92a4a2a3b0db82469bb0d856ee8d189d"
+    },
+    {
+      "path": "native/prestate/monitor_stress_test.go",
+      "bytes": 9052,
+      "sha256": "778cdf7a1ffa1cdd78f248dc596bb7d9f7f4476c24bedbc6b9574ab47648d12b"
+    },
+    {
+      "path": "native/prestate/native_observer.go",
+      "bytes": 6332,
+      "sha256": "40b49652d859ce7a05586dee02e318cb840443bd78e817f00e8c3988681a7acc"
+    },
+    {
+      "path": "native/prestate/observed_selection.go",
+      "bytes": 15399,
+      "sha256": "ee73e769484ea0ebf32367236904d20ef6c6d0a7ef675137319c9a8a91f47047"
+    },
+    {
+      "path": "native/prestate/observed_selection_test.go",
+      "bytes": 22322,
+      "sha256": "e3f3ccb0ea7b0f1457df5bda793095f91fc7802ed062a5ae89b38f5febd575c1"
+    },
+    {
+      "path": "native/prestate/offline_calibration.go",
+      "bytes": 3358,
+      "sha256": "57c11b421590691a2eab0351dec8bbe7179ea0cb241b41e8615ac7546659adca"
+    },
+    {
+      "path": "native/prestate/offline_calibration_test.go",
+      "bytes": 854,
+      "sha256": "4c7026793780999f4a89be3a29606987916523a033c91eb89938b2229e9fff95"
+    },
+    {
+      "path": "native/prestate/package.go",
+      "bytes": 3659,
+      "sha256": "122f89b813d776adaa1cba9f4d096e560075a04321effce477775a17792796ad"
+    },
+    {
+      "path": "native/prestate/proof.go",
+      "bytes": 3614,
+      "sha256": "0d5ebc76f0271bd55b71db1cf162ae8820dc385b96ebe53139cf2dc2e945e52a"
+    },
+    {
+      "path": "native/prestate/prospective.go",
+      "bytes": 18739,
+      "sha256": "18f42693fc22649196e1829cb682614cdcf4daf5aaa3ffbf437b39230410d2de"
+    },
+    {
+      "path": "native/prestate/prospective_contract_test.go",
+      "bytes": 6215,
+      "sha256": "7abed357d4869f8678813f4f0c2dcc91508ce775065ec1a4e0c7fbd1cbd2fd1b"
+    },
+    {
+      "path": "native/prestate/quiet_acceptance_test.go",
+      "bytes": 19904,
+      "sha256": "1bf51f9a0df5a7a7f56289a3e0b8da85d7468fd326cd7b6896f4c5f1db72f406"
+    },
+    {
+      "path": "native/prestate/quiet_coverage.go",
+      "bytes": 4755,
+      "sha256": "d9c21b3e36697f624a97d06c31b3b8b210b73295d6f8f511a5e8fb091ecc3654"
+    },
+    {
+      "path": "native/prestate/quiet_coverage_test.go",
+      "bytes": 2055,
+      "sha256": "d25f420460730dc748dfd67fb0c9e1467515f52a055eba31346bbd64f067784e"
+    },
+    {
+      "path": "native/prestate/quote_projection.go",
+      "bytes": 7725,
+      "sha256": "17010df3dd371acceb6ec718d4a11a2b031ac9ebf23bd9505e3b7b1a30e943c2"
+    },
+    {
+      "path": "native/prestate/quote_projection_test.go",
+      "bytes": 2914,
+      "sha256": "5d8d831d288923a8e2bf80a3d27ac92809517580e8fe6b5f02d210f6b8711c7f"
+    },
+    {
+      "path": "native/prestate/recapture_projection.go",
+      "bytes": 2681,
+      "sha256": "77460dbad35f37d2c0227745a7dc4dcdb958bff38c79ebe1fe8ef7d2c37504f9"
+    },
+    {
+      "path": "native/prestate/recapture_projection_test.go",
+      "bytes": 871,
+      "sha256": "8722e4370ca0573e7c7c1840002230f7b1ee7358ba71e0f5512710d785774d54"
+    },
+    {
+      "path": "native/prestate/review_budget_test.go",
+      "bytes": 830,
+      "sha256": "36802ed8992ba083aecd98691ddc091f1d6a23ee99e0716426147e7b666e3bc2"
+    },
+    {
+      "path": "native/prestate/rpc.go",
+      "bytes": 10080,
+      "sha256": "cca2c9ab2bfce48e33bf75ee7b30ee1791a3c11bf1338269f1e1f3e751d9393e"
+    },
+    {
+      "path": "native/prestate/rpc_test.go",
+      "bytes": 2444,
+      "sha256": "c2ab3969e2b9bf01324f55f9236702204d599c2b8a14b8663c2be33803d8a363"
+    },
+    {
+      "path": "native/prestate/runner.go",
+      "bytes": 7606,
+      "sha256": "93bf9de0df0847d7f75d96d2b9815d3b5abdb9c494ecead3118a43d88823ae07"
+    },
+    {
+      "path": "native/prestate/runner_test.go",
+      "bytes": 13206,
+      "sha256": "6d0b8c556ccbf3c6baf0b9b8a1d744306512ed7c55a9e837aadb66a01c816183"
+    },
+    {
+      "path": "native/prestate/testdata/chain-config.json",
+      "bytes": 624,
+      "sha256": "dfa6de28a2dcf9fa3079d97c73401af7c7df0bc7222a6a3fe1e927d98104ffe0"
+    },
+    {
+      "path": "native/saved-pair/go.mod",
+      "bytes": 10704,
+      "sha256": "7fe58f1dd04bf1097954591b38c7d44769407708b0858f51b5e1a0f765cf8070"
+    },
+    {
+      "path": "native/saved-pair/go.sum",
+      "bytes": 74554,
+      "sha256": "2ebf8b2d412f7b0c63bee72db833115ddb64ed30a368c11ce8c4d4c06e4d663e"
+    },
+    {
+      "path": "native/saved-pair/main.go",
+      "bytes": 3261,
+      "sha256": "e9d4d876ce509192a6ab0f71bcbdd795fc67c86c1358e3b1beec9d0765d4e80a"
+    },
+    {
+      "path": "native/saved-pair/pair.go",
+      "bytes": 9094,
+      "sha256": "ab58607a7778ea57b2054ff383a55dfa671a0fcbe7ba33e3d3142a762baad94e"
+    },
+    {
+      "path": "native/saved-pair/pair_test.go",
+      "bytes": 5956,
+      "sha256": "21d242ef91978482ebcceeacd6b3ae0cf4d6f45e244dfcf5f4ac1eef7dded678"
+    },
+    {
+      "path": "native/saved-pair/plan.json",
+      "bytes": 2867,
+      "sha256": "2b2146d98868714ec6ce5e8f15639314712dc735b75148b3fcb4dec96f81c6b4"
+    }
+  ],
+  "expectedGenerated": {
+    "arbitrator.h": "8f0c5c570daa158aa944d1bd9e423b519d0f6a65bf4266012201c50e171bf592",
+    "precompilesgen.go": "b5cfbfd88f6270bd82948c727b5d750673d5e38da92c9a9c926f4008aadbf380"
+  },
+  "scope": {
+    "ACTUAL": 0,
+    "BRANCH": 0,
+    "EVM": 0,
+    "providerRPC": 0,
+    "WSS": 0,
+    "externalDelivery": "HOLD"
+  }
+}

@@ -1,6 +1,6 @@
 # License scope and third-party notices
 
-RHOOK-authored code and documentation, including `core`, `runtime`, `host`,
+Except for the new SDK import described below, RHOOK-authored code and documentation, including `core`, `runtime`, `host`,
 tests and original example/packaging code, are licensed under
 [Apache-2.0](LICENSE). This grant covers the rights held by RHOOK contributors.
 It does not relicense the third-party material below or grant rights in
@@ -50,3 +50,20 @@ prebuilt native binary or container. Redistributing a combined executable or
 image requires meeting all applicable upstream conditions, including any
 corresponding-source/relinking obligations. The root Apache-2.0 license is
 not a substitute for those conditions.
+
+## New Developer Alpha SDK import
+
+The RHOOK-owned portions of `sdk/` have no new license grant yet; see
+[sdk/LICENSE_SCOPE.md](sdk/LICENSE_SCOPE.md). The existing root Apache-2.0 grant
+does not silently expand to that import. Native module metadata originates in
+Nitro; third-party and derived material retains its upstream terms.
+
+The Alpha references the same pinned Nitro/geth/Brotli/Wasmer/precompiles
+revisions listed above, with an explicit CGO/static Stylus dependency.
+[sdk/engine/repro/dependencies.lock.json](sdk/engine/repro/dependencies.lock.json)
+records the source/toolchain pins. Source bootstrap preserves original notices.
+No upstream implementation archives, npm modules, worker, Node, sensor, witness
+or native run are included in this source import. A manifest or ABI compatibility
+pin is not an upstream implementation. The separate executable distribution
+must retain the full notice inventory and resolve its corresponding-source and
+relink obligations; see [sdk/DISTRIBUTION.md](sdk/DISTRIBUTION.md).

@@ -1,0 +1,19 @@
+# Historical source checkpoint: no activation or runtime payloads here.
+**/runtime/
+**/artifacts/
+**/candidate/
+**/records/
+**/node_modules/
+**/__pycache__/
+**/.DS_Store
+.env
+.env.*
+*.key
+*.pem
+*.dmg
+*.zip
+*.tar
+*.bundle
+*.log
+*.pyc
+/.build/

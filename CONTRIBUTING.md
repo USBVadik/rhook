@@ -1,31 +1,39 @@
 # Contributing
 
-RHOOK is in technical-review stage. Small, test-backed changes are preferred.
+Start with offline tests:
 
-## Before opening a change
-
-```bash
+```sh
 npm ci
 npm run check
 npm test
 npm run quickstart
+python3 -B sdk/tools/test_offline.py
 ```
 
-A change to evidence semantics must include:
+Node tests cover the protocol-neutral code. SDK tests use synthetic fixtures,
+never the historical witness or native engine. Keep tests independent of
+network, personal paths, credentials and developer caches.
 
-- the malformed or previously unsupported input;
-- a focused regression test;
-- compatibility impact;
-- any required schema or domain version change.
+Keep changes small. Describe user-visible behavior and validation. Code,
+comments and documentation should be in English. Do not commit generated runs,
+grants, witnesses, binaries, private archives or credentials. Report sensitive
+material privately to the repository owner instead of including it in an issue.
 
-Do not weaken strict verification to accept a producer-specific payload. Do not change historical claims or provenance hashes to make a test pass.
+Native logic, resource policy, authority consumption, original-parent handling
+and the canonical ACTUAL gate require separate review and execution approval.
+A unit test never authorizes replay. Do not alter accepted evidence or update
+its hashes to make a test pass.
 
-## Pull requests
+Changes to evidence semantics should include the malformed or previously
+unsupported input, a focused regression, compatibility impact and any required
+schema/domain version change. Do not weaken strict verification to accommodate
+one producer. Retain third-party origin and license notices.
 
-Keep pull requests narrow. Describe the execution or verification invariant being changed, not just the files edited. Generated research archives, local traces, credentials, and private endpoints do not belong in this repository.
-
-Contributions to RHOOK-authored code are submitted under [Apache-2.0](LICENSE)
+Licensing for the SDK import is pending. Discuss contributions before submitting
+material that would complicate that decision; no CLA or new license grant is
+implied. Existing public code retains its current license and exceptions.
+Contributions to that existing RHOOK-authored code remain under Apache-2.0
 unless explicitly stated otherwise, as described in its contribution terms.
-Preserve the [third-party license boundaries](THIRD_PARTY_NOTICES.md), including
-the LGPL-derived native adapter. Include the origin and applicable license
-when adding third-party material.
+
+Proposed topics, to apply only after publication approval: `counterfactual-execution`,
+`ethereum`, `evm`, `arbitrum-nitro`, `hookr`, `python`, `developer-tools`, `experimental`.

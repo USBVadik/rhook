@@ -1,0 +1,42 @@
+[
+  {
+    "source": "supervisor/host-capture/tools/diagnostic.py",
+    "name": "save",
+    "sha256": "546375253ee353e9553a0d30fdb0f046db4b0d113070529a578835099e47c195"
+  },
+  {
+    "source": "supervisor/host-capture/tools/diagnostic.py",
+    "name": "capture",
+    "sha256": "3ab7d8758e22be1c6934ee3c3fe1013c39c6c003782cfea40637f98a764223e0"
+  },
+  {
+    "source": "supervisor/host-capture/tools/diagnostic.py",
+    "name": "evaluate",
+    "sha256": "555980690091b7d265d5e04c9b04952f400358a2b675c55ded9e10d32578503a"
+  },
+  {
+    "source": "supervisor/pair03/tools/run_once.py",
+    "name": "utc",
+    "sha256": "9f680e20ae07796a69479c21d1e311a0aa5004f745a875be2756f9c7dbbed535"
+  },
+  {
+    "source": "supervisor/pair03/tools/run_once.py",
+    "name": "store",
+    "sha256": "fcfc5534e03bcdac2e55da08e17b40cbd02f9f6bbc92fd93d36116549636791b"
+  },
+  {
+    "source": "supervisor/pair03/tools/run_once.py",
+    "name": "sample_owned",
+    "sha256": "fdf98d47003e3ed571e8cb79331704107c0539cc695e8cf267f5c6d65f51b5e2"
+  },
+  {
+    "source": "supervisor/pair03/tools/run_once.py",
+    "name": "monitored",
+    "sha256": "016b6da5241bb49d6f6336c0237749cbf89ce72f9761a1b88fc5bf640654ecaf"
+  },
+  {
+    "source": "supervisor/legacy-admission/tools/run_once.py",
+    "name": "assess_host",
+    "sha256": "66b61713d6a676a05c80253aebd281e830d95080543ba90a2a0ef0ac34900b13"
+  }
+]

@@ -1,0 +1,3 @@
+#!/usr/bin/env python3
+from case_sdk.cli import main
+raise SystemExit(main())

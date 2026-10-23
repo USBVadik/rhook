@@ -1,0 +1,8 @@
+{
+  "name": "rhook-pair03-abi-build",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "solc": "0.8.30"
+  }
+}

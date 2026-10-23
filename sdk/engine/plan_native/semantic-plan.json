@@ -1,0 +1,29 @@
+{
+  "schema": "rhook/hookr-plan/0.1",
+  "caseId": "d1cf9882e36f35bee69b3b723b13a2a5023d1bdc661f283a817a8b21afd845a3",
+  "packageSha256": "b55ba3a6d70bd081148966f3b447135a098a26c18bae0c773f065beda807bda3",
+  "ruleId": "hookr-1.standard.RulesConfig.lpBps",
+  "expectedOld": "100",
+  "newValue": "50",
+  "intervention": {
+    "checkpoint": {
+      "chainId": 4663,
+      "blockNumber": 93251802,
+      "blockHash": "0x991db6ee40bd7056cfabff012763a1b75995979e5023dc010553dbc304c16016",
+      "stateRoot": "0x9c63ad5d9c6ba4fd19c301ea35264cec28dd1ad0e951a5f5578af8a32131baa6"
+    },
+    "pool": "0x94d1a318a67449c1fd850f354b4694be69483a6e94148787659e487ecb8c6780",
+    "account": "0x4a71c270b1520f94064268102aebd744b0de7942",
+    "slot": "0x1ad7756ae873b72ee7b85d116a86b7b2c5244640095753f73687752bed4705aa",
+    "mask": "0x00000000000000000000ffff0000000000000000000000000000000000000000",
+    "expectedOldWord": "0x0000000007d0000000000064000000020000000000000000002cec0000000000",
+    "newWord": "0x0000000007d0000000000032000000020000000000000000002cec0000000000"
+  },
+  "status": "PLANNED_NOT_EXECUTED",
+  "branchResult": null,
+  "savedInterventionMatch": false,
+  "executionSupport": "NEW_NATIVE_PLAN_REQUIRED",
+  "witnessClosure": "NOT_EVALUATED",
+  "executionAuthorized": false,
+  "planCommitment": "e8a0e1d0a8158ec073ea076507864bb9b828a96fd81cdd22732ab902345b6cd7"
+}

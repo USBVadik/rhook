@@ -9,3 +9,11 @@ coverage/
 .nyc_output/
 *.log
 *.tgz
+
+# Local Alpha installations, inputs and generated Python state
+.install/
+__pycache__/
+*.pyc
+*.zip
+*.tar
+*.tar.gz
