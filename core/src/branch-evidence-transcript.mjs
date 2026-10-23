@@ -125,7 +125,7 @@ export function buildBranchEvidenceTranscript({ branches, intervention, actualEn
     requireCondition(pair.actual.postStateDigest === actualEnvelopes[index].body.execution.successorStateCommitment, 'SEMANTIC_STATE_BINDING_MISMATCH', `actual semantic pair ${pairIndex} is not bound to envelope successor state`)
     requireCondition(pair.counterfactual.postStateDigest === counterfactualEnvelopes[index].body.execution.successorStateCommitment, 'SEMANTIC_STATE_BINDING_MISMATCH', `counterfactual semantic pair ${pairIndex} is not bound to envelope successor state`)
     return Object.freeze({ envelopeIndex: index, slot: extractionSlotKey(pair.actual), verdict: verdict.verdict, actual: extractionSummary(pair.actual), counterfactual: extractionSummary(pair.counterfactual) })
-  }).sort((a, b) => a.envelopeIndex - b.envelopeIndex || a.slot.localeCompare(b.slot))
+  }).sort((a, b) => a.envelopeIndex - b.envelopeIndex || (a.slot < b.slot ? -1 : a.slot > b.slot ? 1 : 0))
 
   requireCondition(Array.isArray(limitations), 'INVALID_BRANCH_TRANSCRIPT', 'limitations must be an array')
   const normalizedLimitations = [...new Set(limitations.map((item) => cleanToken(item, 'limitation')))].sort()

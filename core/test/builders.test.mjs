@@ -9,16 +9,25 @@ import {
   createCommitment,
   exceptionNone,
   exceptionRevert,
+  exportBranchEvidenceTranscript,
   isBranchEvidenceTranscriptVerified,
   isEnvelopeEvidenceVerified,
+  makeEndpoint,
   makeEnvelopeIdentity,
+  makeExtraction,
   makeGasAndFee,
+  parseAddress,
   parseBlockNumber,
   parseDigest,
   parseHash32,
+  parseHexBytes,
   parseQuantity,
+  present,
+  sourceReturnWord,
+  sourceStorageSlot,
   validationValid,
   verifyBranchEvidenceTranscript,
+  verifyBranchEvidenceTranscriptJson,
   verifyEnvelopeEvidence,
 } from '../src/index.mjs'
 import { recomputeEnvelope } from './helpers.mjs'
@@ -76,4 +85,79 @@ test('branch builder refuses malformed input even with a recomputed receipt', ()
     counterfactualEnvelopes: [valid],
     semanticPairs: [],
   }), (error) => error.code === 'UNVERIFIED_ENVELOPE_EVIDENCE')
+})
+
+function mixedObservations({ callUnchanged = false, envelopeCount = 1 } = {}) {
+  const actualEnvelopes = Array.from({ length: envelopeCount }, (_, index) => envelope({ index }))
+  const counterfactualEnvelopes = Array.from({ length: envelopeCount }, (_, index) => envelope({ index, successor: digest('24') }))
+  const address = parseAddress(`0x${'ab'.repeat(20)}`)
+  const semanticPairs = actualEnvelopes.flatMap((actual, index) => [
+    { selector: '0x', source: sourceStorageSlot(parseHash32(hash32('00'))) },
+    { selector: '0x12345678', source: sourceReturnWord(parseHash32(hash32('00'))) },
+  ].map(({ selector, source }) => {
+    const endpoint = makeEndpoint(address, parseHexBytes(selector))
+    const extraction = (postState, value) => makeExtraction({
+      endpoint,
+      postState: parseDigest(postState),
+      recordIdentity: createCommitment(digest('61'), 'observed-value'),
+      source,
+      presence: present(parseHash32(hash32(value))),
+    })
+    return {
+      envelopeIndex: parseQuantity(String(index)),
+      actual: extraction(actual.body.execution.successorStateCommitment, '05'),
+      counterfactual: extraction(counterfactualEnvelopes[index].body.execution.successorStateCommitment,
+        callUnchanged && selector !== '0x' ? '05' : '06'),
+    }
+  }))
+  return {
+    branches: { actual: createCommitment(digest('aa'), 'actual-branch'), counterfactual: createCommitment(digest('bb'), 'counterfactual-branch') },
+    intervention: { kind: 'REPLACE_COMMITTED_INPUT', target: identity(0) },
+    actualEnvelopes,
+    counterfactualEnvelopes,
+    semanticPairs,
+  }
+}
+
+test('mixed storage and call observations use the strict code-unit order', () => {
+  const transcript = buildBranchEvidenceTranscript(mixedObservations())
+  const semantic = transcript.body.semanticEvidence
+  assert.deepEqual(semantic.map((item) => item.actual.source.kind), ['RETURN_WORD', 'STORAGE_SLOT'])
+  assert.equal(verifyBranchEvidenceTranscript(transcript).valid, true)
+  assert.deepEqual(transcript.body.divergence.semantic, {
+    status: 'DIVERGED', envelopeIndex: 0, slot: semantic[0].slot, verdict: 'VALUE_CHANGED',
+  })
+  assert.equal(verifyBranchEvidenceTranscriptJson(exportBranchEvidenceTranscript(transcript)).valid, true)
+})
+
+test('first semantic divergence skips an equal call before a changed storage observation', () => {
+  const transcript = buildBranchEvidenceTranscript(mixedObservations({ callUnchanged: true }))
+  const semantic = transcript.body.semanticEvidence
+  assert.deepEqual(semantic.map((item) => item.verdict), ['EQUAL', 'VALUE_CHANGED'])
+  assert.deepEqual(transcript.body.divergence.semantic, {
+    status: 'DIVERGED', envelopeIndex: 0, slot: semantic[1].slot, verdict: 'VALUE_CHANGED',
+  })
+  assert.equal(verifyBranchEvidenceTranscript(transcript).valid, true)
+})
+
+test('semantic input permutations preserve envelope priority, bytes and commitment', () => {
+  const input = mixedObservations({ envelopeCount: 2 })
+  const expected = buildBranchEvidenceTranscript(input)
+  const bytes = exportBranchEvidenceTranscript(expected)
+  assert.deepEqual(expected.body.semanticEvidence.map((item) => [item.envelopeIndex, item.actual.source.kind]), [
+    [0, 'RETURN_WORD'], [0, 'STORAGE_SLOT'], [1, 'RETURN_WORD'], [1, 'STORAGE_SLOT'],
+  ])
+  for (const first of input.semanticPairs) {
+    for (const second of input.semanticPairs.filter((item) => item !== first)) {
+      const remaining = input.semanticPairs.filter((item) => item !== first && item !== second)
+      for (const tail of [remaining, [...remaining].reverse()]) {
+        const semanticPairs = [first, second, ...tail]
+        const transcript = buildBranchEvidenceTranscript({ ...input, semanticPairs })
+        assert.deepEqual(semanticPairs, [first, second, ...tail])
+        assert.equal(exportBranchEvidenceTranscript(transcript), bytes)
+        assert.deepEqual(transcript.transcriptCommitment, expected.transcriptCommitment)
+        assert.equal(verifyBranchEvidenceTranscript(transcript).valid, true)
+      }
+    }
+  }
 })
