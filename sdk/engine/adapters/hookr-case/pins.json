@@ -1,0 +1,15 @@
+{
+  "poolKey": {
+    "currency0": "0x0000000000000000000000000000000000000000",
+    "currency1": "0x3c022d43a9f826cd206c2ba60bc753d8b36185c4",
+    "fee": 8388608,
+    "tickSpacing": 60,
+    "hooks": "0x89c9fb50d1f03192230ffb1c279bb6e7d3fe6acc"
+  },
+  "rulesNamespace": "0x762913e4bc0f59f7b08c82f07586fa48932548ab5fab99e6db0b09765b4ff900",
+  "rootRecordSlot": "0xdc5740eeafc78ca4488605782bceeee21ea0cec0908c37bbb90fb77c45910409",
+  "rootRuntimeHash": "0xd336de325837e60a74cea11d87b5ebd1cc8961911f611f38de0508d23b6e779f",
+  "caseRule": "hookr-1.standard.RulesConfig.lpBps",
+  "minimumNewValue": "0",
+  "maximumNewValue": "100"
+}

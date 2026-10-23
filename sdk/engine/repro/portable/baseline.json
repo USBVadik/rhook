@@ -1,0 +1,27 @@
+{
+  "format": "rhook/pair03-portable-acceptance-baseline/1",
+  "sourceManifestSha256": "cebe9e45ac25e6c14f8f112f0a6dfe0019cf3536833dfad2c7d924040a03dbd8",
+  "sourceFreezeSha256": "7b5fcc7876c19dddd96e7eee5903603c1e2a6744f66aa576af0f86b05cd71444",
+  "comparisonFields": [
+    "world",
+    "inputCommitment",
+    "witnessCommitment",
+    "stateRoot",
+    "receiptsRoot",
+    "blockHash",
+    "transactions",
+    "gasUsed",
+    "receipts",
+    "observation"
+  ],
+  "economicAssurance": "UNRESOLVED",
+  "heterogeneousAgreement": "NOT_EVALUATED",
+  "ACTUAL": {
+    "projectionSha256": "0b2582f3207e5afd077376703b63149e2c21c486a68a42bfb345e52407e531b1",
+    "sourceRecordSha256": "a6858c4bc1fd7bb50b6ffc328d8351eae90f90c6747781405caff3bf31704953"
+  },
+  "BRANCH": {
+    "projectionSha256": "02e24535d992baf235c81b2b388b758a34060705460354e5e8f749df399b80b7",
+    "sourceRecordSha256": "9871f2eaba6e01b2e57287795c1d0888b2e685c3c251729c471b329c6857940e"
+  }
+}

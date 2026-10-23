@@ -1,0 +1,41 @@
+{
+  "baselineCommit": "07cabff67506e80728228dbc82b1ee3ced47f030",
+  "officialSdk": {
+    "version": "1.1.1",
+    "tarballIntegrity": "sha512-p/FiRQEdgB1Rj7jjRWbG7kZWhsWsStjGWAbeMD7gKNw2oGXlCwGJwYpCWfTNIINDC97MEsBtrlyj1OKs46C1FQ==",
+    "releaseSourceCommit": "412960b37a631ce145d49fb4a1887f04a4d1fa74",
+    "contractsSnapshotCommit": "e597ef685cf6d65e66853b4394e1e3982fbf27fe",
+    "tarballSha256": "771ae2bf60109d70a1770e8db86d64766d82e5ac0f323690c5ee5d66cd4f20e0"
+  },
+  "layoutSources": [
+    "hookr-1/src/types/HookrTypes.sol",
+    "hookr-1/src/core/HookrRules.sol",
+    "hookr-1/src/libraries/HookrRootStorage.sol"
+  ],
+  "layoutSourceAudit": "Hookr SDK Compatibility01: sourceKeccak256 matched official deployment book; no ABI-to-storage inference",
+  "casePins": "Existing repro/portable/plan.json plus pins.json reconstructed from authenticated compatibility audit",
+  "reusedModules": [
+    {
+      "source": "rhook-historical-witness-b0-1/vendor/proof.mjs",
+      "sourceSha256": "0276d539ead827ed1848c16deedee15f1f3bd138bcc70fd1ea35ff8b01d9bea6",
+      "copy": "proof.mjs",
+      "copySha256": "0276d539ead827ed1848c16deedee15f1f3bd138bcc70fd1ea35ff8b01d9bea6",
+      "change": "Byte-for-byte reuse"
+    },
+    {
+      "source": "rhook-historical-witness-b0-1/vendor/primitives.mjs",
+      "sourceSha256": "1c2447b50ec2269e1e657f115a7ad8812bbe04242071c82a5aa705ac28b85985",
+      "copy": "primitives.mjs",
+      "copySha256": "1f59ab4c08aacf6484f810b6d9d68609558d7bb1b6abb3d077e7f39bb0c52ea3",
+      "change": "Standard viem imports replace the B0 local dependency subset"
+    },
+    {
+      "source": "rhook-historical-witness-b0-1/vendor/strict-json.mjs",
+      "sourceSha256": "8b0e1fed8e0ab50f218c4075dbbf23a9549ba21b5438c83f81e6404b4063627a",
+      "copy": "strict-json.mjs",
+      "copySha256": "8b0e1fed8e0ab50f218c4075dbbf23a9549ba21b5438c83f81e6404b4063627a",
+      "change": "Byte-for-byte reuse"
+    }
+  ],
+  "proofModuleLicense": "Existing RHOOK source; Apache-2.0 public license. Official Hookr SDK and viem are dependencies, not vendored release payloads."
+}

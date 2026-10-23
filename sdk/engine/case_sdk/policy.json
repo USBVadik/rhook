@@ -1,0 +1,40 @@
+{
+  "profile": "hookr-case-darwin-arm64/0.1",
+  "workload": {
+    "chainId": 4663,
+    "blockNumber": 93251803,
+    "arrivals": 7,
+    "packageSha256": "b55ba3a6d70bd081148966f3b447135a098a26c18bae0c773f065beda807bda3",
+    "intervention": "lpBps100to0through99",
+    "source": "NIL_NO_HYDRATION"
+  },
+  "workerRssBytes": 1073741824,
+  "osReserveBytes": 268435456,
+  "supervisorAllowanceBytes": 268435456,
+  "minimumAdmissionFreeBytes": 1610612736,
+  "minimumRuntimeFreeBytes": 536870912,
+  "maximumSampleSeconds": 0.25,
+  "sensorProcessWallSeconds": 1,
+  "maximumSampleGapSeconds": 2,
+  "admissionSpacingSeconds": 1,
+  "runtimeSampleSpacingSeconds": 0.25,
+  "normalPressure": 1,
+  "swapOutGrowthAllowed": false,
+  "swapUsageGrowthAllowed": false,
+  "reservedMemory": false,
+  "memoryEnforcement": "SAMPLED_RSS_AND_FREE_HEADROOM_NOT_HARD_RESERVATION",
+  "pairWallSeconds": 120,
+  "workerKernelCpuSeconds": 120,
+  "workerTelemetryMs": 100,
+  "stdoutStderrBytes": 67108864,
+  "sampledRuntimeBytes": 134217728,
+  "GOMAXPROCS": 2,
+  "GOMEMLIMIT_advisoryBytes": 536870912,
+  "maximumInvocations": {
+    "ACTUAL": 1,
+    "BRANCH": 1,
+    "B": 0
+  },
+  "RPC": 0,
+  "WSS": 0
+}

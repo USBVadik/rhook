@@ -1,0 +1,27 @@
+{
+  "schema": "rhook/controlled-alpha-assets/0.1",
+  "sourceCommitment": "5460f0c6fcf029ad09f3b12b711c3c9e34d438db4803d8ceb160263c72c7b9f1",
+  "policySha256": "1b081fd77d61a4037ec0055a1a129d3fdcc4f9a075f9b56b3c7d66be318e4688",
+  "caseDescriptorSha256": "ef5b95493c9efd3af8733749aa166bea47488464f0bb7c8098e824357834e6d2",
+  "verifierDependenciesCommitment": "b4f0794af5857e7159412bbc8ab02ed60562bc0940bb5c54f325028a3651e511",
+  "originalBuildRecordSha256": "4e285ea9867f01ca4c8b1a0a4d00fc26a9da41da871d1e10422c1f04d52cf283",
+  "files": {
+    "worker": {
+      "sha256": "d7e15c1b4168da06c4f3410ff1cc9f7963e090feedb22a7405d391910942283c",
+      "bytes": 129875506
+    },
+    "sensor": {
+      "sha256": "96661c881c8dac3460753f162c1144c4bd93e8aaf33525d1ed788440e803139e",
+      "bytes": 34192
+    },
+    "node": {
+      "sha256": "2bf0da35856edc1840d7cbc90e937811bf23a03d44aea07e4b491be44af18d91",
+      "bytes": 121304480
+    },
+    "BLOCK_PACKAGE.json": {
+      "sha256": "b55ba3a6d70bd081148966f3b447135a098a26c18bae0c773f065beda807bda3",
+      "bytes": 1417029
+    }
+  },
+  "limitations": "Controlled macOS arm64 kit. Native acceptance50 on one Mac; plans0-99 are not all native-tested. No binary/package/witness is embedded in source."
+}

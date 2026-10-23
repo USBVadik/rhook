@@ -1,5 +1,7 @@
 # Developer SDK Alpha v2: saved Hookr case status
 
+Historical Alpha v2 snapshot. The later [Developer Alpha source candidate](../../sdk/README.md) includes the case-specific TypeScript inspect/plan adapter. The acceptance and availability statements below describe the earlier stage.
+
 **The complete local CLI workflow passed for the saved Pair03 case on one macOS arm64 Mac. Sources and native binaries remain private.** This page documents that result; it is not an installation guide or public SDK release.
 
 ```text

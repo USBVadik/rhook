@@ -1,7 +1,7 @@
 # License scope and third-party notices
 
-RHOOK-authored code and documentation, including `core`, `runtime`, `host`,
-tests and original example/packaging code, are licensed under
+Original RHOOK code and documentation, including `core`, `runtime`, `host`,
+Developer SDK, tests and original example/packaging code, are licensed under
 [Apache-2.0](LICENSE). This grant covers the rights held by RHOOK contributors.
 It does not relicense the third-party material below or grant rights in
 third-party contracts, trademarks or data.
@@ -50,3 +50,32 @@ prebuilt native binary or container. Redistributing a combined executable or
 image requires meeting all applicable upstream conditions, including any
 corresponding-source/relinking obligations. The root Apache-2.0 license is
 not a substitute for those conditions.
+
+## Developer Alpha SDK
+
+Original RHOOK-owned source and documentation in `sdk/` use the root Apache-2.0
+license. [sdk/LICENSE_SCOPE.md](sdk/LICENSE_SCOPE.md) defines that scope. The
+grant does not relicense third-party or differently licensed derived material.
+
+The following imported native module metadata retains the pinned
+[Nitro BSL notice](examples/robinhood-v4/notices/nitro-LICENSE.md):
+
+- `sdk/engine/native/prestate/go.mod`
+- `sdk/engine/native/prestate/go.sum`
+- `sdk/engine/native/saved-pair/go.mod`
+- `sdk/engine/native/saved-pair/go.sum`
+
+The module definitions adapt upstream metadata for RHOOK and local dependency
+locations. These files do not grant an Apache-only license to Nitro or the
+modules they reference. The LGPL-derived adapter and other exceptions in the
+earlier table remain unchanged.
+
+The Alpha references the same pinned Nitro/geth/Brotli/Wasmer/precompiles
+revisions listed above, with an explicit CGO/static Stylus dependency.
+[sdk/engine/repro/dependencies.lock.json](sdk/engine/repro/dependencies.lock.json)
+records the source/toolchain pins. Source bootstrap preserves original notices.
+No upstream implementation archives, npm modules, worker, Node, sensor, witness
+or native run are included in this source import. A manifest or ABI compatibility
+pin is not an upstream implementation. The separate executable distribution
+must retain the full notice inventory and resolve its corresponding-source and
+relink obligations; see [sdk/DISTRIBUTION.md](sdk/DISTRIBUTION.md).

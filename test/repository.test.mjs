@@ -79,6 +79,8 @@ test('repository tree is small and excludes research/archive clutter', async () 
   const forbidden = files.filter((path) => {
     const repositoryPath = relative(root, path)
     if (repositoryPath === '.github/workflows/ci.yml') return false
+    // SDK workflow/guard source is product code, not a generated run archive.
+    if (repositoryPath.startsWith('sdk/')) return /\.(?:patch|log|tgz|svg)$/i.test(path)
     return /\.(?:patch|log|tgz|svg)$/i.test(path) || /(?:workflow|authorization|qualification|closure|checkpoint)/i.test(repositoryPath)
   })
   assert.deepEqual(forbidden, [])
@@ -89,7 +91,7 @@ test('repository tree is small and excludes research/archive clutter', async () 
     if ((await stat(path)).size > limit) oversized.push(name)
   }
   assert.deepEqual(oversized, [])
-  const compactJsonFiles = files.filter((path) => !relative(root, path).startsWith('examples/robinhood-v4/') && path.endsWith('.json') && !path.endsWith('package.json') && !path.endsWith('package-lock.json')).map((path) => relative(root, path))
+  const compactJsonFiles = files.filter((path) => !relative(root, path).startsWith('examples/robinhood-v4/') && !relative(root, path).startsWith('sdk/') && path.endsWith('.json') && !path.endsWith('package.json') && !path.endsWith('package-lock.json')).map((path) => relative(root, path))
   assert.deepEqual(compactJsonFiles, [
     'docs/reproducibility/source-hashes.json',
     'docs/research/bounded-generic-native-branch-result.json',
@@ -109,10 +111,10 @@ test('repository tree is small and excludes research/archive clutter', async () 
 test('README explains the primitive in its first screen without inflated claims', async () => {
   const readme = await readFile(join(root, 'README.md'), 'utf8')
   const firstScreen = readme.slice(0, 1_500)
-  assert.match(firstScreen, /RHOOK is an explainable deterministic counterfactual execution substrate for onchain state machines\./)
-  assert.match(firstScreen, /ACTUAL[\s\S]*COUNTERFACTUAL/)
-  assert.match(firstScreen, /Fixed inputs[\s\S]*Regenerated outputs/)
-  assert.match(firstScreen, /npm run quickstart/)
+  assert.match(firstScreen, /replays historical execution/)
+  assert.match(firstScreen, /inspect → plan → authorize → replay → verify → compare/)
+  assert.match(firstScreen, /Executable download is pending/)
+  assert.match(firstScreen, /sdk\/tools\/test_offline.py/)
   assert.doesNotMatch(readme, /revolutionary|world[- ]first|production[- ]ready|guaranteed|game[- ]changing/i)
   assert.match(readme, /has not been scientifically rerun on Alchemix/i)
 })

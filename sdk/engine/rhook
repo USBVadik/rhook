@@ -1,0 +1,5 @@
+#!/bin/sh
+# Keep the interpreter and repository path explicit; never install or replay implicitly.
+set -eu
+cd -- "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+exec python3 -m sdk_alpha "$@"
