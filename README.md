@@ -2,98 +2,125 @@
 
 [![CI](https://github.com/USBVadik/rhook/actions/workflows/ci.yml/badge.svg)](https://github.com/USBVadik/rhook/actions/workflows/ci.yml)
 
+**Counterfactual execution for Arbitrum-based chains.**
+
 RHOOK replays historical execution, changes one supported rule, and compares
-state, receipts, fees and transfers. Its experimental Developer Alpha has a
-Python API and an installed CLI:
+what happens. The original execution must match the canonical chain before an
+alternative world can run from its own copy of the original state.
+
+Our working example is a Hookr pool on Robinhood Chain: replay all seven arrivals
+in block **93251803**, change LP Rewards from **100 to 50**, then verify the new
+receipts and compare the buyer's output. The Python API and CLI follow:
 
 ```text
 inspect → plan → authorize → replay → verify → compare
 ```
 
-The first case is Hookr Pair03: Robinhood Chain block **93251803**, all seven
-arrivals, and `RulesConfig.lpBps: 100 → 50`. A fresh Go/Nitro ACTUAL must match
-the canonical state root, receipts root and block hash before BRANCH starts
-from an independent copy of the original parent. Replay uses saved inputs,
-with no RPC or automatic state download.
+[Read the Hookr result](docs/research/hookr-pair03-100-to-50.md) ·
+[Developer SDK](sdk/README.md)
 
-## Start here
+**Executable download is pending.** The public clone contains source and offline
+tests. The private executable pilot has passed clean installation and native
+replay on the development Mac; its worker, runtimes and Pair03 witness are not
+published here.
 
-The SDK source, tests and Python example are in [sdk/](sdk/README.md).
-**Executable download is pending distribution clearance.** There is no public
-worker, Node runtime, historical witness or runnable input bundle in Git.
-
-Run the offline SDK tests now with Python 3.12+:
+Try the public SDK tests with Python 3.12+:
 
 ```sh
 python3 -B sdk/tools/test_offline.py
 ```
 
-With separately approved runtime inputs, the [quickstart](sdk/QUICKSTART.md)
-installs the executable CLI. Planning runs no EVM. `authorize` creates a local,
-single-use consent; `replay` computes new ACTUAL/BRANCH results; `verify` checks
-a saved run without executing the EVM. `compare` verifies first, then derives
-differences from that run's receipts.
+## The question we test
 
-```python
-from rhook_alpha import LpBps, SDK
+If a DeFi rule had been different, would the same transactions have produced a
+different result? RHOOK makes that question explicit: fix the parent state and
+ordered input, declare one intervention, execute both worlds, and inspect the
+consequences. It is intended for developers investigating contract and hook
+behavior against authenticated blockchain state.
 
-sdk = SDK()
-sdk.inspect("hookr-pair03")
-plan = sdk.plan("hookr-pair03", LpBps(50))
-print(sdk.describe(plan["planId"]))  # No authority or execution.
+The historical ACTUAL is a control. In the Hookr case, its stateRoot,
+receiptsRoot and blockHash must all match the canonical target header before
+BRANCH begins. BRANCH uses a fresh copy of the original parent, rather than
+ACTUAL's end state. Missing state stops the run; replay does not fetch more data.
+
+```mermaid
+flowchart LR
+    P[Authenticated parent and seven arrivals] --> A[ACTUAL: original rules]
+    A --> G{Canonical header match?}
+    G -->|pass| B[BRANCH: changed rule, fresh parent copy]
+    A --> V[Verify records and compare outcomes]
+    B --> V
 ```
 
-The [compatibility table](sdk/COMPATIBILITY.md) separates tested native results
-from planning support. This Alpha targets macOS arm64. Installed replay passed
-on the development Mac; installation on a second Mac is untested. The
-[100→50 case study](docs/research/hookr-pair03-100-to-50.md) records the result
-and the separate Linux worker comparison.
+## What has run
 
-## What changed in Hookr
+| Demonstration | Result and scope |
+| --- | --- |
+| Historical Hookr LP100→50 | Both Go/Nitro worlds completed. Buyer RHOOK Transfer-event net increased by **0.5040100829%**; subject gas was unchanged. [Case study](docs/research/hookr-pair03-100-to-50.md). |
+| Mac/Linux execution agreement | A separate Ubuntu amd64 worker reproduced the complete macOS results for this case. This is portability within the same engine lineage. |
+| Installed Developer Alpha | On 25 October 2026, a separately built macOS developer worker completed a new pair through an installed CLI. Its own `verify` and `compare` passed; full world files matched the prior references. Installed replay took **6.05 seconds** on that Mac. |
+| Public developer surface | Python API, CLI, Hookr inspect/plan adapter and synthetic offline tests are published. Independent external-developer installation is the next test. |
 
-The intervention reduces the LP Rewards add-on and its associated protocol
-share. It preserves the Hook Block, base/dynamic fees and recapture. For the
-selected buyer, `100 → 50` increased RHOOK Transfer-event net output by about
-**0.5040%**, with unchanged gas. The [earlier 100→0 result](docs/research/hookr-pair03.md)
-increased output by about **1.0088%**. These are different interventions.
+The intervention reduces the LP Rewards add-on and its associated protocol share;
+the Hook Block, base/dynamic fees and recapture remain enabled. Outer Swap fee
+changed from 11048 to 7048 pips. These are observations for one historical trade,
+not a forecast of profit. The [earlier LP100→0 result](docs/research/hookr-pair03.md)
+is a different branch and must not be confused with this demonstration.
 
-The historical pool uses `hookr-1` standard HookrRules contracts, matched to
-official `hookr-sdk@1.1.1` release pins. The case-specific TypeScript
-inspect/plan adapter is included in `sdk/engine/adapters/hookr-case`.
-Current HookrRouter swap-builder compatibility is not established: the
-historical external router differs from the current router.
+This Hookr case has no independent Rust execution, economic assurance remains
+unresolved, and qualified protocol Claims are zero. Arbitrary pools, rules and
+historical blocks remain outside the supported Alpha case.
 
-Pair03 is a single-engine Go/Nitro observation. Independent Rust replay is
-pending, economic assurance is unresolved, and qualified protocol Claims are
-zero. Arbitrary blocks, arbitrary rules and production use are outside this Alpha.
+## Use the repository
 
-## Protocol fixtures and research
+The [SDK quickstart](sdk/QUICKSTART.md) separates public offline tests from private
+pilot installation. A clone alone cannot perform a fresh native Pair03 replay.
+The [compatibility table](sdk/COMPATIBILITY.md) lists the supported platform and
+case. The [distribution status](sdk/DISTRIBUTION.md) explains what is withheld.
 
-The protocol-neutral evidence stack remains available independently of the
-Alpha. It needs Node.js 22+ and has no npm dependencies:
+The protocol-neutral evidence stack also has a small runnable example. With
+Node.js 22+:
 
 ```sh
 npm ci
+npm run check
 npm test
 npm run quickstart
 ```
 
-This [quickstart](QUICKSTART.md) generates and verifies a small transcript,
+This [quickstart](QUICKSTART.md) generates and checks a synthetic transcript,
 including a deliberate tamper rejection. It does not run Hookr or an EVM.
+Neither command sequence needs a provider account or starts native execution.
 
-The [research index](docs/research/README.md), [model](docs/counterfactual-model.md),
-[architecture](docs/architecture.md) and [threat model](docs/threat-model.md)
-retain earlier experiments with their distinct verification boundaries.
-The [Robinhood v4 example](examples/robinhood-v4/README.md) has an explicit
-Docker native command; ordinary tests never start it. The
-[Alchemix study](examples/alchemix/README.md) is separate; the protocol-neutral
-stack has not been scientifically rerun on Alchemix.
+## Next milestones
 
-## Contributing and licensing
+1. **Historical replay: working.** The installed private Alpha reproduces the
+   accepted Hookr case from retained inputs and checks its new evidence.
+2. **First external developer: next.** One supported Mac, one install and native
+   LP100→50 replay, then feedback on whether the SDK is useful and understandable.
+3. **Hookr LaunchLab: in development.** Let developers choose supported hook
+   settings against fresh authenticated state. Reliable state acquisition and a
+   complete fresh Hookr scenario remain open; this is not a live hosted service.
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Alpha notes](sdk/RELEASE_NOTES.md).
-Original RHOOK code and documentation, including the Developer SDK, use
-[Apache-2.0](LICENSE). The [SDK license scope](sdk/LICENSE_SCOPE.md) and
-[third-party notices](THIRD_PARTY_NOTICES.md) preserve the separate terms for
-Nitro/geth and other third-party material. This source license does not grant
-rights to the historical witness or clear the combined executable for release.
+Robinhood Chain is the current execution target. The broader direction is a
+reusable testing tool for DeFi developers on Arbitrum-based chains. We are
+looking for developers who want to test the fixed Alpha case and help choose
+which real debugging questions the next adapters should answer.
+
+## Research and contributing
+
+The [research index](docs/research/README.md) separates the SDK's Hookr result
+from earlier experiments, including Go/Nitro and Rust/arb-revm agreement on
+other Robinhood cases. Those results do not qualify Hookr Pair03 on Rust.
+See the [model](docs/counterfactual-model.md), [architecture](docs/architecture.md)
+and [threat model](docs/threat-model.md) for protocol details.
+
+The [Robinhood v4 example](examples/robinhood-v4/README.md) retains an explicit
+Docker native command; ordinary tests never start it. The separate
+[Alchemix study](examples/alchemix/README.md) has not been scientifically rerun on Alchemix
+by the protocol-neutral stack.
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md). Original RHOOK code and documentation use
+[Apache-2.0](LICENSE); the [SDK license scope](sdk/LICENSE_SCOPE.md) and
+[third-party notices](THIRD_PARTY_NOTICES.md) preserve upstream terms. The source
+license does not clear the combined executable or historical witness for release.

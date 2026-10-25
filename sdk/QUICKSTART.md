@@ -1,13 +1,38 @@
 # Hookr Alpha quickstart
 
-The executable kit is not publicly downloadable yet. These commands require
-approved access to the pinned inputs. A clone alone can run offline tests and
-inspect source, but cannot replay Pair03.
+## Public clone: run offline tests
 
-## Install
+With Python 3.12+ without optimization, from the repository root:
+
+```sh
+python3 -B sdk/tools/test_offline.py
+```
+
+No worker, sensor, witness or RPC account is needed. These synthetic tests do
+not execute the EVM. A clone alone cannot install the complete native demo.
+
+## Private pilot: use its own kit
+
+The private macOS developer kit completed clean installation and a new native
+LP100→50 pair on 25 October 2026, then verified and compared that new run.
+Its [case study](../docs/research/hookr-pair03-100-to-50.md#installed-developer-pilot-25-october-2026)
+records the outcome. The external pilot is prepared but has not been sent.
+
+If you receive that kit through an approved pilot, follow its `START_HERE.md`
+and bundled `source/install_alpha.py`. It has a separately built developer
+worker and its own pinned input bundle. Do not combine that bundle with the
+older public installer registration below. No executable asset URL is offered
+by this repository.
+
+## Public-source installer with matching original inputs
+
+The remaining commands document the public source's original runtime route.
+They require approved access to the exact matching source and assets, not just
+an arbitrary worker or the newer private pilot bundle.
 
 Requirements: Apple Silicon Mac, macOS 15.5+, unoptimized Python 3.12+, and
-space for about 295 MB of expanded inputs plus source and a Python venv.
+space for about 295 MB of expanded original inputs plus source and a Python venv.
+The newer private pilot has different artifact sizes; its own guide is authoritative.
 Version and platform testing limits are in [COMPATIBILITY.md](COMPATIBILITY.md).
 
 Supply the original 198-file engine tree and exact `pair03-inputs.tar.gz`
@@ -53,8 +78,9 @@ is conservative and reserves no memory.
 "$RHOOK" --home "$CASE_HOME" replay --plan PLAN_ID --authority GRANT_PATH
 ```
 
-Use the returned authority path within ten minutes. Consent is bound to this
-installation, owner, host and exact plan. It is a local HMAC mechanism, not a
+Run promptly with the returned authority path. The grant expires after ten
+minutes and must have at least three minutes remaining when consumed. Consent
+is bound to this installation, owner, host and exact plan. It is a local HMAC mechanism, not a
 remote signature or permission from a third party. Consent is consumed before
 admission; a STOP closes the attempt permanently. Do not reuse a grant, rerun
 a closed plan or edit thresholds to obtain PASS.
