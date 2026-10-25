@@ -1,43 +1,68 @@
-# Developer Alpha source
+# Developer SDK Alpha
 
-This executable SDK source candidate comes from checkpoint
-`41ef7672094caf91009a51b197ac4c5e64c35c8d`, imported without private Git history.
-It includes the CLI, Python API, consent boundary, installer, native worker
-source, case-specific Hookr adapter and offline tests.
+The CLI, Python API, Hookr case adapter and offline tests are public source.
+A private executable pilot has also passed clean installation, a fresh native
+LP100→50 replay and verification of its own new run on the development Mac.
+Its full ACTUAL/BRANCH files matched the historical references.
 
-Binary distribution is pending. From the repository root, using Python 3.12+:
+**The executable pilot is not a public download.** The next product test is one
+external developer installing it on another supported Mac and reporting feedback.
+See the [Hookr demonstration](../docs/research/hookr-pair03-100-to-50.md) for the
+result, canonical gate and distinct Mac/Linux observations.
+
+## Run what is public
+
+From the repository root, with Python 3.12+ without optimization:
 
 ```sh
 python3 -B sdk/tools/test_offline.py
 ```
 
-This starts no worker, sensor or network client. See [QUICKSTART.md](QUICKSTART.md)
-for the real CLI/API workflow with approved runtime inputs.
+The tests use synthetic inputs and mocked native dispatch. They start no worker,
+sensor or network client, and need no private runtime bundle or provider account.
+A passing test suite is not a new EVM replay.
 
-Source entry points: [CLI](rhook_alpha/cli.py), [Python API](rhook_alpha/api.py),
-[installer](install_alpha.py), and [Hookr example](examples/execute_hookr.py).
-The example defaults to planning. A public clone provides source and offline
-tests; it is not a self-contained native kit.
+Source entry points are the [CLI](rhook_alpha/cli.py), [Python API](rhook_alpha/api.py),
+[installer](install_alpha.py) and [Hookr example](examples/execute_hookr.py).
+The example defaults to planning after a valid installation. It does not make
+a source-only clone into an installed SDK.
+
+## Runtime availability
+
+| Surface | Available now |
+| --- | --- |
+| Public clone | SDK/API source, adapter and offline tests. No self-contained native Pair03 replay. |
+| Private developer pilot | Install → inspect → plan → local consent → replay → verify → compare passed locally on 25 October 2026. Recipient handoff is prepared, not sent. |
+| Independent developer reproduction | Not yet performed. This is the next milestone. |
+
+The [quickstart](QUICKSTART.md) keeps private-pilot instructions separate from
+this public source's original runtime registration. Follow the instructions
+matching the assets you actually have; the source and binary identities differ.
 
 `rhook_alpha/` is the installed API. `developer/` authenticates and installs the
 pinned runtime. `engine/case_sdk/` implements plans and the canonical ACTUAL gate.
-The remaining engine modules are retained dependencies and historical reference
-tools, not extra supported entry points. The full 198-file engine snapshot is
-retained because its manifests and native bindings cover that closure.
+The other engine modules include retained dependencies and historical reference
+tools. Their old milestone statements describe earlier snapshots; they are not
+the current product entry point.
 
-Seven historical engine files have path-only substitutions. Public source is
-**not byte-identical** to the accepted native build. Installation requires an
-explicit original engine tree, checked against `developer/accepted-source.json`,
-alongside the pinned assets. It never registers the sanitized tree as the
-accepted binary's source. `source-provenance.json` records accepted/public hashes,
-including the installer adaptation and portable test correction. No original
-personal path values or recovery data are published.
+## Source and evidence boundary
 
-The accepted binary is unchanged. No native acceptance of this adapted public
-installer is claimed; offline installation/planning checks are reported separately.
-Read [compatibility](COMPATIBILITY.md), [licensing](LICENSE_SCOPE.md) and
-[distribution requirements](DISTRIBUTION.md).
+This public import comes from checkpoint
+`41ef7672094caf91009a51b197ac4c5e64c35c8d`, without private Git ancestry.
+Its 198-file engine closure is retained because the manifests and native bindings
+cover that source set. Seven files have path-only substitutions; it is not
+byte-identical to the original scientific runtime source.
 
-Original RHOOK-owned SDK source and documentation use the existing root
-[Apache-2.0 license](../LICENSE), with the explicit third-party/data exceptions
-in [LICENSE_SCOPE.md](LICENSE_SCOPE.md). Executable availability remains pending.
+The public installer still requires the original engine tree, checked against
+`developer/accepted-source.json`, and its matching pinned asset bundle.
+[source-provenance.json](source-provenance.json) records accepted/public hashes
+and publication adaptations. No native acceptance of this adapted public
+installer is claimed. The later private pilot uses a separately relinked
+worker/source registration and its own bundled installer. It is not silently
+registered as the older scientific binary.
+
+Read [compatibility](COMPATIBILITY.md), [distribution](DISTRIBUTION.md) and
+[release notes](RELEASE_NOTES.md). Original RHOOK-owned source/docs use the root
+[Apache-2.0 license](../LICENSE), with the third-party/data exceptions in
+[LICENSE_SCOPE.md](LICENSE_SCOPE.md). No binary or witness rights follow merely
+from publishing this source.

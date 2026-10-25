@@ -1,6 +1,9 @@
 # Hookr Pair03: native replay with LP Rewards 100 → 50
 
-Publication snapshot: the figures and provenance below are unchanged. The later installed SDK acceptance and current source availability are described in [Developer Alpha](../../sdk/README.md).
+The historical figures and original provenance below are retained. The
+[installed developer pilot](#installed-developer-pilot-25-october-2026) adds a
+later reproduction of the same result; [Developer Alpha](../../sdk/README.md)
+describes what is available in the public clone.
 
 RHOOK replayed a saved Hookr block on Robinhood Chain, verified the original execution against its canonical commitments, then ran the same seven ordered arrivals with `RulesConfig.lpBps` changed from 100 to 50. The selected buyer's receipt-derived RHOOK output increased by **0.5040100829%**. Both worlds completed in native Go/Nitro with no RPC or state hydration during replay.
 
@@ -90,7 +93,55 @@ The accepted unified run recorded:
 
 These are observations from this run on one macOS arm64 machine. The RSS figure is a sampled peak, not an exact maximum or memory reservation. The timing is for the native pair, not the complete SDK workflow, and is not a general performance guarantee.
 
-## Provenance
+## Installed developer pilot: 25 October 2026
+
+The private Developer Alpha subsequently reproduced this case through a clean
+installation in a fresh HOME, outside the development workspace, on the same
+physical Mac and OS account. The installed CLI executed a new ACTUAL/BRANCH pair,
+then separate `verify` and `compare` commands checked that newly created run.
+Both complete world files were byte-identical to the earlier accepted results.
+
+This pilot used a separately relinked developer worker with its own source and
+binary identity. It did not replace the original scientific worker or reuse its
+closed authority. The EVM implementation, witness, intervention and v2 resource
+policy were preserved. Packaging removed founder-specific source paths; native
+execution still requires normal host pressure and sufficient free-page headroom.
+
+| Installed pilot measurement | Observed value |
+| --- | ---: |
+| Complete installed replay command | 6.045 seconds |
+| Native ACTUAL + BRANCH | 0.832 seconds |
+| Separate own-run verify | 1.166 seconds |
+| Separate own-run compare | 1.166 seconds |
+| Sampled peak worker RSS | 145.45 MiB |
+| ACTUAL / BRANCH invocations in the completed operation | 1 / 1 |
+| RPC / WSS / automatic retries in that operation | 0 / 0 / 0 |
+
+Cleanup was confirmed. These are measurements from one run, with sampled rather
+than exact peak memory; they are not a controlled performance comparison.
+The successful native phase used the normal owner Terminal context and the
+unchanged SDK guards. Extra OS-level isolation was tested for installation and
+planning, but is not claimed for this native phase. The measurements describe
+the completed operation; they do not classify earlier stopped attempts as passes.
+
+| Developer pilot identifier | SHA-256 |
+| --- | --- |
+| Developer worker | `09ed5608c467a330779fcb7ccb677968f17729f25113c684c89ffb5292cc0f64` |
+| Developer source commitment | `a61fc0b687e12d4cfab64fe64593c0d1c9081ca021bd700635e5a3e763364f60` |
+| Complete ACTUAL.json bytes | `a6858c4bc1fd7bb50b6ffc328d8351eae90f90c6747781405caff3bf31704953` |
+| Complete BRANCH.json bytes | `586df83db3c4e25e71dbc01ea4083d810ddb234ec19c3f755c73202d57c1ff13` |
+
+The full-file hashes above differ in serialization scope from the canonical
+`result`-object hashes below. Both comparisons matched their respective retained
+references. The raw pilot records and runtime inputs remain private; this page
+reports the project-authenticated outcome, not a public independent execution.
+
+A prior Linux amd64 worker on a separate founder-controlled Ubuntu server also
+produced these full ACTUAL/BRANCH file hashes. That is same-engine portability
+evidence. It does not establish another Mac installation, an externally operated
+pilot, Linux support for the macOS installer, or independent Rust agreement.
+
+## Original experiment provenance
 
 Before publication, the complete sealed file sets and content hashes were checked for Unified Acceptance02 (99 files), the specialized 50 experiment (49 files) and the original zero experiment (50 files). The unified source inventory's 198 file hashes and the retained worker bytes also matched their commitments. This publication performed offline authentication only; it did not run another native pair.
 
@@ -124,6 +175,11 @@ Readers can inspect the case identifiers, intervention, arithmetic, execution co
 
 Independent native reproduction requires access to the private checkpoint/witness package, matching source and worker, runtime plans and a suitable execution environment. Those materials are not distributed here. Publishing their hashes does not make this page a standalone verifier or native replay kit.
 
-This is one exploratory saved-block Hookr Pair03 case, using one Go/Nitro execution lineage. Independent Rust execution for this case and heterogeneous agreement are `NOT_EVALUATED`; economic assurance is `UNRESOLVED`; new qualified Claims are **0**. Reproduction with another worker build in the same engine lineage does not add an independent engine. Arbitrary blocks, pools, interventions, other-machine execution and production readiness remain unestablished.
+This is one exploratory saved-block Hookr Pair03 case, using one Go/Nitro execution lineage. Independent Rust execution for this case and heterogeneous agreement are `NOT_EVALUATED`; economic assurance is `UNRESOLVED`; new qualified Claims are **0**. Reproduction with another worker build in the same engine lineage does not add an independent engine. Arbitrary blocks, pools, interventions, independent external-developer reproduction and production readiness remain unestablished.
 
-The private Developer Alpha and its evidence remain outside this publication. The next product milestone is native acceptance through the installed SDK package, followed by controlled use on another machine. This report does not announce SDK delivery or a public SDK release.
+The private executable and raw evidence remain outside this publication.
+Installed local native acceptance has passed. The next product milestone is
+one external developer installing the Alpha on another supported Mac and
+reproducing the result. A four-file private pilot handoff is prepared but has
+not been sent. This report does not announce external SDK delivery or a public
+executable release. Fresh-state Hookr LaunchLab remains separate development.

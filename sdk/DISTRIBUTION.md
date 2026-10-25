@@ -1,36 +1,57 @@
-# Executable distribution pending
+# Executable availability
 
-The accepted macOS kit is a real executable SDK. Worker, sensor, Node and saved
-inputs are absent from Git. There is no public asset URL, package index or
-GitHub Release for this kit.
+The public repository distributes SDK source and offline tests. It contains no
+Pair03 worker, sensor, Node runtime or private historical input bundle, and has
+no public executable asset URL or GitHub Release.
 
-Accepted worker SHA-256:
+## Locally validated private pilot
+
+On 25 October 2026, the private developer kit passed clean installation and a
+new installed native LP100→50 pair, followed by its own verify/compare commands.
+Both full world files matched the accepted references. A corresponding-source
+companion and recipient instructions are prepared for one private developer.
+Actual external delivery and another developer's reproduction have not happened.
+
+The separately relinked developer worker is 44,835,778 bytes, SHA-256
+`09ed5608c467a330779fcb7ccb677968f17729f25113c684c89ffb5292cc0f64`.
+Its source commitment is
+`a61fc0b687e12d4cfab64fe64593c0d1c9081ca021bd700635e5a3e763364f60`.
+It preserves the case and v2 policy while using its own artifact registration.
+See the [case study](../docs/research/hookr-pair03-100-to-50.md).
+
+## Existing public-source registration
+
+`developer/artifacts.json` and `source-provenance.json` still describe the earlier
+scientific runtime: worker SHA-256
 `d7e15c1b4168da06c4f3410ff1cc9f7963e090feedb22a7405d391910942283c`.
-`developer/artifacts.json` fixes the other pins. Publishing source does not
-authorize an upload or new execution.
+The sanitized public source cannot impersonate its original engine commitment.
+That installer requires the exact original engine and asset bundle. The newer
+pilot's bundle is not a drop-in replacement for those pins.
 
-The existing inventory covers 222 outer kit files plus 12,338 nested entries.
-Original RHOOK-owned SDK source and documentation are covered by Apache-2.0;
-see [license scope](LICENSE_SCOPE.md). That source decision does not clear the
-combined executable or historical data. Existing notices and dependency locks
-are retained. Remaining executable release work:
+This documentation update changes neither registration nor accepted evidence.
+It does not claim that a public clone can run the private pilot.
 
-1. Review the actual Nitro/geth/CGO/libstylus combination and fulfill the
-   applicable corresponding-source/application-relink route. A local companion
-   has been assembled and authenticated from retained inputs; its build-only
-   recipes have not been executed. Packaging alone is neither legal clearance
-   nor proof of a successful relink.
-2. Retain exact notices, including Node's composite notice. Accepted Node's
-   unsigned content matches the official pinned release; signing bytes differ.
-   Do not silently substitute a different binary.
-3. Resolve exact witness/data-sharing rights and approve public disclosure.
-   On-chain visibility and provider names establish neither blanket permission
-   nor blanket prohibition.
-4. Review original engine source-path disclosure, needed by the accepted
-   runtime. Sanitized public source cannot impersonate its source commitment.
-5. Approve exact final assets/checksums before release and validate the relink
-   route before claiming it works. No relink or new native test is run here.
+## Conditions before delivery
+
+Original RHOOK-owned source/docs are Apache-2.0; see [license scope](LICENSE_SCOPE.md).
+The executable and historical inputs have separate conditions:
+
+- Preserve the actual Nitro/geth/CGO/static-library notices and corresponding
+  source/application-relink material. Local relinking and installation now work;
+  this does not by itself settle combined-license classification or every
+  source/recombination obligation. Arbitrary modified-library combinations and
+  a fresh Rust-library rebuild were not demonstrated.
+- Retain Node's composite notice and accurate provenance. Its unsigned content
+  matched the pinned official release; signing bytes differ. The pilot does not
+  silently substitute another runtime.
+- Record the basis for the exact historical witness disclosure. Public onchain
+  visibility establishes neither blanket permission nor a blanket prohibition.
+- Select a recipient, supported platform and private channel, and approve the
+  exact payload. Upstream compiler path labels are retained as nonsensitive
+  dependency metadata; they do not alone require another build or block a pilot.
 
 Pinned [Nitro terms](../examples/robinhood-v4/notices/nitro-LICENSE.md) and
 [geth LGPL terms](../examples/robinhood-v4/notices/geth-COPYING.LESSER) remain
-separate from the RHOOK source license. No general production grant is claimed.
+separate from RHOOK's source license. No general production grant or automated
+legal-clearance finding is claimed. No private executable, witness, source
+companion, authority or raw execution archive is published by this update.
