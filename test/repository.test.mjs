@@ -79,6 +79,8 @@ test('repository tree is small and excludes research/archive clutter', async () 
   const forbidden = files.filter((path) => {
     const repositoryPath = relative(root, path)
     if (repositoryPath === '.github/workflows/ci.yml') return false
+    // This named protocol proposal is product documentation, not a run archive.
+    if (repositoryPath === 'docs/protocol/authenticated-checkpoint-state-intervention-0.1-proposal.md') return false
     // SDK workflow/guard source is product code, not a generated run archive.
     if (repositoryPath.startsWith('sdk/')) return /\.(?:patch|log|tgz|svg)$/i.test(path)
     return /\.(?:patch|log|tgz|svg)$/i.test(path) || /(?:workflow|authorization|qualification|closure|checkpoint)/i.test(repositoryPath)

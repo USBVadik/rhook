@@ -1,4 +1,4 @@
-"""Public Python API for the fixed historical Hookr case."""
+"""Local capsule API with the original Hookr installation kept compatible."""
 from dataclasses import dataclass
 from decimal import Decimal, localcontext
 from pathlib import Path
@@ -13,7 +13,7 @@ CASE = 'hookr-pair03'
 
 @dataclass(frozen=True)
 class LpBps:
-    """Replace RulesConfig.lpBps=100; native support is currently 0 and 50."""
+    """Hookr LP Rewards value; each capsule adapter validates its original state."""
     value: int
 
     def __post_init__(self):
@@ -24,12 +24,38 @@ class SDK:
     def __init__(self, home=None):
         self.home = no_links(home or Path.home() / '.local/share/rhook-alpha')
         self.workspace = self.home / 'cases' / CASE
+        self._portable = None
+
+    @property
+    def portable(self):
+        # The retained Alpha installer deliberately copies only top-level files.
+        # Its legacy CLI must not depend on the separately installed case SDK.
+        if self._portable is None:
+            require((Path(__file__).parent / 'cases/api.py').is_file(),
+                    'PORTABLE_CASE_SDK_NOT_INSTALLED')
+            from .cases.api import CaseSDK
+            self._portable = CaseSDK(self.home)
+        return self._portable
 
     def _context(self):
         require(not self.home.is_relative_to(runtime.PREFIX), 'HOME_INSIDE_INSTALLATION')
         return runtime.context()
 
+    def import_case(self, directory):
+        return self.portable.import_case(directory)
+
+    def list_cases(self):
+        return self.portable.list_cases()
+
+    def register_runtime(self, path):
+        return self.portable.register_runtime(path)
+
+    def authenticate(self, case, *, trusted_checkpoint=None):
+        return self.portable.authenticate(case, trusted_checkpoint=trusted_checkpoint)
+
     def inspect(self, case=CASE):
+        if (self.home / 'names' / case).exists():
+            return self.portable.inspect(case)
         require(case == CASE, 'UNSUPPORTED_CASE')
         self._context()
         if self.workspace.exists():
@@ -42,6 +68,9 @@ class SDK:
                                str(runtime.PREFIX / 'assets/BLOCK_PACKAGE.json'), '--build-record', str(runtime.PREFIX / 'BUILD.json')])
 
     def plan(self, case=CASE, intervention=None):
+        if (self.home / 'names' / case).exists():
+            request = {'rule': 'lpBps', 'value': intervention.value} if type(intervention) is LpBps else intervention
+            return self.portable.plan(case, request)
         require(case == CASE and type(intervention) is LpBps, 'TYPED_LP_BPS_INTERVENTION_REQUIRED')
         self._context()
         require(self.workspace.exists(), 'INSPECT_CASE_FIRST')
@@ -64,17 +93,23 @@ class SDK:
         return load(binding['semanticPlanPath']), binding, authenticated
 
     def describe(self, plan_id):
+        if plan_id.startswith('c-'):
+            return dict(self.portable.describe(plan_id), status='PLAN_AUTHENTICATED', executionAuthorized=False)
         semantic, binding, _ = self._resolve(plan_id)
         return {'status': 'PLAN_AUTHENTICATED', 'semantic': semantic, 'binding': binding,
                 'nativeSupported': semantic['newValue'] in ('0', '50'), 'authorityIssued': False}
 
-    def authorize(self, plan_id, *, local_owner=False, mac_ready=False):
+    def authorize(self, plan_id, *, local_owner=False, mac_ready=False, trusted_checkpoint=None):
+        if plan_id.startswith('c-'):
+            return self.portable.authorize(plan_id, local_owner=local_owner, mac_ready=mac_ready, trusted_checkpoint=trusted_checkpoint)
         semantic, binding, authenticated = self._resolve(plan_id)
         require(semantic['newValue'] in ('0', '50'), 'PLANNING_ONLY_VALUE_NATIVE_NOT_SUPPORTED')
         _, context, key = authenticated
         return consent.issue(self.workspace, binding, context, key, local_owner=local_owner, mac_ready=mac_ready)
 
     def replay(self, plan_id, authority):
+        if plan_id.startswith('c-'):
+            return self.portable.replay(plan_id, authority)
         began = time.monotonic()
         semantic, binding, authenticated = self._resolve(plan_id)
         require(semantic['newValue'] in ('0', '50'), 'PLANNING_ONLY_VALUE_NATIVE_NOT_SUPPORTED')
@@ -91,10 +126,14 @@ class SDK:
         return dict(value, runDirectory=binding['outputPath'])
 
     def verify(self, run):
+        if Path(run).absolute().parent == self.home / 'runs':
+            return self.portable.verify(run)
         pins, _, _ = self._context()
         return engine.recorded(no_links(run), pins)
 
     def compare(self, run):
+        if Path(run).absolute().parent == self.home / 'runs':
+            return self.portable.compare(run)
         value = self.verify(run)
         require(value.get('status') == 'RECORDED_INTEGRITY_PASS', 'VERIFIED_RESULT_REQUIRED')
         worlds = value['worlds']

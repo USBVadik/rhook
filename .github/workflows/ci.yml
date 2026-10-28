@@ -26,6 +26,11 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run quickstart
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+      - run: npm ci --ignore-scripts --no-audit --no-fund --prefix sdk/engine/adapters/hookr-case
+      - run: npm run test:sdk-cases
   sdk-offline:
     runs-on: ubuntu-24.04
     timeout-minutes: 5

@@ -1,0 +1,13 @@
+{
+  "source": "Retained Final Public RPC Optimization Build01 / Run06 scenario implementation",
+  "sourceFilesSha256": {
+    "scenario/spec.go": "2abc9484acc7de983ec5e634216e6cc438a132afb1200221e05dfc8e40440cbe",
+    "scenario/admission.go": "f4162441342ffbae37322973fccce10f17d544e3a22158a877cefe5723883e29",
+    "scenario/nitro.go": "40ff938bcfbffe87ade0e84f9406c66b7fbf9540ce3966e079741cc6682da0e2",
+    "scenario/controller.go": "aa4155565bff42c7cb8768c40d6eb9fbb66441ffcec897b0c5afdc173adf6c2c",
+    "scenario/evidence.go": "05e3446695d1772179871075b81a56a1bf72292161c1f8564d7cf47f261ca7b5",
+    "scenario/profile.json": "a73bcc5c0cd40d7fa461422c6f9387fc07de5ba0d787bbc93514db5a75b59cc2",
+    "bridge/scenario_setup.go": "e40de27ac710aafe2336219752ef13500ac15490efe8a615797bd5937b5519c1"
+  },
+  "changes": "Offline-only integration; separate worker binding; LP0..99; no historical canonical gate or live EVM discovery; no accepted source replaced."
+}

@@ -1,0 +1,39 @@
+{
+  "GOMAXPROCS": 2,
+  "GOMEMLIMIT_advisoryBytes": 536870912,
+  "RPC": 0,
+  "WSS": 0,
+  "admissionSpacingSeconds": 1,
+  "inheritedNumericalPolicySha256": "1b081fd77d61a4037ec0055a1a129d3fdcc4f9a075f9b56b3c7d66be318e4688",
+  "maximumInvocations": {
+    "SCENARIO_BASELINE": 1,
+    "SCENARIO_VARIANT": 1
+  },
+  "maximumSampleGapSeconds": 2,
+  "maximumSampleSeconds": 0.25,
+  "memoryEnforcement": "SAMPLED_RSS_AND_FREE_HEADROOM_NOT_HARD_RESERVATION",
+  "minimumAdmissionFreeBytes": 1610612736,
+  "minimumRuntimeFreeBytes": 536870912,
+  "normalPressure": 1,
+  "osReserveBytes": 268435456,
+  "pairWallSeconds": 120,
+  "profile": "nitro-hookr-scenario/0.1",
+  "reservedMemory": false,
+  "runtimeSampleSpacingSeconds": 0.25,
+  "sampledRuntimeBytes": 134217728,
+  "sensorProcessWallSeconds": 1,
+  "stdoutStderrBytes": 67108864,
+  "supervisorAllowanceBytes": 268435456,
+  "swapOutGrowthAllowed": false,
+  "swapUsageGrowthAllowed": false,
+  "workerKernelCpuSeconds": 120,
+  "workerRssBytes": 1073741824,
+  "workerTelemetryMs": 100,
+  "workload": {
+    "actions": 1,
+    "chainId": 4663,
+    "commonSetup": "DECLARED_IDENTICAL_SYNTHETIC_FUNDING",
+    "mode": "AUTHENTICATED_CHECKPOINT_SCENARIO",
+    "source": "NIL_NO_HYDRATION"
+  }
+}

@@ -30,6 +30,25 @@ Try the public SDK tests with Python 3.12+:
 python3 -B sdk/tools/test_offline.py
 ```
 
+## Historical execution SDK source
+
+The source now includes the portable `CaseSDK`, the maintained historical
+workflow and a closed [intervention catalogue](sdk/INTERVENTION_ADMISSION.md).
+It supports the pinned LP Rewards adapter and historical Dynamic Fee OFF adapter;
+it does not expose arbitrary state writes or arbitrary-pool execution.
+
+```sh
+python3 -B sdk/install_cases.py --prefix /physical/path/to/new-sdk
+/physical/path/to/new-sdk/bin/rhook-cases --home /physical/path/to/new-home interventions
+/physical/path/to/new-sdk/bin/rhook-cases --home /physical/path/to/new-home execution-capabilities
+```
+
+These source-only commands do not run native code or grant execution authority.
+Missing worker, runtime, chain dependencies and prepared witness are reported
+explicitly. Read the [historical workflow](sdk/HISTORICAL_EXECUTION.md),
+[prepared scenario API](sdk/DEVELOPER_EXECUTION.md) and
+[source-sync boundary](sdk/SOURCE_SYNC.md).
+
 ## The question we test
 
 If a DeFi rule had been different, would the same transactions have produced a
@@ -59,6 +78,7 @@ flowchart LR
 | Historical Hookr LP100→50 | Both Go/Nitro worlds completed. Buyer RHOOK Transfer-event net increased by **0.5040100829%**; subject gas was unchanged. [Case study](docs/research/hookr-pair03-100-to-50.md). |
 | Mac/Linux execution agreement | A separate Ubuntu amd64 worker reproduced the complete macOS results for this case. This is portability within the same engine lineage. |
 | Installed Developer Alpha | On 25 October 2026, a separately built macOS developer worker completed a new pair through an installed CLI. Its own `verify` and `compare` passed; full world files matched the prior references. Installed replay took **6.05 seconds** on that Mac. |
+| Historical Dynamic Fee OFF (Build18) | The signed 0.01 ETH purchase in block 93251803 remained SUCCESS in both Go/Nitro worlds, with LP100 and recapture retained. This is a separate intervention from LP100→50; [scope and assurance](sdk/SOURCE_SYNC.md). |
 | Public developer surface | Python API, CLI, Hookr inspect/plan adapter and synthetic offline tests are published. Independent external-developer installation is the next test. |
 
 The intervention reduces the LP Rewards add-on and its associated protocol share;
@@ -99,8 +119,8 @@ Neither command sequence needs a provider account or starts native execution.
 2. **First external developer: next.** One supported Mac, one install and native
    LP100→50 replay, then feedback on whether the SDK is useful and understandable.
 3. **Hookr LaunchLab: in development.** Let developers choose supported hook
-   settings against fresh authenticated state. Reliable state acquisition and a
-   complete fresh Hookr scenario remain open; this is not a live hosted service.
+   settings against authenticated state. A bounded on-demand scenario completed
+   privately; general acquisition and public hosted execution remain open.
 
 Robinhood Chain is the current execution target. The broader direction is a
 reusable testing tool for DeFi developers on Arbitrum-based chains. We are

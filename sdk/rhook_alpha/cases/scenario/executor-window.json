@@ -1,0 +1,16 @@
+{
+  "schema": "rhook/executor-storage-pages/0.1",
+  "chainId": 4663,
+  "poolId": "0x94d1a318a67449c1fd850f354b4694be69483a6e94148787659e487ecb8c6780",
+  "address": "0x4b4c16681401454140a9dbca55e5c186bbe8d728",
+  "codeHash": "0xa454566f248677718ca1c6ed8df59e23bc6dc4b9f787a1c9bd687912d4ef508f",
+  "start": "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e5f0",
+  "end": "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e60a",
+  "maximumWindowKeys": 59,
+  "maximumKeysPerProof": 48,
+  "meaning": "Initial27 plus bounded pages only around actual unresolved original-root keys in the observed family. Not a decoded layout or complete witness.",
+  "pageSize": 8,
+  "maximumPages": 4,
+  "maximumAdditionalKeys": 32,
+  "observedFamilyPrefix": "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3"
+}

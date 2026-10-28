@@ -79,3 +79,20 @@ or native run are included in this source import. A manifest or ABI compatibilit
 pin is not an upstream implementation. The separate executable distribution
 must retain the full notice inventory and resolve its corresponding-source and
 relink obligations; see [sdk/DISTRIBUTION.md](sdk/DISTRIBUTION.md).
+
+## Additional source SDK interfaces
+
+The additional case/scenario/historical/admission modules are original RHOOK
+orchestration and adapters calling upstream APIs. They do not vendor Nitro/geth
+implementation archives or alter the existing LGPL-derived adapter exception.
+The engine snapshot, its module metadata and the retained license texts above
+remain unchanged. Importing or linking an upstream API does not relicense it.
+
+The Hookr SDK 1.1.1 ABI and release metadata used by the scenario profile retain
+the [Hookr SDK MIT notice](examples/robinhood-v4/notices/hookr-sdk-MIT.txt).
+The original lockfile fetches `hookr-sdk@1.1.1` and `viem@2.55.10` for offline
+JavaScript tests; the [viem MIT notice](examples/robinhood-v4/notices/viem-MIT.txt)
+is also retained. Installed npm implementations and transitive dependencies are
+not vendored by this source update; their own notices accompany those packages.
+Neither these notices nor source publication clear the combined private worker,
+image, witness or raw private execution evidence for distribution.

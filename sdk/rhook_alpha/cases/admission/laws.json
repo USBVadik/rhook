@@ -1,0 +1,225 @@
+{
+  "laws": [
+    {
+      "enforcement": "Registry/capsule hashes, worker original-root proof/code checks, independent original-parent worlds, canonical ACTUAL gate; OFF overlay root independently derived by Go/JS.",
+      "evidenceRequired": [
+        "Canonicality/anchor acceptance basis",
+        "Original account/storage/code proofs at r0",
+        "Exact input/environment binding",
+        "ACTUAL canonical triple match",
+        "Derived initialization-root relation"
+      ],
+      "id": "L1",
+      "name": "Canonical Anchor",
+      "recordedEvidenceSupports": [
+        "Pinned original parent and both canonical/branch records",
+        "Original-root input authentication and canonical triple match",
+        "OFF derived initial root; legacy LP record does not emit this root"
+      ],
+      "required": "Common authenticated pre-transform r0 and accepted history; distinguish rA_init=r0 from derived rB_init. This requires the proposed refinement of old L1.",
+      "structuralCheck": "Common declared anchor and parent/target identities only",
+      "trustAssumptions": [
+        "Operator-pinned canonical checkpoint is not independent consensus proof",
+        "Producer uses the authenticated original root faithfully"
+      ],
+      "unresolved": [
+        "Consumer acceptance of the semantic extension",
+        "Independent canonicality and complete execution/reference proof"
+      ]
+    },
+    {
+      "enforcement": "Closed catalogue reuses typed adapters; Go checks every precondition before SetState and preserves committed/current words, code, nonce, balance and original witness.",
+      "evidenceRequired": [
+        "Resolved target/code/layout",
+        "Authenticated old words",
+        "Exact masks/replacements/application count",
+        "Global confinement of initialization and no other initial changes"
+      ],
+      "id": "L2",
+      "name": "Declared Difference",
+      "recordedEvidenceSupports": [
+        "Declared LP or OFF overlay",
+        "Recorded write count and before/after observations",
+        "OFF independent two-path initial-root reconstruction"
+      ],
+      "required": "One exact initialization transform before arrival0; full-word/code preconditions and preservation of all non-authorized initial state.",
+      "structuralCheck": "Unique storage targets, exact allowed descriptor and masks",
+      "trustAssumptions": [
+        "Recorded overlay corresponds to the state actually consumed",
+        "Global unobserved-state preservation and cache/context initialization follow reviewed producer code"
+      ],
+      "unresolved": [
+        "Independent proof of complete transform confinement and application to execution",
+        "No retroactive qualification under Message.Data-only profile"
+      ]
+    },
+    {
+      "enforcement": "Typed plan and raw package bind original arrivals/headers; native block replay validates original sender/router/system scope; no network source in offline execution.",
+      "evidenceRequired": [
+        "Complete signed arrivals and environment preimages",
+        "Common deterministic origin policy for each environmental read",
+        "No reordered/deleted/re-signed arrival"
+      ],
+      "id": "L3",
+      "name": "Exogenous Conservation",
+      "recordedEvidenceSupports": [
+        "All seven original arrivals and raw package hashes",
+        "Produced transactionsRoot and same declared header context"
+      ],
+      "required": "Preserve all original signed bytes, order and explicitly frozen historical environment; regenerate system-state effects.",
+      "structuralCheck": "Declared arrival order and subject uniqueness",
+      "trustAssumptions": [
+        "Producer obeys the complete environment-origin partition, including mutable native system state"
+      ],
+      "unresolved": [
+        "Independent proof of all environmental reads and C/R binding"
+      ]
+    },
+    {
+      "enforcement": "Existing fresh-bridge Go/Nitro producer and same controller; canonical records are comparators, no playback executor is added.",
+      "evidenceRequired": [
+        "Native transition/reference evidence",
+        "Regenerated receipt/accounting and system/finalization evidence",
+        "Correct qualified invalidation and unknown-error handling"
+      ],
+      "id": "L4",
+      "name": "Endogenous Regeneration",
+      "recordedEvidenceSupports": [
+        "Different newly produced branch receipts/roots",
+        "Completed original arrival domain; all accepted arrivals successful"
+      ],
+      "required": "Generate validation, execution, receipts, fees, system effects, finalization and successor roots from each world predecessor.",
+      "structuralCheck": null,
+      "trustAssumptions": [
+        "Native producer faithfully executes rather than fabricates recorded consequences"
+      ],
+      "unresolved": [
+        "Independent full EVM/reference proof",
+        "Invalid-arrival behavior is not exercised by these successful seven-arrival records"
+      ]
+    },
+    {
+      "enforcement": "Independent original-parent bridges, unchanged witness commitment, Source=nil, typed initial overlay only and missing-state STOP.",
+      "evidenceRequired": [
+        "Initialization provenance for admitted writes",
+        "Read/update lineage including tombstones and code",
+        "No canonical intermediate reset or post-initial patch",
+        "Complete reads and trie-update closure for the executed plan"
+      ],
+      "id": "L5",
+      "name": "No Canonical State Injection",
+      "recordedEvidenceSupports": [
+        "No missing lookups in the exact completed pair",
+        "Original witness commitments and branch overlay record",
+        "Completed final roots for the executed plan"
+      ],
+      "required": "After T_I, each predecessor is world-local; original-r0 witness additions cannot overwrite admitted or later local writes.",
+      "structuralCheck": null,
+      "trustAssumptions": [
+        "Producer bridge honors local-write precedence and no hidden state injection"
+      ],
+      "unresolved": [
+        "Independent full provenance/local-evolution proof",
+        "Witness coverage for any different block or intervention"
+      ]
+    },
+    {
+      "enforcement": "Existing common engine and fixed source/policy identities; only the typed initial overlay differs; unknown native errors remain STOP.",
+      "evidenceRequired": [
+        "Resolved R and implementation-equivalence/trust basis",
+        "Same configuration/error policy in both worlds",
+        "Observational instrumentation and no branch-only rescue"
+      ],
+      "id": "L6",
+      "name": "Shared Reference Semantics",
+      "recordedEvidenceSupports": [
+        "Pinned producer source/worker/policy identities",
+        "Common transaction/environment scope"
+      ],
+      "required": "One accepted world-independent R/configuration/accounting/system/finalization model after the admitted initialization boundary.",
+      "structuralCheck": null,
+      "trustAssumptions": [
+        "A code hash does not establish implementation equivalence to R",
+        "Instrumentation is observational and the producer does not branch ordinary rules by role"
+      ],
+      "unresolved": [
+        "Consumer qualification of R with the proposed initialization boundary",
+        "Independent equivalence/confinement proof"
+      ]
+    },
+    {
+      "enforcement": "Shared recorded verifier/economics functions; fixed subject ordinal and observation plan; integer arithmetic and explicit limitations.",
+      "evidenceRequired": [
+        "Fixed original subject and projection definitions",
+        "World-local receipt/state reads",
+        "Symmetric extraction and codec",
+        "Explicit difference between event net, storage balance and profit"
+      ],
+      "id": "L7",
+      "name": "Projection Symmetry",
+      "recordedEvidenceSupports": [
+        "Same declared subject/observation plan",
+        "Symmetric receipt-event extraction; recomputed receipt roots",
+        "Recorded before-first-arrival and block-final observations"
+      ],
+      "required": "Same P/subject/theta/boundaries/units/exact arithmetic applied to each world facts; no metric-dependent world construction.",
+      "structuralCheck": "Same declared subject, receipt/state boundaries and integer quantities",
+      "trustAssumptions": [
+        "Call/state observations reflect the actual native world",
+        "Token Transfer logs alone do not prove final token-storage balances"
+      ],
+      "unresolved": [
+        "Independent complete projection-read/execution proof",
+        "Formal extension is post hoc and not proof of prospective semantic pre-registration"
+      ]
+    },
+    {
+      "enforcement": "Controller canonical gate, world tags, linked journal/receipts and separate evidence domains; catalogue sidecar is not a BranchClaim.",
+      "evidenceRequired": [
+        "Oriented records and canonical-before-branch journal",
+        "Exact question/result binding",
+        "Stable units and ordered result roles"
+      ],
+      "id": "L8",
+      "name": "Actual to Branch Directionality",
+      "recordedEvidenceSupports": [
+        "Ordered ACTUAL/BRANCH records",
+        "Canonical triple match precedes BRANCH entry",
+        "Role-bound outputs and comparisons"
+      ],
+      "required": "Bind unmodified canonical ACTUAL first, transformed BRANCH second, with signed BRANCH-minus-ACTUAL differences.",
+      "structuralCheck": "Ordered role and delta convention in descriptor",
+      "trustAssumptions": [
+        "Producer execution corresponds to the oriented records"
+      ],
+      "unresolved": [
+        "Independent binding of full Lawful execution to these outputs",
+        "No Protocol0.2 Query/Claim is minted for this extension"
+      ]
+    },
+    {
+      "enforcement": "Existing typed HOST_STOP versus REVERT paths; new assurance report refuses complete Lawful and qualified-claim promotion. Unknown catalogue entries/targets fail closed.",
+      "evidenceRequired": [
+        "Named consumer assurance requirements",
+        "Typed failures and complete evidence/closure",
+        "No automatic promotion from test/hash PASS to Lawful"
+      ],
+      "id": "L9",
+      "name": "Fail Closed Knowledge",
+      "recordedEvidenceSupports": [
+        "Accepted completion/closure at recorded scope only",
+        "Prior failed resource attempt remains closed and does not become a world result"
+      ],
+      "required": "Do not establish a claim beyond discharged obligations; distinguish missing knowledge/evidence rejection from world outcomes.",
+      "structuralCheck": "Consumer report never upgrades complete Lawful or qualifiedClaims",
+      "trustAssumptions": [
+        "Producer failure classification and cleanup evidence are truthful"
+      ],
+      "unresolved": [
+        "Every still-open obligation for a stronger consumer policy",
+        "Independent universal failure-handling guarantee"
+      ]
+    }
+  ],
+  "schema": "rhook/checkpoint-state-obligations/0.1"
+}
