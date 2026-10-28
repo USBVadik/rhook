@@ -1,0 +1,10 @@
+{
+  "protocol02Migration": false,
+  "semanticClass": "AuthenticatedCheckpointStateIntervention/0.1",
+  "sourceFiles": {
+    "docs/protocol/authenticated-checkpoint-state-intervention-0.1-proposal.md": "9d6431495cbee225d25867e8887c97d36c5ab07907024e5f668ecf285059da89",
+    "docs/protocol/branch-protocol-0.2.md": "1636706b7176d5ccad27158f31cb67c5606be6519741e2729462a3a17ee387ab",
+    "docs/protocol/branch-semantics-0.1.md": "6453a1b86793c6ea9cbb6f0a49d094b50fb618d56402e24c5c6806c4f3d509b7"
+  },
+  "status": "LOCAL_EXTENSION_CANDIDATE_NOT_CONSUMER_ACCEPTANCE"
+}

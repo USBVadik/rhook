@@ -14,7 +14,7 @@ def main():
         raise SystemExit('Python 3.12+ without optimization is required')
     # Separate discovery roots preserve imports used by the accepted tests.
     suite = unittest.TestSuite()
-    for relative in ('tests_alpha', 'developer/tests', 'tools/tests'):
+    for relative in ('tests_alpha', 'tests_cases', 'developer/tests', 'tools/tests'):
         loader = unittest.TestLoader()
         suite.addTests(loader.discover(str(ROOT / relative)))
     result = unittest.TextTestRunner(verbosity=2).run(suite)

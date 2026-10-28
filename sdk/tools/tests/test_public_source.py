@@ -3,6 +3,9 @@ import contextlib
 import io
 import json
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -13,6 +16,37 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class PublicSourceBoundary(unittest.TestCase):
+    def test_legacy_top_level_install_imports_without_portable_package(self):
+        with tempfile.TemporaryDirectory() as directory:
+            prefix = Path(directory).resolve()
+            lib = prefix / 'lib'
+            package = lib / 'rhook_alpha'
+            package.mkdir(parents=True)
+            # Match rhook_alpha.install's preserved top-level-only copy exactly.
+            for source in (ROOT / 'rhook_alpha').glob('*.py'):
+                shutil.copyfile(source, package / source.name)
+            shutil.copytree(ROOT / 'developer', lib / 'developer')
+            probe = '''import sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+import rhook_alpha.cli
+from rhook_alpha import SDK
+home = Path(sys.argv[2])
+sdk = SDK(home)
+assert not home.exists()
+try:
+    sdk.list_cases()
+except ValueError as error:
+    assert str(error) == 'PORTABLE_CASE_SDK_NOT_INSTALLED', str(error)
+else:
+    raise AssertionError('missing portable modules must fail explicitly')
+assert not home.exists()
+'''
+            result = subprocess.run([sys.executable, '-I', '-B', '-c', probe,
+                                     str(lib), str(prefix / 'unused-home')],
+                                    capture_output=True, timeout=10)
+            self.assertEqual(result.returncode, 0, result.stderr.decode())
+
     def test_public_source_is_not_accepted_native_source(self):
         with self.assertRaisesRegex(ValueError, 'ACCEPTED_SOURCE_DRIFT'):
             files.accepted_source(ROOT)
@@ -31,6 +65,11 @@ class PublicSourceBoundary(unittest.TestCase):
             'DISTRIBUTION.md', 'RELEASE_NOTES.md', 'source-provenance.json',
             'tools/test_offline.py', 'tools/tests/test_public_source.py',
         }
+        derived = json.loads((ROOT / 'case-source.json').read_bytes())
+        self.assertEqual(derived['schema'], 'rhook/portable-case-source/0.1')
+        for name, pin in derived['files'].items():
+            self.assertEqual(files.sha(ROOT / name), pin, name)
+        expected |= set(derived['files']) | {'case-source.json'}
         self.assertEqual(set(files.tree(ROOT)), expected)
 
     def test_explicit_engine_root_is_verified_not_trusted(self):

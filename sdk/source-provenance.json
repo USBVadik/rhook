@@ -1269,8 +1269,8 @@
     {
       "path": "rhook_alpha/api.py",
       "acceptedSha256": "4a8a4b4310ffe8ddf529251c1dc9f6c30264310a63cd9dd04e4eaf9e676c1d75",
-      "publicSha256": "4a8a4b4310ffe8ddf529251c1dc9f6c30264310a63cd9dd04e4eaf9e676c1d75",
-      "change": "none"
+      "publicSha256": "1e38c1e91dde3807ada30987da6b7dea71e2309edbbbd5c846eab49638721f05",
+      "change": "portable_case_dispatch_lazy_for_legacy_installer"
     },
     {
       "path": "rhook_alpha/cli.py",

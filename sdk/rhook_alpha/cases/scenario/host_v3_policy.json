@@ -1,0 +1,21 @@
+{
+  "profile": "macos-host-admission-v3",
+  "experimental": true,
+  "minimumAdmissionEstimatedBytes": 1610612736,
+  "minimumRuntimeEstimatedBytes": 536870912,
+  "minimumAdmissionImmediateBytes": 268435456,
+  "minimumRuntimeImmediateBytes": 134217728,
+  "admissionSpacingSeconds": 1,
+  "runtimeSampleSpacingSeconds": 0.25,
+  "maximumSampleSeconds": 0.25,
+  "maximumSampleGapSeconds": 2,
+  "sensorProcessWallSeconds": 1,
+  "normalPressure": 1,
+  "reserveModel": "FREE_PLUS_CAPPED_INACTIVE_ESTIMATE",
+  "reservedMemory": false,
+  "workerRssBytes": 1073741824,
+  "workerAndObserverCpuSeconds": 120,
+  "nativeWallSeconds": 120,
+  "nativeStageSeconds": 140,
+  "workflowSeconds": 180
+}

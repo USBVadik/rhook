@@ -1,0 +1,233 @@
+{
+  "schema": "rhook/hookr-scenario-profile/0.1",
+  "manifest": {
+    "schema": "hookr.engagement.sources.v1",
+    "releaseId": "hookr-1",
+    "chainId": "4663",
+    "startBlock": "82536327",
+    "parentHash": "0xe77f49e3ad06e4d93c91a233449a290cfa3ad392b9ea980d822b8bbc0ba8e3b7",
+    "contracts": [
+      {
+        "role": "poolManager",
+        "address": "0x8366a39cc670b4001a1121b8f6a443a643e40951",
+        "runtimeHash": "0xbd3881180b547f5fe817545743cfb4343e96b1bc6640dcd70c106b0066e95626",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "registry",
+        "address": "0x463c82bea1a52f4cc05ca0741a24f0ad24ba4602",
+        "runtimeHash": "0xc16e7681583d8d9af8e8c54962f7e890b967687dee4cf32dbd676d4d547d2359",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "root",
+        "address": "0x89c9fb50d1f03192230ffb1c279bb6e7d3fe6acc",
+        "runtimeHash": "0xd336de325837e60a74cea11d87b5ebd1cc8961911f611f38de0508d23b6e779f",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "rules",
+        "address": "0x4a71c270b1520f94064268102aebd744b0de7942",
+        "runtimeHash": "0x4b6d50b40981b8082f3ee5a7ebf57e48489f71c94c2a3b94032a1d1a382b515b",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "router",
+        "address": "0xc2bc9a3fe6c4ce8c2f7eb4655b0869b01d8c93c9",
+        "runtimeHash": "0x855177b2017e7b73a79cb0c7b3027044beb5e726fbdc0fd2937229e32ecd7e0b",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "quoter",
+        "address": "0x445d7891381aa7f91f5048edbc6a611ccbde7865",
+        "runtimeHash": "0x1623e56a309a31e3626b854cd87623d62e39f743e2943d1f36ba13d677cef67a",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "launcher",
+        "address": "0x1cf2748a6670572425eabf9ab9e5bc4eb2eb8ef4",
+        "runtimeHash": "0x96b8c338c38a072ceef8b947ad93d3d7a46d2d7c70189d2b4ee92efb2a5e1d5d",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "treasury",
+        "address": "0x2242f7fc75606500503075f29ea8cda684efb4a9",
+        "runtimeHash": "0x95d1784c555685e9ccbc0ba9f6d1e6facea864fd1de77ebbc98862dcf2c13454",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "programs",
+        "address": "0x9fa204ac99176782fd20615b2b2a516d1f8c328f",
+        "runtimeHash": "0xedd6b1c99617bd0bb5cb1e6d1088144c579fe5ca0e21d3e4254ade8f4249a19f",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "referrals",
+        "address": "0xefd1dfba80c06e72f793601706c3a1c71aab3057",
+        "runtimeHash": "0xc576e1b1254a8d1e0100f541d3f6d4fbe27029aa8a7eb55607db697543fd6894",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "commissions",
+        "address": "0x690539c53212899a9c6aeee3b4b6737a5c4851d9",
+        "runtimeHash": "0x66b72c0818a51f1f22b8d7e2c053e02606dc170754917d6fbd815fc42701ba9d",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "forwarder",
+        "address": "0xe7863cc0e2fb783b44c279ab159bcd812c2cea1c",
+        "runtimeHash": "0x3242bd3dea1be9c1ffd17b23475f2d1d11fb5ee9cdbe8328b309b7adb8427043",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "rootFactory",
+        "address": "0x21e438fabe10770afb4407cf6b09d32369cbdce4",
+        "runtimeHash": "0xed0774e92af31e9799c7b91b764c4508d33fee4323a564801713714897183849",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "feeAdvisory",
+        "address": "0x3b6b3f00684987b831fcf9eb5f0d5b806aff7306",
+        "runtimeHash": "0x9b3c56e0749889dd01ab6c1a5247c1fb2f47bf92da5d08737f6570ed48fead74",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "sessionAdvisory",
+        "address": "0x78bc6b7302dda8632e661c8d74966bdbea1c66b1",
+        "runtimeHash": "0x0e33fd89175de3909a2a51a4d93c0bd359b17dd9396dd49faeea0d49370d6e18",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "liquidityVault",
+        "address": "0xa408923ef811945ef119bc700b1950dab65467fc",
+        "runtimeHash": "0x6632211514f82b2f0fe6d9016cbdc5a7e2c688bc576a75d4ab1384fcc0344827",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "rules",
+        "address": "0x10f684361b35c8411a2c07f68a6fb1f4b7e555f7",
+        "runtimeHash": "0x3ffac05e248f81ad3843949052af1c0c6343179f0ec591bae3e271e249c7d879",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "rules",
+        "address": "0xb67b73e28c522a3aac438be970bf94976deee52a",
+        "runtimeHash": "0x0fed58ec91368b16ba4166acc65ddd9252529fb860834f81fdc5dab3179a6247",
+        "startBlock": "82536327"
+      },
+      {
+        "role": "rules",
+        "address": "0x3d7e31746127fd9a14d3c7fc12e73611d2e8cb34",
+        "runtimeHash": "0x925797125cde5723bfa57ac04238e847ac0098a2821e6703fd4d5e20881a322b",
+        "startBlock": "82536327"
+      }
+    ],
+    "qualification": {
+      "status": "verified",
+      "evidenceHash": "0xd11146db666e226b65fc27ff225a777c076ab91fbf68f31ee27c3a6a4d30a85d",
+      "sourceCommit": "412960b37a631ce145d49fb4a1887f04a4d1fa74"
+    }
+  },
+  "poolKey": {
+    "currency0": "0x0000000000000000000000000000000000000000",
+    "currency1": "0x3c022d43a9f826cd206c2ba60bc753d8b36185c4",
+    "fee": 8388608,
+    "tickSpacing": 60,
+    "hooks": "0x89c9fb50d1f03192230ffb1c279bb6e7d3fe6acc"
+  },
+  "poolId": "0x94d1a318a67449c1fd850f354b4694be69483a6e94148787659e487ecb8c6780",
+  "rootRecordSlot": "0xdc5740eeafc78ca4488605782bceeee21ea0cec0908c37bbb90fb77c45910409",
+  "rulesNamespace": "0x762913e4bc0f59f7b08c82f07586fa48932548ab5fab99e6db0b09765b4ff900",
+  "configSlot": "0x1ad7756ae873b72ee7b85d116a86b7b2c5244640095753f73687752bed4705aa",
+  "swapAbi": [
+    {
+      "name": "swap",
+      "type": "function",
+      "stateMutability": "payable",
+      "inputs": [
+        {
+          "type": "tuple",
+          "name": "params",
+          "components": [
+            {
+              "type": "tuple",
+              "name": "key",
+              "components": [
+                {
+                  "type": "address",
+                  "name": "currency0"
+                },
+                {
+                  "type": "address",
+                  "name": "currency1"
+                },
+                {
+                  "type": "uint24",
+                  "name": "fee"
+                },
+                {
+                  "type": "int24",
+                  "name": "tickSpacing"
+                },
+                {
+                  "type": "address",
+                  "name": "hooks"
+                }
+              ]
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "int128",
+              "name": "amountSpecified"
+            },
+            {
+              "type": "uint128",
+              "name": "amountBound"
+            },
+            {
+              "type": "uint160",
+              "name": "sqrtPriceLimitX96"
+            },
+            {
+              "type": "address",
+              "name": "recipient"
+            },
+            {
+              "type": "uint256",
+              "name": "deadline"
+            }
+          ]
+        },
+        {
+          "type": "address",
+          "name": "engagement"
+        },
+        {
+          "type": "uint256[]",
+          "name": "campaigns"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "amountIn"
+        },
+        {
+          "type": "uint256",
+          "name": "amountOut"
+        }
+      ]
+    }
+  ],
+  "baselineConfigWords": [
+    "0x0000000007d0000000000064000000020000000000000000002cec0000000000",
+    "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "0x0000000000000000000000000000000000000000000000000000000000000000"
+  ],
+  "rootCapsWord": "0x00000000000000000000000003e80557300927c0001e84800000000e74004588",
+  "baseLpFeePips": 3000
+}

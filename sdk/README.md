@@ -1,6 +1,7 @@
 # Developer SDK Alpha
 
-The CLI, Python API, Hookr case adapter and offline tests are public source.
+The CLI, Python API, portable CaseSDK, historical LP / Dynamic Fee OFF adapters
+and offline tests are public source.
 A private executable pilot has also passed clean installation, a fresh native
 LP100→50 replay and verification of its own new run on the development Mac.
 Its full ACTUAL/BRANCH files matched the historical references.
@@ -26,6 +27,19 @@ Source entry points are the [CLI](rhook_alpha/cli.py), [Python API](rhook_alpha/
 [installer](install_alpha.py) and [Hookr example](examples/execute_hookr.py).
 The example defaults to planning after a valid installation. It does not make
 a source-only clone into an installed SDK.
+
+## Portable cases development
+
+The [portable case workflow](CASE_CAPSULES.md) adds source-only installation,
+content-addressed capsules, multiple local cases and adapter plans. The local
+[historical execution guide](HISTORICAL_EXECUTION.md) covers the maintained
+ACTUAL/BRANCH path, supported LP and Dynamic Fee OFF descriptors, exact-operation
+review and separate owner consent. Build18 accepted one historical Dynamic Fee
+ON/OFF pair from original parent93251802 with all seven original arrivals, including the signed subject;
+same-engine recorded verification is distinct from independent EVM verification.
+See [source synchronization scope](SOURCE_SYNC.md) for the imported milestones,
+publication adaptations and optional retained-fixture tests. The integrated
+source export has not had a new native acceptance.
 
 ## Runtime availability
 

@@ -29,7 +29,8 @@
     "demo:tamper": "node scripts/tamper-transcript.mjs .rhook/minimal-transcript.json",
     "quickstart": "npm run demo:generate && npm run demo:inspect && npm run demo:verify && npm run demo:tamper",
     "demo:robinhood": "node examples/robinhood-v4/scripts/demo.mjs",
-    "test:robinhood": "node --test examples/robinhood-v4/test/*.test.mjs"
+    "test:robinhood": "node --test examples/robinhood-v4/test/*.test.mjs",
+    "test:sdk-cases": "RHOOK_TEST_INSTALLED_LIB=\"$PWD/sdk\" node --test --test-concurrency=1 sdk/tests_cases/*.test.mjs"
   },
   "repository": {
     "type": "git",
