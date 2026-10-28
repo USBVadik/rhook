@@ -1,12 +1,24 @@
 """Native dispatch contracts use explicit test doubles; they do not prove EVM execution."""
 from pathlib import Path
+from contextlib import contextmanager
+from types import SimpleNamespace
 import json,subprocess,sys,tempfile,unittest
 from unittest.mock import patch
 from developer.files import canonical,load,save
 from rhook_alpha.execution import ExecutionSDK,ExecutionError
+from rhook_alpha import execution as execution_module
 from rhook_alpha.cases.scenario import api
 from rhook_alpha.cases import native
 from test_execution import fixture,SDK
+
+@contextmanager
+def supported_mock_host():
+    # Only the facade's module bindings change, never the process-wide platform.
+    # Real dispatch stays replaced by each test's explicit capture/backend double.
+    host_sys=SimpleNamespace(platform='darwin',executable=sys.executable)
+    host_platform=SimpleNamespace(machine=lambda:'arm64')
+    with patch.object(execution_module,'sys',host_sys),patch.object(execution_module,'platform',host_platform):
+        yield
 
 class ExecutionRunner(unittest.TestCase):
     def prepared(self,root):
@@ -29,7 +41,7 @@ class ExecutionRunner(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             root=Path(t).resolve();sdk,prepared,result=self.prepared(root)
             self.assertTrue(callable(getattr(sdk,'run',None)),'native run missing')
-            with patch.object(sdk,'operation',return_value=self.binding(result)),patch.object(native,'capture_workflow',side_effect=AssertionError('dispatch forbidden')):
+            with supported_mock_host(),patch.object(sdk,'operation',return_value=self.binding(result)),patch.object(native,'capture_workflow',side_effect=AssertionError('dispatch forbidden')):
                 with self.assertRaisesRegex(ExecutionError,'OPERATION_MISMATCH'):sdk.run(prepared,operation='b'*64,evidence=root/'workflow',local_owner=True,mac_ready=True)
             self.assertFalse((root/'workflow').exists())
 
@@ -50,7 +62,7 @@ class ExecutionRunner(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             root=Path(t).resolve();sdk,prepared,result=self.prepared(root)
             self.assertTrue(callable(getattr(sdk,'run',None)),'native run missing')
-            with patch.object(sdk,'operation',return_value=self.binding(result)),patch.object(native,'capture_workflow',side_effect=self.fake_capture(root,result)) as capture:
+            with supported_mock_host(),patch.object(sdk,'operation',return_value=self.binding(result)),patch.object(native,'capture_workflow',side_effect=self.fake_capture(root,result)) as capture:
                 answer=sdk.run(prepared,operation='a'*64,evidence=root/'evidence',local_owner=True,mac_ready=True)
                 self.assertEqual(answer['status'],'EXECUTION_COMPLETED');self.assertEqual(answer['nativeResult']['producerInvocations'],2);self.assertTrue(answer['cleanupConfirmed']);capture.assert_called_once()
                 with self.assertRaisesRegex(ExecutionError,'OPERATION_ALREADY_ATTEMPTED'):sdk.run(prepared,operation='a'*64,evidence=root/'other-evidence',local_owner=True,mac_ready=True)
@@ -60,7 +72,7 @@ class ExecutionRunner(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             root=Path(t).resolve();sdk,prepared,result=self.prepared(root)
             self.assertTrue(callable(getattr(sdk,'run',None)),'native run missing')
-            with patch.object(sdk,'operation',return_value=self.binding(result)),patch.object(native,'capture_workflow',side_effect=self.fake_capture(root,result,group_gone=False)):
+            with supported_mock_host(),patch.object(sdk,'operation',return_value=self.binding(result)),patch.object(native,'capture_workflow',side_effect=self.fake_capture(root,result,group_gone=False)):
                 answer=sdk.run(prepared,operation='a'*64,evidence=root/'evidence',local_owner=True,mac_ready=True)
             self.assertEqual(answer['status'],'EXECUTION_STOP');self.assertFalse(answer['cleanupConfirmed']);self.assertFalse(answer['automaticRetry'])
 
@@ -68,7 +80,7 @@ class ExecutionRunner(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             root=Path(t).resolve();sdk,prepared,result=self.prepared(root)
             self.assertTrue(callable(getattr(sdk,'run',None)),'native run missing')
-            with patch.object(sdk,'operation',return_value=self.binding(result)),patch.object(native,'capture_workflow',side_effect=self.fake_capture(root,result,child_status='SCENARIO_STOP')):
+            with supported_mock_host(),patch.object(sdk,'operation',return_value=self.binding(result)),patch.object(native,'capture_workflow',side_effect=self.fake_capture(root,result,child_status='SCENARIO_STOP')):
                 answer=sdk.run(prepared,operation='a'*64,evidence=root/'evidence',local_owner=True,mac_ready=True)
             self.assertEqual(answer['status'],'EXECUTION_STOP');self.assertEqual(answer['nativeResult']['failure']['world'],'SCENARIO_VARIANT');self.assertEqual(answer['primaryStop']['code'],'TRIE_UPDATE_PREIMAGE_UNAVAILABLE')
 
@@ -76,9 +88,9 @@ class ExecutionRunner(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             root=Path(t).resolve();sdk,prepared,result=self.prepared(root)
             self.assertTrue(callable(getattr(sdk,'authenticate',None)),'native authenticate missing')
-            with patch.object(api,'check',return_value=dict(status='AUTHENTICATED_SCENARIO_INPUT',nativeExecutions=0,coverage='KNOWN_PREREQUISITES_ONLY')) as checked:
+            with supported_mock_host(),patch.object(api,'check',return_value=dict(status='AUTHENTICATED_SCENARIO_INPUT',nativeExecutions=0,coverage='KNOWN_PREREQUISITES_ONLY')) as checked:
                 answer=sdk.authenticate(prepared);self.assertEqual(answer['coverage'],'KNOWN_PREREQUISITES_ONLY');checked.assert_called_once()
-            with patch.object(api,'compare',return_value=dict(status='VERIFIED_SCENARIO_COMPARISON',worlds=[{'actorRhookTransferNetBaseUnits':'10'},{'actorRhookTransferNetBaseUnits':'12'}],rhookTransferNetDeltaBaseUnits='2',qualifiedClaims=0)) as compare:
+            with supported_mock_host(),patch.object(api,'compare',return_value=dict(status='VERIFIED_SCENARIO_COMPARISON',worlds=[{'actorRhookTransferNetBaseUnits':'10'},{'actorRhookTransferNetBaseUnits':'12'}],rhookTransferNetDeltaBaseUnits='2',qualifiedClaims=0)) as compare:
                 answer=sdk.compare(Path(result['nativeRunDirectory']));self.assertEqual(answer['targetTokenTransferNetDeltaBaseUnits'],'2');compare.assert_called_once()
 
     def test_v2_child_rechecks_exact_operation_before_authentication_or_authority(self):
@@ -104,7 +116,7 @@ class ExecutionRunner(unittest.TestCase):
                 child=dict(status='INPUT_OR_RUNTIME_STOP',causeCode='SCENARIO_CAPTURE_RUNTIME_DRIFT',
                            details={'stderr':'ACCOUNT_PREIMAGE_UNAVAILABLE: 0x'+'12'*32},nextStep='Inspect input.',automaticRetry=False)
                 return dict(ownedChildReaped=True,workflowGroupGone=True,cleanupError=None,exitCode=1,stop=None),canonical(child),b''
-            with patch.object(sdk,'operation',return_value=self.binding(result)),patch.object(native,'capture_workflow',side_effect=failed):
+            with supported_mock_host(),patch.object(sdk,'operation',return_value=self.binding(result)),patch.object(native,'capture_workflow',side_effect=failed):
                 answer=sdk.run(prepared,operation='a'*64,evidence=root/'evidence',local_owner=True,mac_ready=True)
             self.assertEqual(answer['causeCode'],'SCENARIO_CAPTURE_RUNTIME_DRIFT')
             self.assertIn('ACCOUNT_PREIMAGE_UNAVAILABLE',answer['childDiagnostics']['details']['stderr'])
