@@ -2,13 +2,14 @@
 
 [![CI](https://github.com/USBVadik/rhook/actions/workflows/ci.yml/badge.svg)](https://github.com/USBVadik/rhook/actions/workflows/ci.yml)
 
-**Counterfactual execution for Arbitrum-based chains.**
+**A Counterfactual Execution protocol for Arbitrum-based chains.**
 
 RHOOK replays historical execution, changes one supported rule, and compares
 what happens. The original execution must match the canonical chain before an
 alternative world can run from its own copy of the original state.
 
-Our working example is a Hookr pool on Robinhood Chain: replay all seven arrivals
+Hookr is the first supported application. Our working example is a pool on
+Robinhood Chain: replay all seven arrivals
 in block **93251803**, change LP Rewards from **100 to 50**, then verify the new
 receipts and compare the buyer's output. The Python API and CLI follow:
 
@@ -49,6 +50,11 @@ explicitly. Read the [historical workflow](sdk/HISTORICAL_EXECUTION.md),
 [prepared scenario API](sdk/DEVELOPER_EXECUTION.md) and
 [source-sync boundary](sdk/SOURCE_SYNC.md).
 
+The [clean-room guide](sdk/CLEAN_ROOM.md) covers installation with a pinned
+317-file source inventory and explicit missing-runtime diagnostics. Installation,
+case import and planning do not require a private worker. Native replay still
+requires separately supplied, matching runtime and authenticated case data.
+
 ## The question we test
 
 If a DeFi rule had been different, would the same transactions have produced a
@@ -79,6 +85,7 @@ flowchart LR
 | Mac/Linux execution agreement | A separate Ubuntu amd64 worker reproduced the complete macOS results for this case. This is portability within the same engine lineage. |
 | Installed Developer Alpha | On 25 October 2026, a separately built macOS developer worker completed a new pair through an installed CLI. Its own `verify` and `compare` passed; full world files matched the prior references. Installed replay took **6.05 seconds** on that Mac. |
 | Historical Dynamic Fee OFF (Build18) | The signed 0.01 ETH purchase in block 93251803 remained SUCCESS in both Go/Nitro worlds, with LP100 and recapture retained. This is a separate intervention from LP100→50; [scope and assurance](sdk/SOURCE_SYNC.md). |
+| Private recorder-only replay (Build26D / Build27g) | Two historical cases completed fresh ACTUAL/BRANCH pairs using recorded dependencies without access to their full references during replay. Same Go/Nitro lineage; [results and limits](sdk/RECORDER_RESULTS.md). |
 | Public developer surface | Python API, CLI, Hookr inspect/plan adapter and synthetic offline tests are published. Independent external-developer installation is the next test. |
 
 The intervention reduces the LP Rewards add-on and its associated protocol share;

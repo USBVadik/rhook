@@ -1,5 +1,8 @@
 # Developer SDK Alpha
 
+RHOOK is a Counterfactual Execution protocol. Hookr is its first supported
+application; the Alpha exposes a closed set of supported interventions.
+
 The CLI, Python API, portable CaseSDK, historical LP / Dynamic Fee OFF adapters
 and offline tests are public source.
 A private executable pilot has also passed clean installation, a fresh native
@@ -23,10 +26,16 @@ The tests use synthetic inputs and mocked native dispatch. They start no worker,
 sensor or network client, and need no private runtime bundle or provider account.
 A passing test suite is not a new EVM replay.
 
-Source entry points are the [CLI](rhook_alpha/cli.py), [Python API](rhook_alpha/api.py),
-[installer](install_alpha.py) and [Hookr example](examples/execute_hookr.py).
-The example defaults to planning after a valid installation. It does not make
-a source-only clone into an installed SDK.
+For source-only installation, use the [clean-room guide](CLEAN_ROOM.md) and
+[case installer](install_cases.py). Its exact 317-file inventory excludes private
+calibration modules and preserves the approved default resource policy. The
+bootstrap authenticates its validation helper before executing it. Unknown
+source files, changed policy bytes and edited inventory pins fail closed.
+
+The maintained historical entry points are the [CaseSDK API](rhook_alpha/cases/api.py)
+and [case CLI](rhook_alpha/cases/__main__.py). The older [fixed Alpha installer](install_alpha.py),
+[API](rhook_alpha/api.py) and [example](examples/execute_hookr.py) retain their own
+source/runtime binding. Do not combine the two installations or their assets.
 
 ## Portable cases development
 
@@ -40,6 +49,11 @@ same-engine recorded verification is distinct from independent EVM verification.
 See [source synchronization scope](SOURCE_SYNC.md) for the imported milestones,
 publication adaptations and optional retained-fixture tests. The integrated
 source export has not had a new native acceptance.
+
+The two later private [recorder-only results](RECORDER_RESULTS.md) reproduced
+completed historical pairs from recorded original-state dependencies. These are
+same-engine observations, not an external installation test or a public recorder
+runtime release. `qualifiedClaims=0`; `nativeRecorderCoverage=UNKNOWN`.
 
 ## Runtime availability
 
@@ -67,13 +81,19 @@ Its 198-file engine closure is retained because the manifests and native binding
 cover that source set. Seven files have path-only substitutions; it is not
 byte-identical to the original scientific runtime source.
 
-The public installer still requires the original engine tree, checked against
+The older fixed Alpha installer still requires the original engine tree, checked against
 `developer/accepted-source.json`, and its matching pinned asset bundle.
 [source-provenance.json](source-provenance.json) records accepted/public hashes
 and publication adaptations. No native acceptance of this adapted public
 installer is claimed. The later private pilot uses a separately relinked
 worker/source registration and its own bundled installer. It is not silently
 registered as the older scientific binary.
+
+The source-only case installer copies the reviewed inventory from this clone;
+it does not require that private bundle. Missing native components produce
+actionable errors, including `NATIVE_RUNTIME_MISSING`. Registration and replay
+are separate operations: even runtime registration starts a worker identity
+check. No fresh external native reproduction is claimed by source installation.
 
 Read [compatibility](COMPATIBILITY.md), [distribution](DISTRIBUTION.md) and
 [release notes](RELEASE_NOTES.md). Original RHOOK-owned source/docs use the root
