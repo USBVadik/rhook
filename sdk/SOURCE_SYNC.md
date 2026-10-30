@@ -45,8 +45,11 @@ even when matching retained records support a named subcheck.
 
 The legacy fixed Alpha installer and `rhook_alpha.API` retain their older
 source/runtime binding. New `install_cases.py` and `CaseSDK` do not silently
-register that old worker as a current derivative. This public source export
-has not itself received a fresh native acceptance.
+register that old worker as a current derivative. A later local installed
+[on-demand scenario acceptance](SCENARIOS.md#installed-on-demand-acceptance)
+completed discovery and fresh offline pairs at one new checkpoint. That result
+uses the supported scenario path and retained private runtime; it does not
+qualify every exported profile or supply an externally reproducible runtime.
 
 ## Run source-only checks
 

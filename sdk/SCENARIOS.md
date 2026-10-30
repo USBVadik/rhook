@@ -14,6 +14,29 @@ field changes in VARIANT (original 100, replacement 0–99). These assumptions a
 recorded in the plan and input. Never fund or broadcast from the public signer.
 The historical adapter and its external router are unchanged.
 
+## Installed on-demand acceptance
+
+On 30 October 2026, one private local acceptance completed the full workflow
+through the installed `scenario-close`, without an external laboratory launcher
+or a witness/result prepared for that checkpoint. Discovery BASELINE/VARIANT and
+a fresh offline BASELINE/VARIANT all completed with successful action receipts.
+The final pair used separate original-state copies with `Source=nil`, RPC0 and
+WSS0. All ten declared deterministic comparison fields matched: state/receipt
+roots, produced header, system transaction, action mapping, receipts/logs,
+actor balances before/after, nonce and overlay. Verify/compare and cleanup passed.
+
+Acquisition used 59/64 read-only RPC, including the final header recheck,
+9.202 seconds and 1,503,168 response/header bytes. The captured witness contained
+686 trie nodes and 14 code preimages. Those measurements describe one supported
+LP100/LP50 request; they are not throughput, cost or coverage guarantees for other
+checkpoints. State reads continue to authenticate at the selected original root.
+
+This summarizes retained private evidence; it does not distribute that evidence,
+worker or witness. Both stages use the same Go/Nitro backend. Independence from
+RPC during the offline pair is not independent Rust execution or a cryptographic
+proof of the full transition. General witness coverage remains `UNKNOWN`,
+`qualifiedClaims=0`, and external-developer native reproduction is still untested.
+
 Install the [case CLI](CASE_CAPSULES.md) with its pinned dependencies. Register a
 separately built scenario runtime; this does not replace the historical runtime:
 
@@ -112,11 +135,27 @@ and compares their deterministic outputs with discovery. This covers only the
 declared pool, caller, action, environment and LP intervention. It establishes
 neither historical canonical execution nor an independent Rust/EVM verification.
 
-Prepare without execution:
+Prepare without producer execution (this calls the registered worker's identity
+helper, so it still requires permission to start that native helper):
 
 ```sh
 rhook-cases --home "$SDK_HOME" scenario-closure-prepare --plan "$PLAN" --output "$OUTPUT"
 ```
+
+The installed `scenario-close` CLI owns the same bounded workflow used by the
+prepared execution interface. No external launcher or manually set workflow
+environment variable is required. It starts one isolated Python child through
+the existing `capture_workflow`; that child runs the unchanged closure path.
+An already owned caller keeps its existing path, without a nested workflow.
+The sibling directory `$OUTPUT.workflow` retains outer process/cleanup evidence
+and a permanent attempt record. Both directories must be fresh. A failed attempt
+does not authorize reuse or automatic retry.
+
+Completion is accepted only from the new linked closure `RESULT.json` and
+`BINDING.json`, four completed discovery/offline worlds, confirmed native cleanup
+and a reaped, absent outer process group. Unlinked stdout and uncertain cleanup
+remain STOP. The wrapper preserves engine, consent and host policies;
+no RPC or native execution follows from installation or configuration.
 
 Execute once, through the managed workflow capture, after exact owner approval:
 
@@ -129,9 +168,36 @@ rhook-cases --home "$SDK_HOME" scenario-close --plan "$PLAN" --output "$OUTPUT" 
 The existing v2 policy and accepted workers are unchanged. This initial closure
 launcher explicitly uses the separately registered experimental macOS v3 host
 profile, with fresh power/lid checks, runtime observation and owned-process cleanup.
-Its resource estimate is not a reservation or a guarantee of no effect on other
-applications. Any STOP consumes this operation; there is no automatic recapture.
+Its policy revision `free-telemetry/0.1` records free pages and estimated available
+RAM at admission and runtime without using them as launch/continuation thresholds.
+NORMAL pressure, valid/fresh samples, host identity, unchanged swap checks,
+sampled worker/broker RSS, CPU/wall deadlines, power/lid and cleanup still apply.
+Telemetry does not reserve RAM or guarantee future allocation. The changed host
+policy hash and SDK inventory must be registered and bound to a new operation;
+an old strict-v3 registration or closed consent cannot be reused. Any STOP
+consumes this operation; there is no automatic recapture.
 
 The [Developer Execution SDK](DEVELOPER_EXECUTION.md) imports a prepared witness
 into a new home and wraps the owned native workflow. It keeps exact consent,
 separate recorded verification and native authentication scope explicit.
+
+## ArbOS send accumulator subjects
+
+For the supported ArbOS61 layout, prefetch derives the original checkpoint's send
+Merkle accumulator partial slots from the parent header's hash-bound `mixHash`
+bytes. The separate RPC `sendCount` metadata is ignored. Pinned Nitro stores the
+size at offset 0 in subspace 5 and partial level `i` at offset `2+i`. Its
+`CalcNumPartials` uses `bits.Len64(size)`, including at exact powers of two.
+
+Only slot identities are generated. Every returned account/storage proof still
+authenticates against the selected original state root through `ProofCollector`.
+`SEND_MERKLE_PREFETCH.json` records the derived parent shape. Existing subjects
+are retained and deduplicated before the existing batches of at most 48 keys.
+For the studied size 3540 this adds eight subjects to the 53-key ArbOS union;
+it remains two batches. The uint64 extreme can require a third batch; the global
+RPC/time/response budgets remain unchanged and can still cause STOP.
+
+This rule covers the original parent's accumulator shape. New L2-to-L1 sends can
+grow it during a scenario and introduce further levels. Other contracts, trie
+updates and VARIANT dependencies remain subject to lazy discovery. Fewer modeled
+RPC calls do not establish complete BASELINE/VARIANT execution or witness closure.

@@ -55,6 +55,13 @@ The [clean-room guide](sdk/CLEAN_ROOM.md) covers installation with a pinned
 case import and planning do not require a private worker. Native replay still
 requires separately supplied, matching runtime and authenticated case data.
 
+The installed [on-demand Scenario SDK](sdk/SCENARIOS.md#installed-on-demand-acceptance)
+has also completed one local fresh-checkpoint LP100/LP50 workflow: discovery of
+both worlds, witness closure, a fresh offline `Source=nil` pair and verification.
+All four worlds succeeded; the declared discovery/offline fields matched.
+That private acceptance used 59 RPC and 9.202 seconds of acquisition. It does not
+establish arbitrary-pool coverage or independent external native reproduction.
+
 ## The question we test
 
 If a DeFi rule had been different, would the same transactions have produced a
@@ -86,6 +93,7 @@ flowchart LR
 | Installed Developer Alpha | On 25 October 2026, a separately built macOS developer worker completed a new pair through an installed CLI. Its own `verify` and `compare` passed; full world files matched the prior references. Installed replay took **6.05 seconds** on that Mac. |
 | Historical Dynamic Fee OFF (Build18) | The signed 0.01 ETH purchase in block 93251803 remained SUCCESS in both Go/Nitro worlds, with LP100 and recapture retained. This is a separate intervention from LP100→50; [scope and assurance](sdk/SOURCE_SYNC.md). |
 | Private recorder-only replay (Build26D / Build27g) | Two historical cases completed fresh ACTUAL/BRANCH pairs using recorded dependencies without access to their full references during replay. Same Go/Nitro lineage; [results and limits](sdk/RECORDER_RESULTS.md). |
+| Installed on-demand SDK | One local fresh-checkpoint LP100/LP50 run completed discovery2 + fresh offline2 through the installed CLI; all10 declared deterministic fields matched. Same Go/Nitro backend; [acceptance scope](sdk/SCENARIOS.md#installed-on-demand-acceptance). |
 | Public developer surface | Python API, CLI, Hookr inspect/plan adapter and synthetic offline tests are published. Independent external-developer installation is the next test. |
 
 The intervention reduces the LP Rewards add-on and its associated protocol share;

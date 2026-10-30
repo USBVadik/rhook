@@ -2,6 +2,27 @@
 
 Unreleased. No tag, GitHub Release or binary upload exists for this candidate.
 
+## 30 October 2026: installed on-demand Scenario SDK
+
+- Connect standalone `scenario-close` to the existing owned workflow while
+  preserving the inner acquisition, authority and native execution paths.
+- Derive ArbOS61 send-accumulator subjects from hash-bound parent header data.
+  Authenticate returned proofs at the selected root and retain one final-header
+  RPC reservation. This does not predict all future scenario dependencies.
+- Version the opt-in scenario v3 policy as `free-telemetry/0.1`; immediate free
+  and estimated available memory are telemetry only at admission/runtime.
+  Pressure, swap, freshness, identity, RSS, CPU/wall, power/lid and cleanup
+  controls remain active. V2 defaults and native worker are unchanged.
+- Add regressions and refresh source/installer inventories. The
+  [private local acceptance](SCENARIOS.md#installed-on-demand-acceptance)
+  completed four successful worlds on one fresh checkpoint with all ten declared
+  discovery/offline fields matching; 59 RPC, 9.202s acquisition, 1,503,168 bytes.
+
+This is a source-only integration. No worker, witness, raw evidence, credentials
+or execution permission is included. Same Go/Nitro backend, no independent Rust
+confirmation; general coverage `UNKNOWN`, `qualifiedClaims=0`. Independent
+external-developer native reproduction remains unperformed.
+
 ## 30 October 2026: source-only installation hardening
 
 - Pin the case installer's exact 317-file source inventory. Authenticate the

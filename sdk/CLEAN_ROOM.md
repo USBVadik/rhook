@@ -19,9 +19,14 @@ symlinks and an edited inventory. `SOURCE_INSTALL_INVENTORY.json` and
 `CASE_INSTALL.json` retain the installed source boundary. Use the source-only
 release tree; private experiment trees are not installation sources.
 
-The approved default resource policy stays unchanged. Existing explicitly
-supported opt-in profiles remain source code; the private Build27 free-page
-telemetry policy and calibration module are excluded.
+The default v2 resource policy stays unchanged. The separate Scenario SDK v3
+opt-in now uses `free-telemetry/0.1`: free/estimated-available RAM are telemetry
+at admission and runtime; pressure, swap, freshness, RSS, CPU/wall, power/lid and
+cleanup controls remain active. Fresh matching registration and exact consent
+are required. This is not a RAM reservation. The private historical Build27
+free-page policy and calibration module are still excluded. The inventory's
+`experimentalFreeTelemetryIncluded: false` describes those excluded historical
+modules; the supported scenario v3 policy is explicitly inventoried by its hash.
 
 For an explicitly supplied case bundle containing `CAPSULE.json` and
 `BLOCK_PACKAGE.json`:

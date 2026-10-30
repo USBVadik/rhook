@@ -1,4 +1,4 @@
-"""Experimental host estimate; no memory reservation or clean-cache guarantee."""
+"""Versioned availability telemetry; pressure/resource/identity guards stay active."""
 from pathlib import Path
 import time
 from developer.files import load, require, save, sha, strict
@@ -55,14 +55,12 @@ def sdk_files():
 def assess(samples, runtime=False):
     require(type(samples) is list and len(samples) >= 2, 'TWO_RESOURCE_SAMPLES_REQUIRED')
     mode = 'Runtime' if runtime else 'Admission'
-    threshold = POLICY['minimum' + mode + 'EstimatedBytes']
-    immediate = POLICY['minimum' + mode + 'ImmediateBytes']
+    require(POLICY.get('availabilityMode') == 'TELEMETRY_ONLY'
+            and POLICY.get('policyRevision') == 'free-telemetry/0.1', 'AVAILABILITY_POLICY')
     estimates = []
     for sample in samples:
         validate_sample(sample)
-        require(sample['freePages'] * sample['pageBytes'] >= immediate, 'IMMEDIATE_FREE_RESERVE')
         estimates.append(estimated_available(sample))
-        require(estimates[-1] >= threshold, 'INSUFFICIENT_ESTIMATED_AVAILABLE')
     for before, after in zip(samples, samples[1:]):
         require(all(before[k] == after[k] for k in ('boot', 'pageBytes', 'physicalBytes')), 'HOST_IDENTITY_CHANGED')
         gap = (after['beganNs'] - before['endedNs']) / 1e9
@@ -71,7 +69,10 @@ def assess(samples, runtime=False):
         require(after['swapUsedBeforeBytes'] <= before['swapUsedBytes'], 'ACTIVE_SWAP_USAGE')
         require(all(after[k] >= before[k] for k in ('compressions', 'decompressions')), 'VM_COUNTER_REGRESSION')
     return dict(status='PASS', profile=PROFILE, experimental=True, reservedMemory=False,
-                minimumEstimatedAvailableBytes=min(estimates), requiredEstimatedBytes=threshold,
+                policyRevision=POLICY['policyRevision'], availabilityMode=POLICY['availabilityMode'],
+                availabilityAdmissionEnforced=False,
+                minimumEstimatedAvailableBytes=min(estimates), requiredEstimatedBytes=0,
+                requiredImmediateFreeBytes=0,
                 minimumImmediateFreeBytes=min(s['freePages'] * s['pageBytes'] for s in samples),
                 reserveModel=POLICY['reserveModel'], cleanInactiveIntersectionMeasured=False,
                 mode='runtime' if runtime else 'admission', qualifiedScientificAdmission=False)

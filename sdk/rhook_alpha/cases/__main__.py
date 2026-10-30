@@ -183,8 +183,8 @@ def main(argv=None):
             from .scenario.closure import prepare
             value = prepare(sdk, args.plan, args.output)
         elif args.command == 'scenario-close':
-            from .scenario.closure import run
-            value = run(sdk, args.plan, args.output, credential_file=args.credential_file,
+            from .scenario.closure import run_owned
+            value = run_owned(sdk, args.plan, args.output, credential_file=args.credential_file,
                         account_assertions=args.account_assertions, expected_operation=args.operation,
                         local_owner=args.local_owner, mac_ready=args.mac_ready)
         elif args.command == 'scenario-pool':

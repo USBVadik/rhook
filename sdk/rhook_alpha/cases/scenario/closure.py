@@ -7,9 +7,11 @@ accepted counterfactual result. All execution belongs to one explicit consent.
 import json
 import os
 from pathlib import Path
+import re
 import resource
 import shutil
 import subprocess
+import sys
 import time
 
 from developer.files import canonical, digest, load, no_links, read, require, save, sha, sync
@@ -20,6 +22,70 @@ from . import api, host_v3, outcome, power
 PROFILE = 'rhook/scenario-witness-discovery/0.1'
 BUDGET = dict(requests=64, wallMs=30000, bytes=8 << 20, estimatedCU=1280,
               discoveryBaseline=1, discoveryVariant=1, offlineBaseline=1, offlineVariant=1, finalHeaderRequests=1)
+
+
+def run_owned(sdk, ref, output, *, credential_file, account_assertions,
+              expected_operation, local_owner=False, mac_ready=False):
+    """Give the installed CLI the existing bounded workflow, without a launcher."""
+    require(local_owner is True and mac_ready is True, 'EXPLICIT_CLOSURE_OWNER_AND_READY_REQUIRED')
+    if active_group() is not None:
+        return run(sdk, ref, output, credential_file=credential_file,
+                   account_assertions=account_assertions, expected_operation=expected_operation,
+                   local_owner=local_owner, mac_ready=mac_ready)
+    require(type(expected_operation) is str and re.fullmatch('[0-9a-f]{64}', expected_operation),
+            'EXACT_CLOSURE_OPERATION_REQUIRED')
+    out = no_links(output)
+    require(not out.exists(), 'FRESH_CLOSURE_OUTPUT_REQUIRED')
+    require(len(str(out / 'broker.sock').encode()) <= 103, 'SHORT_PRIVATE_SOCKET_PATH_REQUIRED')
+    evidence = out.with_name(out.name + '.workflow')
+    require(not evidence.exists(), 'FRESH_CLOSURE_WORKFLOW_EVIDENCE_REQUIRED')
+    evidence.mkdir(mode=0o700)
+    sync(evidence.parent)
+    save(evidence / 'ATTEMPT.json', dict(operationCommitment=expected_operation,
+         outputPath=str(out), automaticRetry=False))
+    bootstrap = ('import sys;sys.dont_write_bytecode=True;sys.path.insert(0,sys.argv[1]);'
+                 'from rhook_alpha.cases.__main__ import main;raise SystemExit(main(sys.argv[2:]))')
+    command = [sys.executable, '-I', '-S', '-B', '-c', bootstrap, str(native.SDK_ROOT),
+               '--home', str(sdk.home), 'scenario-close', '--plan', ref, '--output', str(out),
+               '--credential-file', str(credential_file), '--account-assertions', str(account_assertions),
+               '--operation', expected_operation, '--local-owner', '--mac-ready']
+    result = dict(status='SCENARIO_CLOSURE_STOP', operationCommitment=expected_operation,
+                  operationPermanentlyClosed=True, automaticRetry=False, cleanupConfirmed=False,
+                  externalDelivery='HOLD')
+    try:
+        process, stdout, _ = native.capture_workflow(command, evidence / 'process', 180, 1 << 20, 1 << 20)
+        try:
+            from developer.files import strict
+            child = strict(stdout)
+        except (ValueError, UnicodeError, RecursionError):
+            child = None
+        linked = (type(child) is dict and child.get('operationCommitment') == expected_operation
+                  and (out / 'RESULT.json').is_file() and (out / 'BINDING.json').is_file()
+                  and load(out / 'RESULT.json', 2 << 20) == child
+                  and load(out / 'BINDING.json', 2 << 20).get('operationCommitment') == expected_operation)
+        clean = (process.get('ownedChildReaped') is True and process.get('workflowGroupGone') is True
+                 and process.get('cleanupError') is None)
+        completed = (linked and clean and child.get('cleanupConfirmed') is True
+                     and process.get('exitCode') == 0 and not process.get('stop')
+                     and child.get('status') == 'SCENARIO_WITNESS_CLOSURE_COMPLETED'
+                     and child.get('finalSource') == 'NIL' and child.get('completedOfflineWorlds') == 2
+                     and child.get('nativeProducerEntries') == {'discovery': 2, 'finalOffline': 2})
+        if linked:
+            result = dict(child)
+        elif type(child) is dict:
+            result['childDiagnostics'] = child
+            result['childDiagnosticsScope'] = 'UNLINKED_STDOUT_NOT_NATIVE_EXECUTION_EVIDENCE'
+            result['causeCode'] = child.get('causeCode')
+        if not completed:
+            result.update(status='SCENARIO_CLOSURE_STOP', operationPermanentlyClosed=True,
+                          automaticRetry=False, cleanupConfirmed=clean and linked and child.get('cleanupConfirmed') is True)
+            result['causeCode'] = (process.get('stop') or result.get('causeCode')
+                                   or 'CLOSURE_WORKFLOW_RESULT_OR_CLEANUP_UNCONFIRMED')
+    except BaseException as error:
+        result.update(status='SCENARIO_CLOSURE_STOP', causeCode=type(error).__name__ + ': ' + str(error)[:1024],
+                      cleanupConfirmed=False, operationPermanentlyClosed=True, automaticRetry=False)
+    save(evidence / 'SDK_RESULT.json', result)
+    return result
 
 
 def prepare(sdk, ref, output):

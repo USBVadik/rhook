@@ -1,7 +1,31 @@
 // Trace slots are acquisition hints. Values always come from fresh root-bound proofs.
 import assert from 'node:assert/strict';
-import {address,hash} from '../../../engine/adapters/hookr-case/primitives.mjs';
+import {address,hash,keccak256} from '../../../engine/adapters/hookr-case/primitives.mjs';
+import {headerHash} from '../../../engine/plan_native/ethereum.mjs';
 import {HISTORY_ADDRESS,FILTER_ADDRESS} from './system.mjs';
+
+// Pinned Nitro: ArbOS subspace {5}, mapAddress's 31-byte page hash;
+// accumulator size is offset 0, partial[level] is offset 2+level.
+const sendMerklePage=keccak256(keccak256('0x05')+'00'.repeat(31)).slice(0,64);
+export function addSendMerkleSubjects(subjects,parent,checkpoint){
+ assert.equal(checkpoint.chainId,4663,'SEND_MERKLE_CHAIN');
+ assert.equal(headerHash(parent),checkpoint.blockHash,'SEND_MERKLE_HEADER');
+ assert.equal(parent.stateRoot,checkpoint.stateRoot,'SEND_MERKLE_ROOT');
+ assert.equal(Number(BigInt(parent.number)),checkpoint.blockNumber,'SEND_MERKLE_BLOCK');
+ const mix=hash(parent.mixHash);
+ assert.equal(BigInt('0x'+mix.slice(34,50)),61n,'SEND_MERKLE_ARBOS_PROFILE');
+ // Decode the hashed header bytes, never the unauthenticated RPC sendCount field.
+ const size=BigInt('0x'+mix.slice(2,18));let levels=0;
+ for(let n=size;n>0n;n>>=1n)levels++;
+ // Nitro's Log2ceil is bits.Len64, including the power-of-two boundary.
+ const slots=[sendMerklePage+'00',...Array.from({length:levels},(_,i)=>sendMerklePage+(i+2).toString(16).padStart(2,'0'))];
+ const a='0xa4b05fffffffffffffffffffffffffffffffffff';
+ if(!subjects.has(a))subjects.set(a,new Set());
+ for(const key of slots)subjects.get(a).add(key);
+ return {schema:'rhook/scenario-send-merkle-prefetch/0.1',checkpoint:structuredClone(checkpoint),
+  parentSendCount:size.toString(),partialLevels:levels,slots,
+  coverage:'ORIGINAL_PARENT_SHAPE_HINTS_ONLY_FUTURE_APPENDS_AND_EXECUTION_CLOSURE_UNKNOWN'};
+}
 
 export function mergeHints(base,hints,{chainId,poolId}){
  assert.equal(hints.schema,'rhook/scenario-trace-hints/0.1');

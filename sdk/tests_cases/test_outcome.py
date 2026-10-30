@@ -200,7 +200,8 @@ class HarmlessSupervision(unittest.TestCase):
             helper.write_text('#!' + sys.executable + ' -I\nimport sys,time\nsys.stdin.buffer.read()\ntime.sleep(10)\n')
             helper.chmod(0o700)
             current = packet(beganNs=2_100_000_000, endedNs=2_110_000_000,
-                             freePages=108 * (1 << 20) // 4096, speculativePages=0)
+                             freePages=108 * (1 << 20) // 4096, speculativePages=0,
+                             pressureAfter=2)
             # Synthetic sensor packets and RSS; actual harmless child, production
             # RuntimeGuard/monitored kill+reap and production result interpretation.
             with mock.patch.object(portable.guards, 'sample_owned', return_value={'rssBytes':1}), \
@@ -216,14 +217,14 @@ class HarmlessSupervision(unittest.TestCase):
             result = dict(status='SCENARIO_CLOSURE_STOP', cleanupConfirmed=False,
                           operationPermanentlyClosed=True, automaticRetry=False)
             outcome.apply_failure(result, caught.exception)
-            with mock.patch.object(closure, 'run', return_value=result), \
+            with mock.patch.object(closure, 'run_owned', return_value=result), \
                  contextlib.redirect_stdout(io.StringIO()) as stdout:
                 code = main(['--home', str(root / 'home'), 'scenario-close', '--plan', 'c-' + 'a' * 32,
                              '--output', str(root / 'out'), '--credential-file', '/unused',
                              '--account-assertions', '/unused', '--operation', OP, '--local-owner', '--mac-ready'])
             self.assertEqual(code, 1)
             reported = json.loads(stdout.getvalue())
-            self.assertEqual(reported['causeCode'], 'HOST_STOP: IMMEDIATE_FREE_RESERVE')
+            self.assertEqual(reported['causeCode'], 'HOST_STOP: MEMORY_PRESSURE')
             self.assertEqual(reported['processTermination'], 'CONFIRMED')
             self.assertEqual(reported['engineBridgeClosure'], 'UNKNOWN')
             self.assertFalse(reported['cleanupConfirmed'])

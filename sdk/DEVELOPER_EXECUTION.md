@@ -9,9 +9,13 @@ substitutes recorded receipts for execution or automatically fetches missing dat
 
 `hookr-buy/0.1` maps to backend`nitro-hookr-scenario/0.1`: one fixed Hookr pool on
 Robinhood Chain4663, pinned contracts and ArbOS61 configuration. BASELINE is LP100;
-VARIANT may be configured to an integer0–99. Only the retained LP50 example at
-checkpoint99236464 has the accepted completed reference. Other values may need
-additional witness; a configuration value is not a coverage guarantee.
+VARIANT may be configured to an integer0–99. The retained LP50 example at
+checkpoint99236464 is a prepared reference. A later local
+[installed on-demand acceptance](SCENARIOS.md#installed-on-demand-acceptance)
+completed a fresh-checkpoint LP100/LP50 discovery pair and a matching fresh offline
+pair. That path obtains state through `CaseSDK`/`scenario-close`; this prepared
+`ExecutionSDK` facade still requires an explicit local witness. Other values may
+need additional witness; a configuration value is not a coverage guarantee.
 
 The action is fixed: one hypothetical0.001ETH exact-input buy, public simulation
 actor/nonce0, common modeled1ETH funding, gas cap10000000, minimum output1base unit,
@@ -134,9 +138,14 @@ rhook-cases --home HOME execution-run --prepared PREPARED --operation EXACT_OPER
 V3 is opt-in via `--host-admission macos-host-admission-v3` after separate host
 registration; it is experimental, not a reservation or guarantee of no impact on
 other applications. Both v2 and v3 recheck the exact operation inside the child.
+The v3 `free-telemetry/0.1` revision records immediate free pages and estimated
+available RAM without blocking admission or runtime on those values. Pressure,
+sample validity/freshness, swap, RSS, CPU/wall, power and cleanup checks remain
+active. Its distinct policy/code hashes require fresh host/runtime registration
+and a newly bound operation. Previously sealed strict-v3 evidence is unchanged.
 The outer SDK workflow owns/reaps the complete process group; the original native
 supervisor enforces RSS≤1GiB, native CPU/wall≤120s, stage≤140s, workflow≤180s,
-fresh power/lid/resource checks and owned cleanup. Policies and worker are unchanged.
+fresh power/lid/resource checks and owned cleanup. V2 and the native worker are unchanged.
 
 A permanent developer-attempt marker prevents repeating the same operation even
 if the outer workflow stops before grant issuance. The native layer issues and
@@ -192,3 +201,11 @@ integration fixtures are explicit test doubles, not proof of new Nitro execution
 Retained checkpoint input preparation can be tested without executing a producer.
 Current engineering status and native acceptance/remaining blockers must be read
 from the local Build12 report, not inferred from the presence of these APIs.
+
+For a fresh checkpoint, the installed [scenario closure CLI](SCENARIOS.md#execution-guided-witness-closure)
+combines bounded acquisition, both discovery worlds, a frozen witness and a new
+nil-Source pair, followed by verification/comparison. It owns its existing process
+workflow directly. This remains a separately reviewed live/native operation;
+`ExecutionSDK.run()` continues to be the offline prepared-witness path and never
+acquires state implicitly. A retained successful witness does not guarantee that
+a fresh root will close within the acquisition budget.
