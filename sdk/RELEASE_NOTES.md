@@ -2,6 +2,23 @@
 
 Unreleased. No tag, GitHub Release or binary upload exists for this candidate.
 
+## 30 October 2026: source-only installation hardening
+
+- Pin the case installer's exact 317-file source inventory. Authenticate the
+  validation helper before executing it, preserve executable text entrypoints
+  and reject extra modules, source substitutions and altered policies.
+- Add installed CLI/API integration checks using fresh homes and regression
+  coverage for the bootstrap boundary. Optional private inputs remain external.
+- Explain missing native runtime setup with `NATIVE_RUNTIME_MISSING`, preserving
+  the existing `FileNotFoundError` / `errno=2` API contract.
+- Document two private [recorder-only historical results](RECORDER_RESULTS.md)
+  without adding their worker, witness, trial policy or scientific archives.
+
+No EVM semantics, worker profile, native resource guard or accepted scientific
+artifact changes. The public surface remains source-only. External native
+reproduction is not yet performed; `qualifiedClaims=0` and
+`nativeRecorderCoverage=UNKNOWN`. See [clean-room installation](CLEAN_ROOM.md).
+
 Includes executable CLI/Python API, typed `LpBps`, inspect/plan, local consent,
 guarded replay, recorded verify and verified comparison. Planning accepts
 0–99; initial developer native scope is fixed Pair03 100→50 on macOS arm64.

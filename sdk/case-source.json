@@ -13,6 +13,7 @@
   "acceptedScientificIdentitiesChanged": false,
   "files": {
     "CASE_CAPSULES.md": "726def8a615883a1caf7b27ebfb8662f19e097d681220830c12dcda41129902a",
+    "CLEAN_ROOM.md": "602d5e124c6c095bec3a5618f0ebdf1f68072a58cc524a36ee12a9b89621c3dd",
     "DEVELOPER_EXECUTION.md": "682b5890acc5882732c741d63937cf376832cad0d2d997b92ec47d7670874253",
     "DYNAMIC_FEE_NATIVE.md": "8e3fa82429cd1146724ed5eb8edba3dab155bb279741c7c9c8a7deec6d2f132d",
     "HISTORICAL_EXECUTION.md": "9197e9d58d4168ec8a37da9ef771ade5d25215d78dd9e62b9a8c1d094c04cfc5",
@@ -23,10 +24,11 @@
     "SCENARIO_STOP_REPORTING.md": "7769a0500c4c2629207aecebb9cd41c1acfda0e3b5c24365b668ba7633bc54d5",
     "SOURCE_SYNC.md": "c594ca860714eaf95dbb241190d6ccb790755d682bf24aa1ead68b724e8f6e09",
     "WITNESS_FORGE.md": "7f2704eac32862bbcdddb70004f8fd7d33063620beac2d2545cc21a75cfaeee7",
+    "case-install-inventory.json": "34818f15bb90a03aa71ad9fdae85d5ecd26c0e85f622bf611c418acca1ef07d3",
     "examples/execute_prepared_hookr.py": "231dfc1f4a084f27f0f583f972e328a634eb31de59a8a1cdc4a832f25f8be85f",
     "examples/historical_dynamic_fee_off.py": "1d85865f27b1d903902a6208616e5de70e1108e1fce30038c4fee7ef1ccb994e",
     "examples/plan_prepared_hook_block.py": "30373b9f9ac63490d986ee2fa6432e6a0cc7dd0f3d7963d2798ed173e7dda863",
-    "install_cases.py": "fced0a703da0507e06a74279ec73fb1aa151e026ef405d879f5387e4bc98ec85",
+    "install_cases.py": "4e9fd228fae93bffdd0fbe96fe644d11d51b7b25bc6256d4e0344d16ce1777b5",
     "rhook_alpha/cases/__init__.py": "e018c912fbca7afd96f309a163bf86b72e669158cb902a37dd0d2186d7472902",
     "rhook_alpha/cases/__main__.py": "f8702d35c264d7af0b420ecf5941efabfb237704f800ff885336e9237e401bb7",
     "rhook_alpha/cases/adapters.py": "07241650ee86c648405a0eab650647b6c24f19af7c6c30bb15343e437ce05cf6",
@@ -58,7 +60,7 @@
     "rhook_alpha/cases/historical/verify.mjs": "132b0431de1fe480f80d367948c07959d17e79b9e0fbe484af5d3211d5d766dc",
     "rhook_alpha/cases/historical/worker_extra_test.go": "e22c4260039866107b89e3b6f8160d0a9d7be724896d74287c50535dafef8ff4",
     "rhook_alpha/cases/io.mjs": "88ab25e5c72b2726ecfd878916dd8a1dfb997ce78840d42bb8a6926b38794356",
-    "rhook_alpha/cases/native.py": "809f9c68edf11db00484d40cb68cbf93fee9711beb1ff8af5ef29204161be640",
+    "rhook_alpha/cases/native.py": "cd09fb2aea74c45c9c6d851a8f22c6306b051ad0f85ff41e7a3e8fb7689fd075",
     "rhook_alpha/cases/native/main.go": "3da337c89a5e54b91734cb1d0b66a7ca65657709e5fa08703c9e50a203b432f2",
     "rhook_alpha/cases/native/main_test.go": "b15511eb3bee7a8610277fdd576d3c7b867649c8141bcd9f0c923be9c850832d",
     "rhook_alpha/cases/native/overlay.go": "b38618e9bf5370ddacd7e6142ff14e122007cf813b5bfb41c9badf907ea10542",
@@ -150,6 +152,7 @@
     "tests_cases/test_backend.py": "521248a0e17a15c3e85fc5b3cba475de63bc8a17bd8b89ad6fc7aa0e45976a73",
     "tests_cases/test_backend_dispatch.py": "22359d2f4067808653811ea4d3cc9286c3e8e4087803a6acbc31fabdcac933d5",
     "tests_cases/test_capsules.py": "76182b02894656bc1feaa34002a0b30ca5c7c35d58d6b879596e5f0defcf6fd9",
+    "tests_cases/test_cleanroom_source.py": "d0de7947e0d97252ba17932184121070e66e6c7732e4b473381839cc72222c83",
     "tests_cases/test_closure.py": "1de2de75b1079dda6e80e7e071587a049eb9bb784773953b1411bae0daa0d7e6",
     "tests_cases/test_diagnostic.py": "7956d8b3c31788d58d567261fd6d1266daa2334dcfa29f3bf424862d8b87a27d",
     "tests_cases/test_dynamic_fee.py": "ecbbf7a9364c08e2522b1c96a1d90f9a0be0fd5dafe890d1930c99ad404b2975",
@@ -160,6 +163,7 @@
     "tests_cases/test_historical.py": "e883019d9c76d60e8c168a013ec6c111225d0a967fa79183ea272ed29335ee42",
     "tests_cases/test_host_v3.py": "d29b5467a9a1cd318ef942a11dec790ac874b032334c1c0d5cc8e8d3e12422c0",
     "tests_cases/test_install_cases.py": "8dcc4feefaf525cc28ba3611104efda565b155fd15a252e9ea1e0a73ca7f5842",
+    "tests_cases/test_install_inventory.py": "fdde5df8ff44b5db3520fce9f2e1cd2ad6612f3479a2bd94e8db4db58a35e838",
     "tests_cases/test_interventions.py": "d3e18e0754c8d62e94d68eb1a7170277a01131196d0068657a51df540fb4b299",
     "tests_cases/test_operation_review.py": "498089cf7f29ac8d2198f9c12b3feb33130ed60eec116584ac14c7ccba45aaae",
     "tests_cases/test_outcome.py": "423c9bbacbdf365d655e522af9d9c8cc3dc96a77d243e0712410f68e1781a90e",
@@ -173,6 +177,7 @@
     "tests_cases/websocket.test.mjs": "447ba90bb69e69c4d3dbc7a6aad027be74693f928437b8235f03114bc5f1f842",
     "tests_cases/witness.test.mjs": "14fada045472784523c33323eb79df82a09a1b237c82c84e241efd1a64b68ed4",
     "tools/build_case_worker.py": "d928b1690da607efbadb12c9d816853a7913d96e449b67724142a5445fbef79b",
-    "tools/build_scenario_worker.py": "43f4384889973bc178bdada37f9bd320f5a4569fba6c94776332ba539449ee2c"
+    "tools/build_scenario_worker.py": "43f4384889973bc178bdada37f9bd320f5a4569fba6c94776332ba539449ee2c",
+    "RECORDER_RESULTS.md": "75331cb65907839da3131788964ed9ab54bf3025bea1488ebd13320d0c0251b0"
   }
 }

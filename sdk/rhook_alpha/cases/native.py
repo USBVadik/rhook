@@ -109,7 +109,10 @@ def read_key(home):
 
 
 def runtime(sdk):
-    saved = load(sdk.home / 'RUNTIME.json', 2 << 20)
+    path = sdk.home / 'RUNTIME.json'
+    if not path.exists():
+        raise FileNotFoundError(2, 'NATIVE_RUNTIME_MISSING: explicitly register a compatible worker, sensor and Node runtime in RUNTIME.json.', str(path))
+    saved = load(path, 2 << 20)
     require(saved['sdkFiles'] == code_files(), 'REGISTERED_SDK_CODE_DRIFT')
     return _check_runtime(saved['runtime'], sdk)
 
