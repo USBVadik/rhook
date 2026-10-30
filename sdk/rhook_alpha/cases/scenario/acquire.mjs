@@ -8,7 +8,7 @@ import {C,chunkSlots} from '../witness/material.mjs';
 import {configProfile} from '../witness/profile.mjs';
 import {buildSpec,profile,word,actor,intent,canonical} from './build.mjs';
 import {addHistorySubject,addActionSubjects,FILTER_ADDRESS} from './system.mjs';
-import {mergeHints,initialRuleKeys,groupSubjects,prefetch} from './prefetch.mjs';
+import {mergeHints,initialRuleKeys,groupSubjects,prefetch,addSendMerkleSubjects} from './prefetch.mjs';
 import {addExecutorWindow,WINDOW} from './executor-window.mjs';
 import {reserveFinalHeader} from './checkpoint-budget.mjs';
 const catalogue=JSON.parse(fs.readFileSync(new URL('./prefetch.json',import.meta.url)));
@@ -36,6 +36,7 @@ export async function acquire(rawClient,value,engine,output,{discover}={}){
   for(const address of [actor(),C.filtered,C.rules,C.root,C.arbos,...profile.manifest.contracts.filter(c=>['router','poolManager'].includes(c.role)).map(c=>c.address),profile.poolKey.currency1])if(!subjects.has(address))subjects.set(address,new Set());
   for(const slot of [C.version,C.length,C.gas,...chunkSlots(640)])subjects.get(C.arbos).add(slot);
   for(const slot of [profile.rootRecordSlot,word(BigInt(profile.rootRecordSlot)+1n),C.executorSlot,C.executorHashSlot])subjects.get(C.root).add(slot);
+  save('SEND_MERKLE_PREFETCH.json',addSendMerkleSubjects(subjects,parent,checkpoint));
   const plan=groupSubjects(subjects,checkpoint);save('PREFETCH_PLAN.json',plan);
   await prefetch(collector,plan,each);
   const addedFilterKeys=new Set(filters.map(r=>r.slot).filter(k=>!filterKeysBefore.has(k)));

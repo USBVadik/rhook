@@ -47,8 +47,10 @@ review and separate owner consent. Build18 accepted one historical Dynamic Fee
 ON/OFF pair from original parent93251802 with all seven original arrivals, including the signed subject;
 same-engine recorded verification is distinct from independent EVM verification.
 See [source synchronization scope](SOURCE_SYNC.md) for the imported milestones,
-publication adaptations and optional retained-fixture tests. The integrated
-source export has not had a new native acceptance.
+publication adaptations and optional retained-fixture tests. The installed
+[on-demand scenario path](SCENARIOS.md#installed-on-demand-acceptance) later
+completed one local fresh-checkpoint LP100/LP50 discovery pair and a matching
+fresh nil-Source pair. This does not qualify every exported workflow.
 
 The two later private [recorder-only results](RECORDER_RESULTS.md) reproduced
 completed historical pairs from recorded original-state dependencies. These are
@@ -61,6 +63,7 @@ runtime release. `qualifiedClaims=0`; `nativeRecorderCoverage=UNKNOWN`.
 | --- | --- |
 | Public clone | SDK/API source, adapter and offline tests. No self-contained native Pair03 replay. |
 | Private developer pilot | Install → inspect → plan → local consent → replay → verify → compare passed locally on 25 October 2026. Recipient handoff is prepared, not sent. |
+| Installed on-demand Scenario SDK | One local installed CLI completed fresh acquisition → discovery2 → witness freeze → offline2 → verify/compare on 30 October 2026. Worker/witness remain private; arbitrary amounts/pools are unsupported. |
 | Independent developer reproduction | Not yet performed. This is the next milestone. |
 
 The [quickstart](QUICKSTART.md) keeps private-pilot instructions separate from

@@ -56,21 +56,29 @@ class HostV3(unittest.TestCase):
                                  freePages=1024*MIB//4096))
         self.assertEqual(self.host.assess(samples)['minimumEstimatedAvailableBytes'],1792*MIB)
 
-    def test_anonymous_inactive_without_file_credit_does_not_pass(self):
-        with self.assertRaisesRegex(ValueError,'INSUFFICIENT_ESTIMATED_AVAILABLE'):
-            self.host.assess(self.pair(dict(fileBackedPages=256*MIB//4096)))
+    def test_anonymous_inactive_without_file_credit_is_telemetry(self):
+        result=self.host.assess(self.pair(dict(fileBackedPages=256*MIB//4096)))
+        self.assertEqual(result['status'],'PASS')
+        self.assertEqual(result['minimumEstimatedAvailableBytes'],384*MIB)
 
-    def test_normal_pressure_alone_does_not_pass(self):
-        with self.assertRaisesRegex(ValueError,'INSUFFICIENT_ESTIMATED_AVAILABLE'):
-            self.host.assess(self.pair(dict(inactivePages=0)))
+    def test_normal_pressure_with_low_capacity_estimate_passes_without_reservation_claim(self):
+        result=self.host.assess(self.pair(dict(inactivePages=0)))
+        self.assertEqual(result['status'],'PASS')
+        self.assertEqual(result['requiredEstimatedBytes'],0)
+        self.assertFalse(result['availabilityAdmissionEnforced'])
+        self.assertFalse(result['reservedMemory'])
 
-    def test_immediate_reserve_is_required_even_with_large_cache(self):
-        with self.assertRaisesRegex(ValueError,'IMMEDIATE_FREE_RESERVE'):
-            self.host.assess(self.pair(dict(freePages=255*MIB//4096,speculativePages=0)))
+    def test_low_immediate_free_is_recorded_and_does_not_block_admission(self):
+        result=self.host.assess(self.pair(dict(freePages=1,speculativePages=0)))
+        self.assertEqual(result['status'],'PASS')
+        self.assertEqual(result['minimumImmediateFreeBytes'],4096)
+        self.assertEqual(result['requiredImmediateFreeBytes'],0)
+        self.assertEqual(result['availabilityMode'],'TELEMETRY_ONLY')
 
-    def test_wired_and_compressor_cap_estimated_capacity(self):
-        with self.assertRaisesRegex(ValueError,'INSUFFICIENT_ESTIMATED_AVAILABLE'):
-            self.host.assess(self.pair(dict(wiredPages=22016*MIB//4096)))
+    def test_wired_and_compressor_cap_is_recorded_without_blocking(self):
+        result=self.host.assess(self.pair(dict(wiredPages=22016*MIB//4096)))
+        self.assertEqual(result['status'],'PASS')
+        self.assertEqual(result['minimumEstimatedAvailableBytes'],512*MIB)
 
     def test_pressure_warning_critical_and_unknown_all_stop(self):
         for pressure in [0,2,4,99]:
@@ -105,12 +113,31 @@ class HostV3(unittest.TestCase):
             with self.subTest(change=change),self.assertRaises(ValueError):
                 self.host.assess(self.pair(second=change))
 
-    def test_runtime_uses_reserve_and_fails_when_cache_is_consumed(self):
+    def test_runtime_low_or_zero_free_remains_telemetry_with_no_allocation_guarantee(self):
         self.assertEqual(self.host.assess(self.pair(dict(freePages=128*MIB//4096,
                                                         speculativePages=0)),runtime=True)['status'],'PASS')
-        with self.assertRaisesRegex(ValueError,'INSUFFICIENT_ESTIMATED_AVAILABLE'):
-            self.host.assess(self.pair(dict(freePages=128*MIB//4096,speculativePages=0,
-                                           inactivePages=0)),runtime=True)
+        for runtime in (False,True):
+            with self.subTest(runtime=runtime):
+                result=self.host.assess(self.pair(dict(freePages=0,speculativePages=0,
+                                                       inactivePages=0)),runtime=runtime)
+                self.assertEqual(result['status'],'PASS')
+                self.assertEqual(result['minimumImmediateFreeBytes'],0)
+                self.assertEqual(result['minimumEstimatedAvailableBytes'],0)
+                self.assertFalse(result['availabilityAdmissionEnforced'])
+                self.assertFalse(result['reservedMemory'])
+
+    def test_previously_stopped_free_byte_values_do_not_block(self):
+        samples=self.pair(dict(freePages=201015296//4096,speculativePages=0),
+                          dict(freePages=275300352//4096))
+        result=self.host.assess(samples)
+        self.assertEqual(result['status'],'PASS')
+        self.assertEqual(result['minimumImmediateFreeBytes'],201015296)
+        self.assertEqual(result['policyRevision'],'free-telemetry/0.1')
+
+    def test_unknown_availability_policy_cannot_silently_remove_checks(self):
+        with patch.dict(self.host.POLICY,availabilityMode='UNRECOGNIZED'):
+            with self.assertRaisesRegex(ValueError,'AVAILABILITY_POLICY'):
+                self.host.assess(self.pair())
 
     def test_runtime_guard_propagates_sensor_stop_and_records_failure(self):
         previous=packet();current=packet(beganNs=2_100_000_000,endedNs=2_110_000_000,pressureAfter=2)
