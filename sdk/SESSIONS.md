@@ -149,6 +149,12 @@ HOME/sessions/<sessionId>/
 ```
 
 Every file is created exclusively. Nothing is overwritten; a second verification of a variant is refused.
+A variant directory appears in one rename with its `VARIANT.json` already written, so an interrupted
+registration leaves only a `variants/.staging-*` directory, which is never listed as a variant; registering
+the same variant again completes it. An unreadable `VARIANT.json` stops with `VARIANT_RECORD_DRIFT`.
+
+To move a session to another installation, export a [handoff package](HANDOFF.md) and import it there with
+its manifest SHA-256. An imported session uses this same storage.
 
 ## Limits
 

@@ -197,6 +197,20 @@ class ExecutionSDK:
         from .session import open_session
         return open_session(self.home, session_id, profile=profile)
 
+    def inspect_session_handoff(self, package, *, expected_manifest_sha256=None):
+        """Read-only check of a session handoff package; authenticated only with the external manifest pin."""
+        from .session import handoff
+        return handoff.inspect(self.home, package, expected_manifest_sha256)
+
+    def import_session_handoff(self, package, *, expected_manifest_sha256, prepare=False):
+        """Rebuild a session from a complete, pinned handoff package. Offline; grants no authority.
+
+        With prepare=True every variant is prepared locally and compared with the exporter's reference;
+        a mismatch raises SessionError HANDOFF_PREPARED_RECONSTRUCTION_MISMATCH instead of returning.
+        """
+        from .session import handoff
+        return handoff.import_package(self.home, package, expected_manifest_sha256, prepare=prepare)[0]
+
     def _sdk(self):
         check(os.name == 'posix', 'UNSUPPORTED_NATIVE_HOST', 'Use a supported POSIX installation; native execution currently requires macOS arm64.')
         from .cases.api import CaseSDK

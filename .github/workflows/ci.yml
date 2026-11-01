@@ -31,8 +31,8 @@ jobs:
           node-version: 24
       - run: npm ci --ignore-scripts --no-audit --no-fund --prefix sdk/engine/adapters/hookr-case
       - run: npm run test:sdk-cases
-      # sdk-offline has no Node dependencies, so the Python -> Node session coverage tests skip there.
-      - run: python3 -B -m unittest discover -v -s tests_cases -t tests_cases -p test_session.py
+      # sdk-offline has no Node dependencies, so the Python -> Node session and handoff coverage tests skip there.
+      - run: python3 -B -m unittest discover -v -s tests_cases -t tests_cases -p 'test_session*.py'
         working-directory: sdk
         env:
           RHOOK_REQUIRE_SESSION_COVERAGE: '1'
