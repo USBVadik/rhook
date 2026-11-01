@@ -91,7 +91,8 @@ For the Hookr profile the declared reads are the same prefetch subjects that liv
 capture (checkpoint 101935336) the plan equals the recorded `PREFETCH_PLAN.json`, and all 24 dependencies,
 220 slots and 20 code reads resolve from 686 nodes and 14 code preimages with 0 network requests. The same
 check authenticates the original RulesConfig words against the LP100 baseline, proves the simulation actor
-absent and recomputes the parent header hash.
+absent and recomputes the parent header hash. That capture is not distributed with this repository; its
+parity test runs only when `RHOOK_SESSION_REAL_CAPTURE` points at a local copy.
 
 Reporting rules:
 

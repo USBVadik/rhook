@@ -14,6 +14,8 @@ FIXTURE_JS = SDK / 'tests_cases/session-fixture.mjs'
 NODE = shutil.which('node')
 DEPS = all((SDK / 'engine/adapters/hookr-case/node_modules' / n / 'package.json').is_file() for n in ('viem', 'hookr-sdk'))
 COVERAGE = unittest.skipUnless(NODE and DEPS, 'Node.js and pinned adapter dependencies are required for coverage')
+if os.environ.get('RHOOK_REQUIRE_SESSION_COVERAGE') == '1' and not (NODE and DEPS):
+    raise RuntimeError('RHOOK_REQUIRE_SESSION_COVERAGE=1: Node.js or the pinned adapter dependencies are missing')
 REAL = os.environ.get('RHOOK_SESSION_REAL_CAPTURE')
 
 
