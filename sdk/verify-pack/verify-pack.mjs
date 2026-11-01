@@ -68,6 +68,18 @@ const LEVEL_TEXT = Object.freeze({
     doesNotEstablish: 'That the target block is canonical, unless a trusted block hash is supplied.',
   },
   canonicalActual: {
+    covered: [
+      'receipt type, status, cumulativeGasUsed, logsBloom and logs (committed by the receipts root)',
+      'per-receipt gasUsed (determined by consecutive cumulativeGasUsed values)',
+      'stateRoot, receiptsRoot and blockHash',
+      'produced header fields compared with the target header',
+    ],
+    notCovered: [
+      'observation.beforeFirstArrival and observation.afterBlockFinalizationBeforeCommit: storage values, balances, nonces and code hashes, including the RulesConfig value the intervention starts from',
+      'observation.subjectCalls: the recorded call trace',
+      'receipt fields outside the receipts trie: gasUsedForL1, multiGasUsed, effectiveGasPrice, contractAddress',
+      'inputCommitment and witnessCommitment: compared with the plan, not recomputed',
+    ],
     establishes: 'The recorded ACTUAL receipts recompute to the receipts root of the anchored block, and the recorded stateRoot and blockHash equal that block.',
     doesNotEstablish: 'That RHOOK computed ACTUAL itself; the recorded values equal canonical chain data and could have been copied from it. Recorded observations (the RulesConfig value before the first arrival, call traces, balances) are engine records that no receipt commits to.',
   },
@@ -290,7 +302,8 @@ function validatePins(pins) {
  */
 export async function verifyPack({files, pins = null, trustedBlockHash = null}) {
   const report = {
-    anchor: {status: 'UNANCHORED', trustedBlockHash: null},
+    // Both anchors are needed before a result counts as tied to the published RHOOK result and the chain.
+    anchoring: {complete: false, externalPins: 'NOT_SUPPLIED', trustedBlock: 'NOT_SUPPLIED', trustedBlockHash: null},
     case: null,
     economics: null,
     failure: null,
@@ -319,6 +332,7 @@ export async function verifyPack({files, pins = null, trustedBlockHash = null}) 
         report.inputs[name].status = report.inputs[name].sha256 === expected ? 'MATCH' : 'MISMATCH';
       }
       const bad = Object.keys(pins.files).filter((name) => report.inputs[name].status === 'MISMATCH');
+      report.anchoring.externalPins = bad.length === 0 ? 'MATCH' : 'MISMATCH';
       check(bad.length === 0, 'PINNED_HASH_MISMATCH', `differs from external pins: ${bad.join(', ')}`);
     }
     records = Object.fromEntries(PACK_FILES.map((name) => [name, parseJson(files[name], name)]));
@@ -337,6 +351,8 @@ export async function verifyPack({files, pins = null, trustedBlockHash = null}) 
       chainId: plan.checkpoint.chainId,
       checkpointBlock: plan.checkpoint.blockNumber,
       intervention: {account: plan.intervention.account, field: 'RulesConfig.lpBps', from: Number(lpBefore),
+        // Without the witness, the starting value is what the plan and the recorded observation say.
+        fromBasis: 'DECLARED_BY_PLAN_NOT_AUTHENTICATED_WITHOUT_WITNESS',
         pool: plan.intervention.pool, slot: plan.intervention.slot, to: Number(lpAfter)},
       subjectOrdinal: plan.nativeOrdinal,
       subjectTransaction: plan.subject,
@@ -352,18 +368,19 @@ export async function verifyPack({files, pins = null, trustedBlockHash = null}) 
     if (trustedBlockHash !== null) {
       const trusted = String(trustedBlockHash).toLowerCase();
       check(HASH.test(trusted), 'TRUSTED_BLOCK_HASH_FORMAT', 'trusted block hash must be 0x followed by 64 hex digits');
-      report.anchor.trustedBlockHash = trusted;
+      report.anchoring.trustedBlockHash = trusted;
+      report.anchoring.trustedBlock = trusted === profile.plan.blockHash ? 'MATCH' : 'MISMATCH';
       check(trusted === profile.plan.blockHash, 'TRUSTED_BLOCK_HASH_MISMATCH',
         `pack describes block ${profile.plan.blockHash}, trusted hash is ${trusted}`);
-      report.anchor.status = 'ANCHORED';
     }
-    if (report.inputs['CHAIN_CONTEXT.json'].status === 'NOT_PINNED' && report.anchor.status === 'ANCHORED') {
+    const anchored = report.anchoring.trustedBlock === 'MATCH';
+    if (report.inputs['CHAIN_CONTEXT.json'].status === 'NOT_PINNED' && anchored) {
       report.inputs['CHAIN_CONTEXT.json'].status = 'NOT_PINNED_BOUND_BY_TRUSTED_BLOCK_HASH';
     }
     report.levels.chainContext = {
       ...LEVEL_TEXT.chainContext,
       declaredOrigin: records['CHAIN_CONTEXT.json'].origin,
-      status: report.anchor.status === 'ANCHORED' ? 'BOUND_TO_TRUSTED_BLOCK' : 'BOUND_TO_PLAN_UNANCHORED',
+      status: anchored ? 'BOUND_TO_TRUSTED_BLOCK' : 'BOUND_TO_PLAN_UNANCHORED',
     };
   });
 
@@ -372,9 +389,9 @@ export async function verifyPack({files, pins = null, trustedBlockHash = null}) 
     report.levels.canonicalActual = {
       ...LEVEL_TEXT.canonicalActual,
       receiptsRecomputed: records['ACTUAL.json'].result.receipts.length,
-      status: report.anchor.status === 'ANCHORED'
-        ? 'RECORDED_ACTUAL_MATCHES_TRUSTED_CANONICAL_BLOCK'
-        : 'RECORDED_ACTUAL_CONSISTENT_UNANCHORED',
+      status: report.anchoring.trustedBlock === 'MATCH'
+        ? 'ACTUAL_RECEIPTS_AND_ROOTS_MATCH_TRUSTED_BLOCK'
+        : 'ACTUAL_RECEIPTS_AND_ROOTS_CONSISTENT_UNANCHORED',
     };
   });
 
@@ -401,7 +418,7 @@ export async function verifyPack({files, pins = null, trustedBlockHash = null}) 
     const a = BigInt(pair.worlds.ACTUAL.buyerRhookTransferNetBaseUnits);
     const delta = BigInt(pair.buyerRhookTransferNetDeltaBaseUnits);
     report.economics = {
-      actual: world(pair.worlds.ACTUAL, report.anchor.status === 'ANCHORED' ? 'CANONICAL_RECEIPTS_OF_TRUSTED_BLOCK' : 'RECORDED_RECEIPTS_UNANCHORED'),
+      actual: world(pair.worlds.ACTUAL, report.anchoring.trustedBlock === 'MATCH' ? 'CANONICAL_RECEIPTS_OF_TRUSTED_BLOCK' : 'RECORDED_RECEIPTS_UNANCHORED'),
       branch: world(pair.worlds.BRANCH, 'RHOOK_ENGINE_RECORD_NOT_REEXECUTED'),
       buyerRhookTransferNetDeltaBaseUnits: pair.buyerRhookTransferNetDeltaBaseUnits,
       buyerRhookTransferNetDeltaPercent: percent(delta, a),
@@ -409,9 +426,19 @@ export async function verifyPack({files, pins = null, trustedBlockHash = null}) 
       percentRounding: 'TRUNCATED_TO_10_DECIMALS',
       subjectGasDelta: pair.subjectGasDelta,
     };
-    report.outcome = 'CHECKS_PASSED_WITHIN_STATED_SCOPE';
+    report.anchoring.complete = report.anchoring.externalPins === 'MATCH' && report.anchoring.trustedBlock === 'MATCH';
+    // Even fully anchored, BRANCH is a recorded engine claim; the outcome names only what was checked.
+    report.outcome = report.anchoring.complete
+      ? 'RECORDED_PAIR_CONSISTENT_FULLY_ANCHORED'
+      : 'RECORDED_PAIR_CONSISTENT_NOT_FULLY_ANCHORED';
   }
   return report;
+}
+
+/** CLI exit code: 0 only when both anchors matched; 3 when the checks passed without them; 1 on failure. */
+export function exitCodeFor(report) {
+  if (report.failure) return 1;
+  return report.anchoring.complete ? 0 : 3;
 }
 
 /** Read a pack directory and an optional pins file, then call verifyPack. */
@@ -485,9 +512,12 @@ export function renderText(report) {
   if (report.pins) lines.push(`Pins: ${report.pins.name} (${report.pins.source})`);
   if (l.chainContext?.declaredOrigin) lines.push(`Chain context origin, as declared by the pack: ${l.chainContext.declaredOrigin}`);
   if (report.ignoredFiles?.length) lines.push(`Ignored files in the pack (not inputs): ${report.ignoredFiles.join(', ')}`);
-  lines.push(`Anchor: ${report.anchor.status}${report.anchor.trustedBlockHash ? ` to ${short(report.anchor.trustedBlockHash)}` : ' (no trusted block hash supplied)'}`);
-  if (!report.failure && report.anchor.status !== 'ANCHORED') lines.push('Warning: without --trusted-block-hash nothing here is tied to the real chain.');
-  if (!report.failure && !report.pins) lines.push('Warning: without --pins the files are not tied to any published RHOOK result.');
+  const a = report.anchoring;
+  lines.push(`Anchors: external pins ${a.externalPins}; trusted block ${a.trustedBlock}`
+    + (a.trustedBlockHash ? ` (${short(a.trustedBlockHash)})` : ''));
+  if (!report.failure && a.trustedBlock !== 'MATCH') lines.push('Warning: without --trusted-block-hash nothing here is tied to the real chain.');
+  if (!report.failure && a.externalPins !== 'MATCH') lines.push('Warning: without --pins the files are not tied to any published RHOOK result.');
+  lines.push('ACTUAL observations (storage, balances, call trace) are engine records, not checked against the chain.');
   lines.push('Not performed: prestate authentication, native re-execution, independent-engine agreement.');
   if (report.economics) {
     const e = report.economics;
@@ -499,6 +529,6 @@ export function renderText(report) {
   }
   lines.push(report.failure
     ? `Outcome: CHECK_FAILED at ${report.failure.level}: ${report.failure.code}: ${report.failure.detail}`
-    : `Outcome: ${report.outcome}`);
+    : `Outcome: ${report.outcome} (exit code ${exitCodeFor(report)})`);
   return lines.join('\n') + '\n';
 }

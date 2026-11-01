@@ -3,13 +3,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {parseArgs} from 'node:util';
-import {chainContextFromPackage, renderText, stableJson, verifyPackDirectory} from './verify-pack.mjs';
+import {chainContextFromPackage, exitCodeFor, renderText, stableJson, verifyPackDirectory} from './verify-pack.mjs';
 
 const USAGE = `Usage:
   node sdk/verify-pack/cli.mjs verify --bundle DIR [--pins FILE] [--trusted-block-hash 0x...] [--json] [--report FILE]
   node sdk/verify-pack/cli.mjs make-context --package BLOCK_PACKAGE.json --plan RUNTIME_PLAN.json --output CHAIN_CONTEXT.json
 
-verify        Check a pack offline. Exit 0 when every performed check passed, 1 when a check failed.
+verify        Check a pack offline. Exit codes:
+                0  every check passed AND both --pins and --trusted-block-hash matched
+                3  every check passed, but --pins or --trusted-block-hash was not supplied
+                1  a check failed
+                2  usage or file error
+              Exit 0 never means the BRANCH world was re-executed.
 make-context  Copy the public headers and transactions out of a local witness package after
               authenticating it. Writes a new file; never overwrites.`;
 
@@ -33,7 +38,7 @@ async function main(argv) {
     const json = stableJson(report);
     if (values.report) fs.writeFileSync(path.resolve(values.report), json, {flag: 'wx'});
     process.stdout.write(values.json ? json : renderText(report));
-    return report.failure ? 1 : 0;
+    return exitCodeFor(report);
   }
   if (command === 'make-context') {
     const {values} = parseArgs({args: rest, strict: true, options: {

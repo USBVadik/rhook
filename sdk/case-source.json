@@ -180,9 +180,9 @@
     "tools/build_scenario_worker.py": "43f4384889973bc178bdada37f9bd320f5a4569fba6c94776332ba539449ee2c",
     "RECORDER_RESULTS.md": "75331cb65907839da3131788964ed9ab54bf3025bea1488ebd13320d0c0251b0",
     "tests_cases/test_closure_workflow.py": "417a8001dc1e968e62d2d079e72bc257ee11f3ffd4a54a55e9d460edcb313c03",
-    "verify-pack/README.md": "c1c3eaa6aeebe109bac57c7ee2aaa8b6cdf4089586eb2a858e94f9b309ad718d",
-    "verify-pack/cli.mjs": "203c92e2620ce9f28bc514aacb4777b2e2d33dd486619d88ba84fcf92c09afd0",
-    "verify-pack/verify-pack.mjs": "5c87f36c74cd32c1de7659d367654b75699cc12f7ba450a9c988ed3f7d7539da",
+    "verify-pack/README.md": "1a9be44bfcdfd0c0a715acab4bce6ee74c6ad562a2ec237f182ec4b23c5e8bfb",
+    "verify-pack/cli.mjs": "85bdcd8c5d311c6208232df7c9931bb97c194958aba6250e5dcad0f7485937ec",
+    "verify-pack/verify-pack.mjs": "89ebb5ee08dcf959be02a4b7de16a7d9d4fcb44d0e02c95b39aaa65e0051b019",
     "verify-pack/synthetic-pack.mjs": "6bbb522ce494f872b48f7b755dc3b3633b7271ff9c840ff4b8724d36984b91c5",
     "verify-pack/pins/hookr-pair03-lp50.json": "ce830a711f99e1c0d223f1eac448378e3b634114e592322499ce8c0a67ffe4f4",
     "verify-pack/examples/synthetic-lp50.pins.json": "9257774f40e877bdd99f16fbd8cf780dcec898738b7453536ddd028bc3d7f16d",
@@ -190,6 +190,6 @@
     "verify-pack/examples/synthetic-lp50/BRANCH.json": "c1496864edcd07a91aa85063a760c9f1f0137dd2a19d06d7bdd4f96ea5ef6934",
     "verify-pack/examples/synthetic-lp50/CHAIN_CONTEXT.json": "c07a4b9c29541525c68652951580856bb0a52a2a615d2e032e8781734c31ee9f",
     "verify-pack/examples/synthetic-lp50/RUNTIME_PLAN.json": "8b9c2b2c3d7bb803578515da38dea7558d28d643444d1c9bd7951881e5aadcf8",
-    "tests_cases/verify-pack.test.mjs": "d666494cd0e758610987b44cd3b03e6dc674f5794e2435223bf32d3a4876d875"
+    "tests_cases/verify-pack.test.mjs": "e10515bf82e91ca77bc815c0344822b9a657049ffc71a86456ee0180ce0d54d0"
   }
 }

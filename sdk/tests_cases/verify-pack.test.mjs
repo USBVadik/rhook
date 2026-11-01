@@ -7,7 +7,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {promisify} from 'node:util';
 import {headerHash, receiptBytes, trieRoot} from '../engine/plan_native/ethereum.mjs';
-import {LIMITATIONS, chainContextFromPackage, renderText, sha256Hex, stableJson, verifyPack, verifyPackDirectory} from '../verify-pack/verify-pack.mjs';
+import {LIMITATIONS, chainContextFromPackage, exitCodeFor, renderText, sha256Hex, stableJson, verifyPack, verifyPackDirectory} from '../verify-pack/verify-pack.mjs';
 import {SYNTHETIC_DIR, SYNTHETIC_PINS, buildSyntheticPack} from '../verify-pack/synthetic-pack.mjs';
 
 const run = promisify(execFile);
@@ -61,10 +61,13 @@ test('checked-in synthetic example is exactly what the generator produces', () =
 test('pinned and anchored synthetic pack passes only within the stated scope', async () => {
   const report = await verify();
   assert.equal(report.failure, null);
-  assert.equal(report.outcome, 'CHECKS_PASSED_WITHIN_STATED_SCOPE');
+  assert.equal(report.outcome, 'RECORDED_PAIR_CONSISTENT_FULLY_ANCHORED');
+  assert.deepEqual(report.anchoring, {complete: true, externalPins: 'MATCH', trustedBlock: 'MATCH', trustedBlockHash: TRUSTED});
+  assert.equal(exitCodeFor(report), 0);
   assert.equal(report.levels.artifactIntegrity.status, 'MATCH_EXTERNAL_PINS');
   assert.equal(report.levels.chainContext.status, 'BOUND_TO_TRUSTED_BLOCK');
-  assert.equal(report.levels.canonicalActual.status, 'RECORDED_ACTUAL_MATCHES_TRUSTED_CANONICAL_BLOCK');
+  assert.equal(report.levels.canonicalActual.status, 'ACTUAL_RECEIPTS_AND_ROOTS_MATCH_TRUSTED_BLOCK');
+  assert.equal(report.case.intervention.fromBasis, 'DECLARED_BY_PLAN_NOT_AUTHENTICATED_WITHOUT_WITNESS');
   assert.equal(report.levels.recordedBranch.status, 'RECORDED_BRANCH_INTERNALLY_CONSISTENT');
   assert.equal(report.levels.recordedBranch.claim, 'RHOOK_ENGINE_CLAIM_NOT_REEXECUTED');
   assert.equal(report.inputs['CHAIN_CONTEXT.json'].status, 'NOT_PINNED_BOUND_BY_TRUSTED_BLOCK_HASH');
@@ -77,7 +80,8 @@ test('pinned and anchored synthetic pack passes only within the stated scope', a
   assert.equal(report.economics.buyerRhookTransferNetDeltaPercent, '+0.5000000000');
   assert.deepEqual([report.economics.actual.outerSwapFeePips, report.economics.branch.outerSwapFeePips], ['11000', '7000']);
   assert.deepEqual(report.case.intervention, {account: '0x2222222222222222222222222222222222222222', field: 'RulesConfig.lpBps',
-    from: 100, pool: report.case.intervention.pool, slot: report.case.intervention.slot, to: 50});
+    from: 100, fromBasis: 'DECLARED_BY_PLAN_NOT_AUTHENTICATED_WITHOUT_WITNESS', pool: report.case.intervention.pool,
+    slot: report.case.intervention.slot, to: 50});
 });
 
 test('the report never claims execution verification or a proof', async () => {
@@ -86,13 +90,24 @@ test('the report never claims execution verification or a proof', async () => {
   assert.doesNotMatch(json, /CRYPTOGRAPHIC_PROOF_VALID|EXECUTION_VERIFIED|"VERIFIED"/);
 });
 
+test('a missing anchor never yields the fully anchored outcome or exit code 0', async () => {
+  for (const [pins, block, externalPins, trustedBlock] of [
+    [PINS, null, 'MATCH', 'NOT_SUPPLIED'], [null, TRUSTED, 'NOT_SUPPLIED', 'MATCH'], [null, null, 'NOT_SUPPLIED', 'NOT_SUPPLIED']]) {
+    const report = await verify(copy(), pins, block);
+    assert.equal(report.failure, null);
+    assert.equal(report.outcome, 'RECORDED_PAIR_CONSISTENT_NOT_FULLY_ANCHORED');
+    assert.deepEqual([report.anchoring.complete, report.anchoring.externalPins, report.anchoring.trustedBlock], [false, externalPins, trustedBlock]);
+    assert.equal(exitCodeFor(report), 3);
+  }
+});
+
 test('without pins or a trusted block hash every anchored status stays unanchored', async () => {
   const report = await verify(copy(), null, null);
   assert.equal(report.failure, null);
   assert.equal(report.levels.artifactIntegrity.status, 'NOT_ANCHORED_NO_EXTERNAL_PINS');
-  assert.equal(report.anchor.status, 'UNANCHORED');
+  assert.equal(report.anchoring.trustedBlockHash, null);
   assert.equal(report.levels.chainContext.status, 'BOUND_TO_PLAN_UNANCHORED');
-  assert.equal(report.levels.canonicalActual.status, 'RECORDED_ACTUAL_CONSISTENT_UNANCHORED');
+  assert.equal(report.levels.canonicalActual.status, 'ACTUAL_RECEIPTS_AND_ROOTS_CONSISTENT_UNANCHORED');
   assert.equal(report.economics.actual.basis, 'RECORDED_RECEIPTS_UNANCHORED');
   for (const name of Object.keys(report.inputs)) assert.equal(report.inputs[name].status, 'NOT_PINNED');
   assert.match(renderText(report), /Warning: without --trusted-block-hash/);
@@ -159,6 +174,25 @@ test('substituted ACTUAL receipts fail against the canonical receipts root', asy
   assertFailed(await verify(files, null), 'canonicalActual');
 });
 
+test('the canonical ACTUAL check does not extend to recorded observations', async () => {
+  // Observations are not committed by the receipts root: an edited balance still passes level B ...
+  const edited = read(fixture.files, 'ACTUAL.json');
+  const account = edited.result.observation.afterBlockFinalizationBeforeCommit.accounts[0];
+  account.balance = (BigInt(account.balance) + 12345n).toString();
+  const files = copy();
+  files['ACTUAL.json'] = bytes(edited);
+  const report = await verify(files, null);
+  assert.equal(report.levels.canonicalActual.status, 'ACTUAL_RECEIPTS_AND_ROOTS_MATCH_TRUSTED_BLOCK');
+  // ... so the report says so, and reports only receipt-derived economics for ACTUAL.
+  assert(report.levels.canonicalActual.notCovered.some((item) => /^observation\.beforeFirstArrival.*balances/.test(item)));
+  assert(report.levels.canonicalActual.notCovered.some((item) => /^observation\.subjectCalls/.test(item)));
+  assert.deepEqual(Object.keys(report.economics.actual).sort(),
+    ['basis', 'buyerRhookTransferNetBaseUnits', 'outerSwapFeePips', 'subjectGasUsed', 'subjectStatus']);
+  assert.match(renderText(report), /ACTUAL observations \(storage, balances, call trace\) are engine records/);
+  // Against the published pins the edited file is rejected.
+  assertFailed(await verify(files, PINS), 'artifactIntegrity', 'PINNED_HASH_MISMATCH');
+});
+
 test('changing the plan or its intervention fails even without pins', async () => {
   const cases = [
     ['recordedBranch', null, (p) => { p.newValue = '49'; p.plan.intervention.newWord = p.plan.intervention.newWord.replace(/0032(?=0{40}$|[0-9a-f]{40}$)/, '0031'); }],
@@ -213,7 +247,8 @@ test('a self-consistent forged BRANCH passes only as recorded consistency, never
 
   // Bound to the real block but not to any published result: the forgery is internally consistent.
   const report = await verify(files, null);
-  assert.equal(report.outcome, 'CHECKS_PASSED_WITHIN_STATED_SCOPE');
+  assert.equal(report.outcome, 'RECORDED_PAIR_CONSISTENT_NOT_FULLY_ANCHORED');
+  assert.equal(exitCodeFor(report), 3);
   assert.equal(report.levels.recordedBranch.status, 'RECORDED_BRANCH_INTERNALLY_CONSISTENT');
   assert.equal(report.levels.recordedBranch.claim, 'RHOOK_ENGINE_CLAIM_NOT_REEXECUTED');
   assert.match(report.levels.recordedBranch.doesNotEstablish, /self-consistent forgery passes/);
@@ -232,9 +267,16 @@ test('reports are deterministic and the CLI reports the same result', async () =
   const json = await run(process.execPath, [CLI, ...args, '--json']);
   assert.equal(json.stdout, stableJson(await verifyPackDirectory(SYNTHETIC_DIR, {pinsFile: SYNTHETIC_PINS, trustedBlockHash: TRUSTED})));
   const text = await run(process.execPath, [CLI, ...args]);
-  assert.match(text.stdout, /B {2}Canonical ACTUAL {7}RECORDED_ACTUAL_MATCHES_TRUSTED_CANONICAL_BLOCK/);
+  assert.match(text.stdout, /B {2}Canonical ACTUAL {7}ACTUAL_RECEIPTS_AND_ROOTS_MATCH_TRUSTED_BLOCK/);
   assert.match(text.stdout, /Delta .*\(\+0\.5000000000%\)/);
-  assert.match(text.stdout, /Outcome: CHECKS_PASSED_WITHIN_STATED_SCOPE/);
+  assert.match(text.stdout, /Outcome: RECORDED_PAIR_CONSISTENT_FULLY_ANCHORED \(exit code 0\)/);
+
+  // A consumer that only checks for exit code 0 never gets it without both anchors.
+  await assert.rejects(run(process.execPath, [CLI, 'verify', '--bundle', SYNTHETIC_DIR, '--trusted-block-hash', TRUSTED]),
+    (e) => e.code === 3 && /RECORDED_PAIR_CONSISTENT_NOT_FULLY_ANCHORED \(exit code 3\)/.test(e.stdout));
+  await assert.rejects(run(process.execPath, [CLI, 'verify', '--bundle', SYNTHETIC_DIR, '--pins', SYNTHETIC_PINS]),
+    (e) => e.code === 3 && /Warning: without --trusted-block-hash/.test(e.stdout));
+  await assert.rejects(run(process.execPath, [CLI, 'verify', '--bundle', SYNTHETIC_DIR]), (e) => e.code === 3);
 
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'verify-pack-'));
   try {
@@ -302,7 +344,8 @@ test('real Pair03 LP100->50 pack against published pins and the canonical block'
     trustedBlockHash: '0xc73ef372869ad5bf2a664bc1bc4cbe411c3adeb1938f349dd7686d82425398cd'});
   assert.equal(report.failure, null, JSON.stringify(report.failure));
   assert.equal(report.levels.artifactIntegrity.status, 'MATCH_EXTERNAL_PINS');
-  assert.equal(report.levels.canonicalActual.status, 'RECORDED_ACTUAL_MATCHES_TRUSTED_CANONICAL_BLOCK');
+  assert.equal(report.outcome, 'RECORDED_PAIR_CONSISTENT_FULLY_ANCHORED');
+  assert.equal(report.levels.canonicalActual.status, 'ACTUAL_RECEIPTS_AND_ROOTS_MATCH_TRUSTED_BLOCK');
   assert.equal(report.levels.canonicalActual.receiptsRecomputed, 7);
   assert.equal(report.economics.actual.buyerRhookTransferNetBaseUnits, '291469365928126821002944');
   assert.equal(report.economics.branch.buyerRhookTransferNetBaseUnits, '292938400920971228766928');

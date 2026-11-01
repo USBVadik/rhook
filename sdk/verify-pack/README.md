@@ -35,11 +35,11 @@ Case: chain 4663, block 1000001 (0xc4b9e0d3…2580e5), 2 arrivals, RulesConfig.l
 Checks:
   A  Artifact integrity     MATCH_EXTERNAL_PINS
   -  Chain context          BOUND_TO_TRUSTED_BLOCK
-  B  Canonical ACTUAL       RECORDED_ACTUAL_MATCHES_TRUSTED_CANONICAL_BLOCK
+  B  Canonical ACTUAL       ACTUAL_RECEIPTS_AND_ROOTS_MATCH_TRUSTED_BLOCK
   C  Recorded BRANCH        RECORDED_BRANCH_INTERNALLY_CONSISTENT
 ...
   Delta         5000000000000000000000  (+0.5000000000%)
-Outcome: CHECKS_PASSED_WITHIN_STATED_SCOPE
+Outcome: RECORDED_PAIR_CONSISTENT_FULLY_ANCHORED (exit code 0)
 ```
 
 Add `--json` for the full report, or `--report FILE` to also write it. Run the tests with
@@ -112,8 +112,21 @@ This authenticates the whole package first, then copies out only the header fiel
 |---|---|---|---|
 | A. Artifact integrity | SHA-256 of plan, ACTUAL and BRANCH against `--pins` | The files are byte-identical to the published result | Anything about their content. Without `--pins`: `NOT_ANCHORED_NO_EXTERNAL_PINS` |
 | Chain context | Header hashes, parent link, transactions root, arrival hashes, signatures and calldata of the signed transactions | The public block data matches the plan | That the block is canonical, unless `--trusted-block-hash` is given (`ANCHORED`) |
-| B. Canonical ACTUAL | Recomputes the receipts trie from the recorded receipts, checks blooms, gas sums, header fields and roots against the block | The recorded ACTUAL receipts, stateRoot and blockHash equal the trusted block | That RHOOK computed them: they are public chain data and could have been copied. Recorded observations (RulesConfig value before the first arrival, call traces, balances) are engine records that no receipt commits to |
+| B. Canonical ACTUAL | Recomputes the receipts trie from the recorded receipts, checks blooms, gas sums, header fields and roots against the block | The recorded ACTUAL receipts (type, status, gas, blooms, logs), stateRoot and blockHash equal the trusted block | That RHOOK computed them: they are public chain data and could have been copied. It covers no recorded observation; see below |
 | C. Recorded BRANCH | Same structural checks, the declared intervention and patch, the shared starting observation | BRANCH is internally consistent | That BRANCH is the correct execution result |
+
+Level B is limited to what the receipts root and the header commit to. The report lists the rest under
+`levels.canonicalActual.notCovered`, and these fields stay engine records even when the block is anchored:
+
+- `observation.beforeFirstArrival` and `observation.afterBlockFinalizationBeforeCommit`: storage values,
+  balances, nonces and code hashes, including the RulesConfig value the intervention starts from
+  (`case.intervention.fromBasis` is `DECLARED_BY_PLAN_NOT_AUTHENTICATED_WITHOUT_WITNESS`);
+- `observation.subjectCalls`, the recorded call trace;
+- receipt fields outside the receipts trie: `gasUsedForL1`, `multiGasUsed`, `effectiveGasPrice`, `contractAddress`;
+- `inputCommitment` and `witnessCommitment`, which are compared with the plan but not recomputed.
+
+The economics in the report use only receipt data. A test edits an ACTUAL balance: level B still passes,
+and the published pins reject the file.
 
 Every report also carries these fixed limitations:
 
@@ -132,12 +145,20 @@ why level C is reported as `RHOOK_ENGINE_CLAIM_NOT_REEXECUTED`.
 ## Report and exit codes
 
 The JSON report (`rhook/verify-pack-report/0.1`) has sorted keys and no timestamps, so the same inputs
-give the same bytes. `outcome` is `CHECKS_PASSED_WITHIN_STATED_SCOPE` or `CHECK_FAILED`; `failure` names
-the level and code of the first failed check, and later levels are `NOT_EVALUATED_AFTER_FAILURE`.
-Other files in the pack directory are listed under `ignoredFiles` and never used, so a hash list shipped
-inside a pack cannot stand in for `--pins`.
+give the same bytes. `failure` names the level and code of the first failed check, and later levels are
+`NOT_EVALUATED_AFTER_FAILURE`. Other files in the pack directory are listed under `ignoredFiles` and never
+used, so a hash list shipped inside a pack cannot stand in for `--pins`.
 
-Exit code 0: every performed check passed. 1: a check failed. 2: usage or file error.
+| Exit code | `outcome` | Meaning |
+|---|---|---|
+| 0 | `RECORDED_PAIR_CONSISTENT_FULLY_ANCHORED` | Every check passed, and both `--pins` and `--trusted-block-hash` matched |
+| 3 | `RECORDED_PAIR_CONSISTENT_NOT_FULLY_ANCHORED` | Every check passed, but at least one anchor was not supplied |
+| 1 | `CHECK_FAILED` | A check failed |
+| 2 | | Usage or file error |
+
+A script that accepts only exit code 0 therefore never accepts a pack that is not tied to both the
+published result and the trusted block. `anchoring` in the report shows which anchor is missing. Exit code
+0 still does not mean BRANCH was re-executed.
 
 ## Supported profile
 
