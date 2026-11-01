@@ -171,9 +171,9 @@ class CaseSDK:
         from .scenario.api import register
         return register(self, path)
 
-    def register_scenario_host(self, sensor):
+    def register_scenario_host(self, sensor, **options):
         from .scenario.api import register_host
-        return register_host(self, sensor)
+        return register_host(self, sensor, **options)
 
     def prepare_scenario(self, capture, **options):
         from .scenario.api import prepare

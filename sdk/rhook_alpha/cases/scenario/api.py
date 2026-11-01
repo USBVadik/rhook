@@ -153,25 +153,32 @@ def check(sdk,capture):
     return result
 
 
-def register_host(sdk,sensor):
-    from . import host_v3
+def host_profile_module(profile):
+    """Opt-in host admission profiles and their registration records; v2 has neither."""
+    from . import host_v3, host_v4
+    profiles={host_v3.PROFILE:(host_v3,'HOST_V3.json'),host_v4.PROFILE:(host_v4,host_v4.RECORD)}
+    require(profile in profiles,'UNSUPPORTED_HOST_PROFILE')
+    return profiles[profile]
+
+
+def register_host(sdk,sensor,*,profile='macos-host-admission-v3'):
+    host,record=host_profile_module(profile)
     sensor=no_links(sensor)
     sdk.registry._prepare();directory=sdk.home/'scenarios';directory.mkdir(mode=0o700,exist_ok=True)
-    value={'profile':host_v3.PROFILE,'policySha256':host_v3.POLICY_SHA,
+    value={'profile':host.PROFILE,'policySha256':host.POLICY_SHA,
            'sensor':{'path':str(sensor),'sha256':sha(sensor)},
-           'sdkFilesCommitment':digest(canonical(host_v3.sdk_files()))}
-    save(directory/'HOST_V3.json',value)
+           'sdkFilesCommitment':digest(canonical(host.sdk_files()))}
+    save(directory/record,value)
     return dict(value,status='HOST_PROFILE_REGISTERED',executionAuthorized=False)
 
 
 def select_host(sdk,profile):
     if profile=='v2':return {'profile':'v2'}
-    from . import host_v3
-    require(profile==host_v3.PROFILE,'UNSUPPORTED_HOST_PROFILE')
-    value=load(sdk.home/'scenarios/HOST_V3.json',65536)
+    host,record=host_profile_module(profile)
+    value=load(sdk.home/'scenarios'/record,65536)
     require(set(value)=={'profile','policySha256','sensor','sdkFilesCommitment'} and value['profile']==profile
-            and value['policySha256']==host_v3.POLICY_SHA
-            and value['sdkFilesCommitment']==digest(canonical(host_v3.sdk_files())),'HOST_RUNTIME_DRIFT')
+            and value['policySha256']==host.POLICY_SHA
+            and value['sdkFilesCommitment']==digest(canonical(host.sdk_files())),'HOST_RUNTIME_DRIFT')
     require(set(value['sensor'])=={'path','sha256'}
             and sha(no_links(value['sensor']['path']))==value['sensor']['sha256'],'HOST_RUNTIME_DRIFT')
     return value
@@ -219,8 +226,8 @@ def run(sdk,capture,*,local_owner=False,mac_ready=False,host_profile='v2',expect
         # Reauthenticate after prerequisite checks and before consuming authority.
         require(b==prepare(sdk,capture,host_profile=host_profile),'SCENARIO_PREFLIGHT_DRIFT')
         if host_profile!='v2':
-            from . import host_v3
-            admission,supervise=host_v3.admission,host_v3.supervise
+            host=host_profile_module(host_profile)[0]
+            admission,supervise=host.admission,host.supervise
             r=dict(r,files=dict(r['files'],sensor=b['hostAdmission']['sensor']))
         grant=authority.issue(sdk.home/'scenarios/consents',b,key)
         body=authority.consume(grant,sdk.home/'scenarios/consents',b,key)

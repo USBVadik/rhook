@@ -217,7 +217,7 @@
     "rhook_alpha/__init__.py": "8f6a7fe0a480866057f9672232edc808997c322b75ce287707444e6d7d5389fe",
     "rhook_alpha/api.py": "1e38c1e91dde3807ada30987da6b7dea71e2309edbbbd5c846eab49638721f05",
     "rhook_alpha/cases/__init__.py": "e018c912fbca7afd96f309a163bf86b72e669158cb902a37dd0d2186d7472902",
-    "rhook_alpha/cases/__main__.py": "033fc6f0c1336be51a950b3c75fb6c08eb7ebcfbb26d314af094d560b5212a94",
+    "rhook_alpha/cases/__main__.py": "f70e7bc879d9cbdaf90b353a382f52f44ea3ecdf75469c26af562c185ed700c4",
     "rhook_alpha/cases/adapters.py": "07241650ee86c648405a0eab650647b6c24f19af7c6c30bb15343e437ce05cf6",
     "rhook_alpha/cases/adapters/code.mjs": "145304b5428fab021f5d9386f22c55324c9494d7f5f91df2c750e68a37a277dc",
     "rhook_alpha/cases/adapters/hookr.mjs": "29705622872e2748b4f67392684b48fb767f4297f7890d30d19ee32526ab1d43",
@@ -226,7 +226,7 @@
     "rhook_alpha/cases/admission/catalogue.py": "926af572b9e95c2455e3f03dcf21e003531d6322acd94344c389f754cf069387",
     "rhook_alpha/cases/admission/definitions.json": "af6af63d53cc21abbf6ebe90c8b92011d28f4f309c0107bf2460df61888eecc0",
     "rhook_alpha/cases/admission/laws.json": "ae8c05d6ccd5b090c9ad42c4cc0f09ba989d290b52718ca5b22d4369e4b7785f",
-    "rhook_alpha/cases/api.py": "ebeb15f71f394f499c9555595fa0b19578870ae6010963bd2a92e6aed127c871",
+    "rhook_alpha/cases/api.py": "85bbff5f489483a813498fd5c02faf265a442e397b6aa4bb58ebbee028fb9a1c",
     "rhook_alpha/cases/authority.py": "df89d339608c7a1859a9be9b565957a00134ee11fc148079b3f5595372124f72",
     "rhook_alpha/cases/backends.py": "acbbb11b0cdb5f2953f4470457dd68a894a050905816f5e1e4c784d0d6425510",
     "rhook_alpha/cases/capsule.py": "c7e4c52d1ac02042e3d5c68083cc66e008c9fc52b72d95b672fa093ced338971",
@@ -257,7 +257,7 @@
     "rhook_alpha/cases/scenario/PROVENANCE.json": "d3bd4693505fa9ddbf7b1781b57b4597ea1f3b88290a42996286be1883f438c6",
     "rhook_alpha/cases/scenario/__init__.py": "1113a166708c2cbbe0552d086dd78dbb1db34903f63216e41f9894dd66e072bc",
     "rhook_alpha/cases/scenario/acquire.mjs": "aa3d5f18bccd83010a920096a40d5d41a7ce8c8b224f76ac87c097880a1e6d73",
-    "rhook_alpha/cases/scenario/api.py": "3672af59fa7fc4aeb40e89d0aaa5eeb89204093d70cf44211331af0c5841f4ec",
+    "rhook_alpha/cases/scenario/api.py": "0f1d8e52d29c13eb36510b46c34e4875f1f765ab0e3249d6bc41908127368849",
     "rhook_alpha/cases/scenario/build.mjs": "1e5feb1cac7836ff58d4a7cad1807b7a0191b94647da0a97f56a949c63f0a49f",
     "rhook_alpha/cases/scenario/checkpoint-budget.mjs": "821273119f677e603b8a4660085f88f60fb1d2b8aa2d8e4c9b411bd9aa7e3090",
     "rhook_alpha/cases/scenario/closure-main.mjs": "5b695f56b16c584a14ac0a7091dc95ac8a14b9dd1856d3c93519215dd665197b",
@@ -319,7 +319,7 @@
     "rhook_alpha/cli.py": "6f426c9e534a130ee33f307107c9e641b1ba0e34da520336e8708cac6d45ff16",
     "rhook_alpha/consent.py": "43ab18bd01dc7eb99bfbae5628c2dd6c70f2076e48c324be8eece6f75f481cf6",
     "rhook_alpha/dynamic_fee.py": "78cb31316dc0087db970835488531fd57ebc79c1a56a7cbb8673171663f36f0a",
-    "rhook_alpha/execution.py": "0c3909547349b785032e297f8867f60676fbc502d7bf0b9503641d9e20e4159d",
+    "rhook_alpha/execution.py": "731b0fed30f7fa64d076b99e37cd6587403c0fcc1a438364027c60ad43406eb4",
     "rhook_alpha/install.py": "64e0026d242c5b0fc1f2191c42e53493314ed75f418d24bf82526f25b949ea88",
     "rhook_alpha/intervention-state.mjs": "808c11474349d864f4c5e18a9959aefcf148aab2e522927642adb95597dac77a",
     "rhook_alpha/interventions.py": "a9aab80838918db59a4ae1e8a395ea64c7b1957bfea6e50d3e401974ea3f8a11",
@@ -330,7 +330,9 @@
     "rhook_alpha/session/hookr-coverage-main.mjs": "490215038b5a04957a04d0044d2015d0df29a5f25ac8fedb25b9b12b740782b6",
     "rhook_alpha/session/hookr-plan.mjs": "37e937ab619043a46f55656f9fc2cbc5d365e2b23e6206483afbbda5e42ae255",
     "rhook_alpha/session/hookr.py": "7ba8b5ea0b66e74ed8aba7d327a387d674200cea039c5246a84485493e2bbf6b",
-    "rhook_alpha/session/handoff.py": "8f9243163e44a7c4db50d90cc4b01a47fd0a1ba80c138647a3475ce5ff78e563"
+    "rhook_alpha/session/handoff.py": "8f9243163e44a7c4db50d90cc4b01a47fd0a1ba80c138647a3475ce5ff78e563",
+    "rhook_alpha/cases/scenario/host_v4.py": "fdc11ecc7ad3b6375f90e63b2dce771ec4c5ccb0333751e889555c2cbbce474a",
+    "rhook_alpha/cases/scenario/host_v4_policy.json": "387f58fae87ff8263611bbb1c99fabd89212e41bcd9e4fe03d4dfc87a6759e96"
   },
   "nativeAssetsIncluded": false,
   "roots": [
@@ -340,9 +342,10 @@
   ],
   "schema": "rhook/case-install-source/0.1",
   "sourceChanges": {
-    "rhook_alpha/cases/__main__.py": "Add offline session-* and session-handoff-* commands; existing commands unchanged.",
+    "rhook_alpha/cases/__main__.py": "Add offline session-* and session-handoff-* commands and the v4 host profile; existing commands unchanged.",
     "rhook_alpha/cases/native.py": "Explicit missing-runtime setup error; no execution or admission change.",
+    "rhook_alpha/cases/scenario/api.py": "Select host admission v3 or the new v4 profile for registration, selection and run; v3 behaviour unchanged.",
     "rhook_alpha/cases/scenario/closure.py": "Installed CLI entry to existing owned workflow; inner acquisition/producer/guards unchanged.",
-    "rhook_alpha/execution.py": "Add create_session/open_session and session handoff inspect/import entry points to the existing offline facade."
+    "rhook_alpha/execution.py": "Add create_session/open_session, session handoff inspect/import and the v4 host admission profile to the existing offline facade."
   }
 }
