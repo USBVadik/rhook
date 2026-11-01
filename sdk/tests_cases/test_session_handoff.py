@@ -241,6 +241,33 @@ class Import(HandoffTest):
                 self.assertEqual((tree(local.directory), sorted(p.name for p in (local.directory / 'variants').iterdir())), before)
                 self.assertFalse((local.directory / 'variants' / ids[0]).exists())
 
+    def test_an_interrupted_reimport_into_an_existing_session_is_completed_by_running_it_again(self):
+        s, ids, result = self.exported()
+        package, pin = self.root / 'package', result['manifestSha256']
+        local, _, _ = self.session(name='receiver')  # the session exists, without variants
+        real, written = core.save, []
+        def crash(path, value):
+            if Path(path).name == 'VARIANT.json':
+                written.append(path)
+                if len(written) == 2:  # the second variant: torn write, process dies before cleanup
+                    Path(path).write_bytes(b'{"partial"')
+                    raise KeyboardInterrupt('power loss')
+            return real(path, value)
+        with patch.object(core, 'save', crash), patch.object(core.shutil, 'rmtree'):
+            with self.assertRaises(KeyboardInterrupt):
+                self.receiver().import_session_handoff(package, expected_manifest_sha256=pin)
+        # No import result was returned. The session holds only complete variants of the package.
+        reopened = self.receiver().open_session(s.id)
+        self.assertEqual([v['variantId'] for v in reopened.variants()], [ids[0]])
+        self.assertEqual(reopened._load_variant(ids[0]), s._load_variant(ids[0]))
+        # Running the same import again completes it; the staging leftover is never a variant.
+        imported, report = handoff.import_package(self.root / 'receiver', package, pin)
+        self.assertEqual((report['status'], report['existingSessionReused']), ('SESSION_HANDOFF_IMPORTED', True))
+        self.assertEqual({v['descriptor']['replacement']: v['variantId'] for v in imported.variants()}, ids)
+        for variant_id in ids.values():
+            self.assertEqual(imported._load_variant(variant_id), s._load_variant(variant_id))
+        self.assertEqual({v['status'] for v in imported.variants()}, {'CONFIGURED'})
+
     def test_package_variants_beyond_the_session_limit_add_nothing(self):
         _, ids, result = self.exported()
         local, _, _ = self.session(name='receiver')

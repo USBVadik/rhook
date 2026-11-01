@@ -11,7 +11,7 @@ import types
 ROOT = Path(__file__).resolve().parent
 sys.dont_write_bytecode = True
 
-INVENTORY_SHA256 = '0056ee308f350d80f1832967fb809f43e1f1f1dcd670bd8765f651508be90ced'
+INVENTORY_SHA256 = 'b7ad90ccf856d2976fa435eb1827d0b0f636d65b6ea4fdda7385e3378ec9c49f'
 SOURCE_ROOTS = ('rhook_alpha', 'developer', 'engine')
 
 def bootstrap_read(path, limit):

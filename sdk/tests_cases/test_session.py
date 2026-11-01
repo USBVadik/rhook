@@ -6,7 +6,7 @@ from unittest.mock import patch
 from developer.files import canonical, digest, load
 from rhook_alpha.execution import ExecutionSDK
 from rhook_alpha.session import SessionError, LIMITATIONS, MAX_VARIANTS
-from rhook_alpha.session import hookr
+from rhook_alpha.session import core, hookr
 from test_execution import fixture as execution_fixture, META
 
 SDK = Path(__file__).resolve().parents[1]
@@ -214,6 +214,27 @@ class Variants(SessionTest):
             s.add_variant({'lpBps': lp})
         self.assertEqual(len(s.variants()), MAX_VARIANTS)
         self.code(lambda: s.add_variant({'lpBps': 90}), 'VARIANT_LIMIT')
+
+    def test_an_interrupted_registration_leaves_no_variant(self):
+        s, _, _ = self.session()
+        v0 = s.add_variant({'lpBps': 0})['variantId']
+        real = core.save
+        def crash(path, value):
+            Path(path).write_bytes(b'{"partial"')  # torn write, then the process dies before cleanup
+            raise KeyboardInterrupt('power loss')
+        with patch.object(core, 'save', crash), patch.object(core.shutil, 'rmtree'):
+            with self.assertRaises(KeyboardInterrupt):
+                s.add_variant({'lpBps': 50})
+        # The torn record exists only in a staging directory, which is never a variant.
+        self.assertTrue(any(p.name.startswith('.staging-') for p in (s.directory / 'variants').iterdir()))
+        self.assertEqual([v['variantId'] for v in s.variants()], [v0])
+        self.assertEqual(self.sdk().open_session(s.id).variants(), s.variants())
+        self.assertFalse(s.add_variant({'lpBps': 50})['alreadyRegistered'])
+        self.assertEqual([v['descriptor']['replacement'] for v in s.variants()], [0, 50])
+        # An unreadable stored record is a structured stop, not a parser exception.
+        path = s.directory / 'variants' / v0 / 'VARIANT.json'
+        path.chmod(0o600); path.write_bytes(b'{"partial"')
+        self.code(lambda: s.variants(), 'VARIANT_RECORD_DRIFT')
 
     def test_tampered_variant_record_is_drift(self):
         s, _, _ = self.session()

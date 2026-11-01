@@ -196,8 +196,21 @@ class CounterfactualSession:
             return dict(self._variant_view(record), alreadyRegistered=True)
         check(len(self._variant_ids()) < MAX_VARIANTS, 'VARIANT_LIMIT',
               f'A session holds at most {MAX_VARIANTS} variants; open a second session for more.')
-        directory.mkdir(mode=0o700)
-        save(directory / 'VARIANT.json', record)
+        # The variant directory appears in one rename, already holding its record. An interrupted
+        # registration leaves only a .staging-* directory, which is never listed as a variant.
+        staging = self.directory / 'variants' / ('.staging-' + secrets.token_hex(8))
+        staging.mkdir(mode=0o700)
+        try:
+            save(staging / 'VARIANT.json', record)
+            os.rename(staging, directory)
+        except BaseException:
+            shutil.rmtree(staging, ignore_errors=True)
+            # A concurrent registration of the same variant won the rename; it must be identical.
+            if not (isinstance(sys.exc_info()[1], OSError) and (directory / 'VARIANT.json').is_file()):
+                raise
+            self._load_variant(record['variantId'])
+            return dict(self._variant_view(record), alreadyRegistered=True)
+        sync(self.directory / 'variants')
         return dict(self._variant_view(record), alreadyRegistered=False)
 
     def _variant_ids(self):
@@ -208,7 +221,11 @@ class CounterfactualSession:
         check(type(variant_id) is str and SESSION_ID.fullmatch(variant_id), 'VARIANT_ID', 'Use a 64-hex variant id.')
         path = no_links(self.directory / 'variants' / variant_id / 'VARIANT.json')
         check(path.is_file(), 'VARIANT_UNKNOWN', 'Register the variant in this session first.')
-        stored = load(path, 1 << 20)
+        try:
+            stored = load(path, 1 << 20)
+        except (OSError, ValueError) as error:
+            raise SessionError('VARIANT_RECORD_DRIFT', 'Restore the unchanged VARIANT.json; it is unreadable.',
+                               {'error': str(error)[:200]}) from error
         body = _unseal(stored, VARIANT_SCHEMA, 'variantCommitment', VARIANT_KEYS, 'VARIANT_RECORD_DRIFT')
         descriptor = self.adapter.variant_descriptor(self.adapter.parameters(body['descriptor']), self.header)
         check(self._variant_record(descriptor) == stored and stored['variantId'] == variant_id,
