@@ -127,8 +127,13 @@ function parseJson(bytes, name) {
   }
 }
 
-function percent(delta, base) {
-  if (base === 0n) return null;
+/**
+ * Relative change of the buyer's Transfer-event net, truncated to 10 decimals.
+ * Defined only when the ACTUAL net is positive: a zero or negative net (the buyer sent more of the
+ * token than it received in the subject receipt) has no meaningful "percent more output", so null.
+ */
+export function percentChange(delta, base) {
+  if (base <= 0n) return null;
   const sign = delta < 0n ? '-' : '+';
   const scaled = ((delta < 0n ? -delta : delta) * 10n ** 12n) / base;
   return `${sign}${scaled / 10n ** 10n}.${(scaled % 10n ** 10n).toString().padStart(10, '0')}`;
@@ -421,7 +426,7 @@ export async function verifyPack({files, pins = null, trustedBlockHash = null}) 
       actual: world(pair.worlds.ACTUAL, report.anchoring.trustedBlock === 'MATCH' ? 'CANONICAL_RECEIPTS_OF_TRUSTED_BLOCK' : 'RECORDED_RECEIPTS_UNANCHORED'),
       branch: world(pair.worlds.BRANCH, 'RHOOK_ENGINE_RECORD_NOT_REEXECUTED'),
       buyerRhookTransferNetDeltaBaseUnits: pair.buyerRhookTransferNetDeltaBaseUnits,
-      buyerRhookTransferNetDeltaPercent: percent(delta, a),
+      buyerRhookTransferNetDeltaPercent: percentChange(delta, a),
       measure: 'ERC20_TRANSFER_EVENT_NET_IN_SUBJECT_RECEIPT_NOT_TOKEN_STORAGE_BALANCE',
       percentRounding: 'TRUNCATED_TO_10_DECIMALS',
       subjectGasDelta: pair.subjectGasDelta,
@@ -439,6 +444,31 @@ export async function verifyPack({files, pins = null, trustedBlockHash = null}) 
 export function exitCodeFor(report) {
   if (report.failure) return 1;
   return report.anchoring.complete ? 0 : 3;
+}
+
+// A pins file shipped inside the pack is the pack vouching for itself. Reject it by real path (so a
+// symlinked parent directory does not hide it) and by file identity (so a hard link outside does not).
+// This cannot prove that a file elsewhere is independent; the user still compares it with the source.
+function checkPinsOutsideBundle(pinsFile, pinsStat, directory) {
+  const bundle = fs.realpathSync(directory);
+  const real = fs.realpathSync(pinsFile);
+  check(real !== bundle && !real.startsWith(bundle + path.sep), 'PINS_INSIDE_BUNDLE',
+    'the pins file must come from outside the bundle being verified');
+  const pending = [bundle];
+  let seen = 0;
+  while (pending.length) {
+    const current = pending.pop();
+    for (const entry of fs.readdirSync(current, {withFileTypes: true})) {
+      check(++seen <= 10000, 'PACK_DIRECTORY', 'bundle directory has too many entries');
+      const file = path.join(current, entry.name);
+      if (entry.isDirectory()) pending.push(file);
+      else if (entry.isFile()) {
+        const s = fs.statSync(file);
+        check(!(s.dev === pinsStat.dev && s.ino === pinsStat.ino), 'PINS_INSIDE_BUNDLE',
+          `the pins file is the same file as ${path.relative(bundle, file)} inside the bundle`);
+      }
+    }
+  }
 }
 
 /** Read a pack directory and an optional pins file, then call verifyPack. */
@@ -459,6 +489,7 @@ export async function verifyPackDirectory(directory, {pinsFile = null, trustedBl
   if (pinsFile !== null) {
     const stat = fs.lstatSync(pinsFile);
     check(stat.isFile() && stat.size <= 1 << 16, 'PINS_SHAPE', 'pins must be a small regular file');
+    checkPinsOutsideBundle(pinsFile, stat, directory);
     pins = parseJson(fs.readFileSync(pinsFile), path.basename(pinsFile));
   }
   const report = await verifyPack({files, pins, trustedBlockHash});
@@ -524,7 +555,9 @@ export function renderText(report) {
     lines.push('Subject transaction, buyer RHOOK Transfer-event net (base units):');
     lines.push(`  ACTUAL  ${e.actual.buyerRhookTransferNetBaseUnits.padStart(28)}  ${e.actual.basis}`);
     lines.push(`  BRANCH  ${e.branch.buyerRhookTransferNetBaseUnits.padStart(28)}  ${e.branch.basis}`);
-    lines.push(`  Delta   ${e.buyerRhookTransferNetDeltaBaseUnits.padStart(28)}  (${e.buyerRhookTransferNetDeltaPercent}%)`);
+    const pct = e.buyerRhookTransferNetDeltaPercent;
+    lines.push(`  Delta   ${e.buyerRhookTransferNetDeltaBaseUnits.padStart(28)}  `
+      + (pct === null ? '(percent N/A: ACTUAL net is not positive)' : `(${pct}%)`));
     lines.push(`  Outer swap fee pips: ${e.actual.outerSwapFeePips} -> ${e.branch.outerSwapFeePips}; subject gas delta ${e.subjectGasDelta}`);
   }
   lines.push(report.failure

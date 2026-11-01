@@ -7,7 +7,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {promisify} from 'node:util';
 import {headerHash, receiptBytes, trieRoot} from '../engine/plan_native/ethereum.mjs';
-import {LIMITATIONS, chainContextFromPackage, exitCodeFor, renderText, sha256Hex, stableJson, verifyPack, verifyPackDirectory} from '../verify-pack/verify-pack.mjs';
+import {LIMITATIONS, chainContextFromPackage, exitCodeFor, percentChange, renderText, sha256Hex, stableJson, verifyPack, verifyPackDirectory} from '../verify-pack/verify-pack.mjs';
 import {SYNTHETIC_DIR, SYNTHETIC_PINS, buildSyntheticPack} from '../verify-pack/synthetic-pack.mjs';
 
 const run = promisify(execFile);
@@ -303,6 +303,65 @@ test('hash lists shipped inside a pack are reported as ignored, never used as pi
     assert.equal(report.pins, null);
   } finally {
     fs.rmSync(directory, {recursive: true, force: true});
+  }
+});
+
+test('percent change is defined only for a positive ACTUAL net', () => {
+  assert.equal(percentChange(5n, 100n), '+5.0000000000');
+  assert.equal(percentChange(-1n, 3n), '-33.3333333333');
+  assert.equal(percentChange(5n, 0n), null);
+  assert.equal(percentChange(5n, -100n), null);
+  assert.equal(percentChange(-5n, -100n), null);
+});
+
+test('a zero or negative ACTUAL Transfer-event net reports N/A, never a percent increase', async () => {
+  for (const [options, actualNet] of [
+    [{actualOutput: 0n}, '0'],
+    [{actualOutput: 10n ** 18n, actualOutflow: 3n * 10n ** 18n}, (-2n * 10n ** 18n).toString()],
+  ]) {
+    const pack = await buildSyntheticPack(options);
+    const report = await verifyPack({files: pack.files, pins: JSON.parse(pack.pins), trustedBlockHash: pack.trustedBlockHash});
+    assert.equal(report.failure, null, JSON.stringify(report.failure));
+    assert.equal(report.outcome, 'RECORDED_PAIR_CONSISTENT_FULLY_ANCHORED');
+    assert.equal(report.economics.actual.buyerRhookTransferNetBaseUnits, actualNet);
+    assert.equal(report.economics.buyerRhookTransferNetDeltaPercent, null);
+    const text = renderText(report);
+    assert.match(text, /\(percent N\/A: ACTUAL net is not positive\)/);
+    assert.doesNotMatch(text, /null%|NaN|Infinity/);
+  }
+});
+
+test('a pins file from inside the bundle is rejected, however it is reached', async () => {
+  const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'verify-pack-')));
+  try {
+    const bundle = path.join(root, 'real/bundle');
+    fs.mkdirSync(path.join(bundle, 'meta'), {recursive: true});
+    for (const [name, b] of Object.entries(fixture.files)) fs.writeFileSync(path.join(bundle, name), b);
+    fs.writeFileSync(path.join(bundle, 'PINS.json'), fixture.pins);
+    fs.writeFileSync(path.join(bundle, 'meta/PINS.json'), fixture.pins);
+    fs.symlinkSync(path.join(root, 'real'), path.join(root, 'alias'));
+    fs.linkSync(path.join(bundle, 'PINS.json'), path.join(root, 'hardlink-PINS.json'));
+    const inside = [path.join(bundle, 'PINS.json'), path.join(bundle, 'meta/PINS.json'),
+      path.join(root, 'alias/bundle/PINS.json'), path.join(root, 'hardlink-PINS.json')];
+    for (const pinsFile of inside) {
+      await assert.rejects(verifyPackDirectory(bundle, {pinsFile, trustedBlockHash: TRUSTED}), /PINS_INSIDE_BUNDLE/, pinsFile);
+    }
+    // Reaching the bundle through a symlinked parent directory changes nothing.
+    await assert.rejects(verifyPackDirectory(path.join(root, 'alias/bundle'), {pinsFile: path.join(bundle, 'PINS.json')}), /PINS_INSIDE_BUNDLE/);
+    // A bundle path that is itself a symlink was already refused before pins are read.
+    fs.symlinkSync(bundle, path.join(root, 'bundle-link'));
+    await assert.rejects(verifyPackDirectory(path.join(root, 'bundle-link'), {pinsFile: path.join(root, 'hardlink-PINS.json')}), /PACK_DIRECTORY/);
+    await assert.rejects(run(process.execPath, [CLI, 'verify', '--bundle', bundle, '--pins', path.join(bundle, 'PINS.json')]),
+      (e) => e.code === 2 && /PINS_INSIDE_BUNDLE/.test(e.stderr));
+
+    // A separate copy outside the bundle is accepted as external pins.
+    const outside = path.join(root, 'PINS.json');
+    fs.writeFileSync(outside, fixture.pins);
+    const report = await verifyPackDirectory(bundle, {pinsFile: outside, trustedBlockHash: TRUSTED});
+    assert.equal(report.levels.artifactIntegrity.status, 'MATCH_EXTERNAL_PINS');
+    assert.deepEqual(report.ignoredFiles, ['PINS.json', 'meta']);
+  } finally {
+    fs.rmSync(root, {recursive: true, force: true});
   }
 });
 

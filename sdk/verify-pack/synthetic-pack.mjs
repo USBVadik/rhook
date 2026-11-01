@@ -58,7 +58,9 @@ function combinedBloom(receipts) {
   return '0x' + out.toString('hex');
 }
 
-export async function buildSyntheticPack() {
+// Defaults produce the checked-in example. Tests vary the ACTUAL buyer flows to cover a zero or
+// negative Transfer-event net (actualOutflow adds a Transfer from the buyer in the subject receipt).
+export async function buildSyntheticPack({actualOutput = 10n ** 24n, actualOutflow = 0n} = {}) {
   const account = privateKeyToAccount(h32('subject signing key, test only'));
   const sender = account.address.toLowerCase();
   const input = '0x3593564c' + label('router calldata').repeat(2);
@@ -83,12 +85,15 @@ export async function buildSyntheticPack() {
   const gasUsed = 1_234_567;
 
   // One world: same block template, its own buyer output, fee and state root.
-  const world = (name, output, feePips, stateRoot) => {
+  const world = (name, output, feePips, stateRoot, outflow = 0n) => {
     const logs = [
       {address: MANAGER, topics: [topicOf('Swap(bytes32,address,int128,int128,uint160,uint128,int24,uint24)'), POOL, pad(ROUTER)],
         data: '0x' + [-value, output, 2n ** 96n / 1000n, 10n ** 20n, -46_000n, BigInt(feePips)].map(word).join('')},
       {address: TOKEN, topics: [topicOf('Transfer(address,address,uint256)'), pad(MANAGER), pad(sender)], data: '0x' + word(output)},
     ];
+    if (outflow > 0n) {
+      logs.push({address: TOKEN, topics: [topicOf('Transfer(address,address,uint256)'), pad(sender), pad(MANAGER)], data: '0x' + word(outflow)});
+    }
     const receipts = [
       {type: '0x6a', root: '0x', status: '0x1', cumulativeGasUsed: '0x0', logsBloom: ZERO_BLOOM, logs: [],
         transactionHash: arrivals[0], transactionIndex: '0x0', gasUsed: '0x0'},
@@ -129,7 +134,7 @@ export async function buildSyntheticPack() {
     return {error: '', missingLookupAttempts: null, result};
   };
 
-  const actual = world('ACTUAL', 10n ** 24n, 11000, h32('actual state'));
+  const actual = world('ACTUAL', actualOutput, 11000, h32('actual state'), actualOutflow);
   const branch = world('BRANCH', 1_005_000n * 10n ** 18n, 7000, h32('branch state'));
   const target = actual.result.producedHeader;
   const plan = {

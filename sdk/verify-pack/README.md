@@ -53,6 +53,9 @@ pack is not in this repository; it is shared separately once its distribution is
 
 1. Check the published hashes. `pins/hookr-pair03-lp50.json` copies the three SHA-256 values printed in
    the case study. Compare them with the case study yourself; do not rely on a hash shipped inside the pack.
+   The CLI refuses a pins file located inside the bundle directory (`PINS_INSIDE_BUNDLE`, exit code 2),
+   including through a symlinked parent directory or a hard link. It cannot tell whether a file elsewhere is
+   independent, so `MATCH_EXTERNAL_PINS` is only as good as your own comparison with the published source.
 2. Get the block hash of block 93251803 from a source you trust, for example
    [the block explorer](https://robin.etherscan.io/block/93251803) or your own node.
 3. Run:
@@ -73,6 +76,10 @@ Expected result on the published pack:
 
 Outer Swap fee changes from 11048 to 7048 pips; subject gas is unchanged. The report's economics use only
 receipt data (Transfer and Swap events, status, gas), which is what the receipts root commits to.
+
+The percent is defined only when the ACTUAL net is positive. When the buyer's net in the subject receipt
+is zero or negative, `buyerRhookTransferNetDeltaPercent` is `null` and the text output prints `N/A`; the
+base-unit delta is still reported.
 
 ## What a pack contains
 
