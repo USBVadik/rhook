@@ -885,8 +885,8 @@
     {
       "path": "engine/repro/README.md",
       "acceptedSha256": "b6eead7d7c1989aaf97bb615a877e3c717252e037f08a930107f772efcdd09c4",
-      "publicSha256": "b6eead7d7c1989aaf97bb615a877e3c717252e037f08a930107f772efcdd09c4",
-      "change": "none"
+      "publicSha256": "5e12ff5689fec7a4c8560e2723d1b3082b0839fc4d75c0c8168a15e7f4b54628",
+      "change": "public status correction: portable build source is on main"
     },
     {
       "path": "engine/repro/abi/generate.mjs",

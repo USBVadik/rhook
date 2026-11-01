@@ -1,0 +1,10 @@
+{
+  "files": {
+    "ACTUAL.json": "a6858c4bc1fd7bb50b6ffc328d8351eae90f90c6747781405caff3bf31704953",
+    "BRANCH.json": "586df83db3c4e25e71dbc01ea4083d810ddb234ec19c3f755c73202d57c1ff13",
+    "RUNTIME_PLAN.json": "d54448edc0cff6786f2b00281e4d2e83dc02af83b2bf163426c88bbcc659f110"
+  },
+  "name": "hookr-pair03-lp50",
+  "schema": "rhook/verify-pack-pins/0.1",
+  "source": "docs/research/hookr-pair03-100-to-50.md: runtime plan SHA-256 and complete ACTUAL.json/BRANCH.json bytes"
+}

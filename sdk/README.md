@@ -26,6 +26,10 @@ The tests use synthetic inputs and mocked native dispatch. They start no worker,
 sensor or network client, and need no private runtime bundle or provider account.
 A passing test suite is not a new EVM replay.
 
+To check a recorded ACTUAL/BRANCH result offline without the witness or a worker,
+use [verify-pack](verify-pack/README.md). It anchors ACTUAL to a block hash you
+supply and reports BRANCH as an RHOOK engine record, not a re-executed result.
+
 For source-only installation, use the [clean-room guide](CLEAN_ROOM.md) and
 [case installer](install_cases.py). Its exact 317-file inventory excludes private
 calibration modules and preserves the approved default resource policy. The
