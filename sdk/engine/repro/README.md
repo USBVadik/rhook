@@ -15,9 +15,7 @@ Go 1.25.12 and Rust 1.93.0 are installed locally by bootstrap. No system Go, Rus
 
 ## Build
 
-These files are currently on the local portability branch; the checkpoint's remote `main` does not yet include them. After the branch is separately reviewed and made available, a developer with private repository access can clone it. No push is part of this task.
-
-From the checkout containing this `repro/` directory:
+These files are in the public repository under `sdk/engine/repro/`; they have been on `main` since the Developer Alpha source publication. Run the commands below from `sdk/engine`, the directory containing `repro/`:
 
 ```sh
 python3 -B -m unittest discover -s repro/tests -v

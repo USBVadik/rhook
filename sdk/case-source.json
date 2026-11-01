@@ -24,11 +24,11 @@
     "SCENARIO_STOP_REPORTING.md": "7769a0500c4c2629207aecebb9cd41c1acfda0e3b5c24365b668ba7633bc54d5",
     "SOURCE_SYNC.md": "308bdb547b97084ef0698474fd00a44699ba1e79def9a06352740c375fe9f8be",
     "WITNESS_FORGE.md": "7f2704eac32862bbcdddb70004f8fd7d33063620beac2d2545cc21a75cfaeee7",
-    "case-install-inventory.json": "ff3514ab35e5a344d5b1f91436972361f745e76ea556ba7574f63cb987cb9d0e",
+    "case-install-inventory.json": "16713f7ee9c317f82f2680d1f8e67b5bcb2c19330e95b9b2bdc360fc50752c9d",
     "examples/execute_prepared_hookr.py": "231dfc1f4a084f27f0f583f972e328a634eb31de59a8a1cdc4a832f25f8be85f",
     "examples/historical_dynamic_fee_off.py": "1d85865f27b1d903902a6208616e5de70e1108e1fce30038c4fee7ef1ccb994e",
     "examples/plan_prepared_hook_block.py": "30373b9f9ac63490d986ee2fa6432e6a0cc7dd0f3d7963d2798ed173e7dda863",
-    "install_cases.py": "cca15150398de4eb43ea5dc8440d2a3cb0c720d8860074187cc0cda50025beb8",
+    "install_cases.py": "b02b8b008124cbe9212af41fc654365da692f55472d81f6fd569def33a14696e",
     "rhook_alpha/cases/__init__.py": "e018c912fbca7afd96f309a163bf86b72e669158cb902a37dd0d2186d7472902",
     "rhook_alpha/cases/__main__.py": "bfb0085c184cff1b851a3003d0d110bb1ca76c0f494465dd7caa1256bbe4358c",
     "rhook_alpha/cases/adapters.py": "07241650ee86c648405a0eab650647b6c24f19af7c6c30bb15343e437ce05cf6",
@@ -179,6 +179,17 @@
     "tools/build_case_worker.py": "d928b1690da607efbadb12c9d816853a7913d96e449b67724142a5445fbef79b",
     "tools/build_scenario_worker.py": "43f4384889973bc178bdada37f9bd320f5a4569fba6c94776332ba539449ee2c",
     "RECORDER_RESULTS.md": "75331cb65907839da3131788964ed9ab54bf3025bea1488ebd13320d0c0251b0",
-    "tests_cases/test_closure_workflow.py": "417a8001dc1e968e62d2d079e72bc257ee11f3ffd4a54a55e9d460edcb313c03"
+    "tests_cases/test_closure_workflow.py": "417a8001dc1e968e62d2d079e72bc257ee11f3ffd4a54a55e9d460edcb313c03",
+    "verify-pack/README.md": "c1c3eaa6aeebe109bac57c7ee2aaa8b6cdf4089586eb2a858e94f9b309ad718d",
+    "verify-pack/cli.mjs": "203c92e2620ce9f28bc514aacb4777b2e2d33dd486619d88ba84fcf92c09afd0",
+    "verify-pack/verify-pack.mjs": "5c87f36c74cd32c1de7659d367654b75699cc12f7ba450a9c988ed3f7d7539da",
+    "verify-pack/synthetic-pack.mjs": "6bbb522ce494f872b48f7b755dc3b3633b7271ff9c840ff4b8724d36984b91c5",
+    "verify-pack/pins/hookr-pair03-lp50.json": "ce830a711f99e1c0d223f1eac448378e3b634114e592322499ce8c0a67ffe4f4",
+    "verify-pack/examples/synthetic-lp50.pins.json": "9257774f40e877bdd99f16fbd8cf780dcec898738b7453536ddd028bc3d7f16d",
+    "verify-pack/examples/synthetic-lp50/ACTUAL.json": "3d30dc1df8f385c6da762b7235572325ed30f5c57344fd8d3e5d706bbd6f227c",
+    "verify-pack/examples/synthetic-lp50/BRANCH.json": "c1496864edcd07a91aa85063a760c9f1f0137dd2a19d06d7bdd4f96ea5ef6934",
+    "verify-pack/examples/synthetic-lp50/CHAIN_CONTEXT.json": "c07a4b9c29541525c68652951580856bb0a52a2a615d2e032e8781734c31ee9f",
+    "verify-pack/examples/synthetic-lp50/RUNTIME_PLAN.json": "8b9c2b2c3d7bb803578515da38dea7558d28d643444d1c9bd7951881e5aadcf8",
+    "tests_cases/verify-pack.test.mjs": "d666494cd0e758610987b44cd3b03e6dc674f5794e2435223bf32d3a4876d875"
   }
 }

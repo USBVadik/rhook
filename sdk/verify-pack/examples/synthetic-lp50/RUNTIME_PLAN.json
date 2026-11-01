@@ -1,0 +1,64 @@
+{
+  "caseDescriptorSha256": "d6755b4daae92790e5706ac92c0b4b7d8d72d0803e4c9157ab7861d58a7bb573",
+  "newValue": "50",
+  "plan": {
+    "arrivals": [
+      "0x1276aa1a42f215c1b70c1242211fb1aaec205dab436050f8a0d39adb54d45d68",
+      "0x80b621aba4ed342c7bffa8a0fb549669a4da1ab1b0c623bfad55604c86c75828"
+    ],
+    "blockHash": "0xc4b9e0d3a8e172ae9bf83d74b2231cdc0d6acfcd75bb64f9ceec6ed4072580e5",
+    "blockNumber": 1000001,
+    "checkpoint": {
+      "blockHash": "0xe1d5c558d0a1be0b14ac83714924941c6f5c37f6d916f69b490ef47261a23084",
+      "blockNumber": 1000000,
+      "chainId": 4663,
+      "stateRoot": "0xf1b0fc84d7f6ba35a46059c79be409ab5c9feb104b9395e2789536eba54cbd8e"
+    },
+    "externalDelivery": "SYNTHETIC_FIXTURE",
+    "inputCommitment": "ee58201eda5d9c544d25512725af499433d90da3c3c8099a195ad2e8f6109297",
+    "intervention": {
+      "account": "0x2222222222222222222222222222222222222222",
+      "checkpoint": {
+        "blockHash": "0xe1d5c558d0a1be0b14ac83714924941c6f5c37f6d916f69b490ef47261a23084",
+        "blockNumber": 1000000,
+        "chainId": 4663,
+        "stateRoot": "0xf1b0fc84d7f6ba35a46059c79be409ab5c9feb104b9395e2789536eba54cbd8e"
+      },
+      "expectedOldWord": "0x81cca2b09d6c7af297030064325add00dc07436122ce440081a8ca716041d87b",
+      "mask": "0x00000000000000000000ffff0000000000000000000000000000000000000000",
+      "newWord": "0x81cca2b09d6c7af297030032325add00dc07436122ce440081a8ca716041d87b",
+      "pool": "0xcf277b63c085bfe3e9281660c6bdbbc5582e889e195cc9fff90bb3c2b75304fb",
+      "slot": "0xd29563af5181c7347743f272dc3c9e8a664fc0f69b30df50b43007562d748cb1"
+    },
+    "nativeOrdinal": 1,
+    "observation": {
+      "accounts": [
+        "0x06bfcbd775a4362eba9b95ca81b741b2148d3604",
+        "0x1111111111111111111111111111111111111111",
+        "0x2222222222222222222222222222222222222222",
+        "0x8366a39cc670b4001a1121b8f6a443a643e40951",
+        "0x3c022d43a9f826cd206c2ba60bc753d8b36185c4"
+      ],
+      "nativeOrdinal": 1,
+      "storage": [
+        {
+          "account": "0x2222222222222222222222222222222222222222",
+          "slot": "0xd29563af5181c7347743f272dc3c9e8a664fc0f69b30df50b43007562d748cb1"
+        }
+      ],
+      "subject": "0x80b621aba4ed342c7bffa8a0fb549669a4da1ab1b0c623bfad55604c86c75828"
+    },
+    "packageSha256": "632e284b01949df286903616711262760dbfcbaf3a7997a3f21594d416e72739",
+    "receiptsRoot": "0x8676104f9f0ec93bb14687f811f1991a960eb56aa81e1c06c8389d077df37ea4",
+    "router": "0x1111111111111111111111111111111111111111",
+    "selection": "SYNTHETIC_TEST_FIXTURE_NOT_CHAIN_DATA",
+    "sender": "0x06bfcbd775a4362eba9b95ca81b741b2148d3604",
+    "source": "NIL_NO_HYDRATION",
+    "stateRoot": "0x0bf8a7296f47efd47287b74536b4e372ba3944b8e135cc4c87370ef5a0871c94",
+    "subject": "0x80b621aba4ed342c7bffa8a0fb549669a4da1ab1b0c623bfad55604c86c75828",
+    "transactions": 2,
+    "witnessCommitment": "fc5a3c8aaef08fd176a54db2910e44ae5f23c52b4bac4987266e89604dc2bab5"
+  },
+  "schema": "rhook/hookr-runtime-plan/0.2",
+  "semanticPlanCommitment": "2c43fcde85850db45cdab853b5e7c0cc0c3440de0a2d1de318d21858260e5305"
+}
