@@ -38,7 +38,9 @@ session.compare_verified()
 ```
 
 `sdk.open_session(session_id)` reopens a session offline. Every identity is re-derived from the retained
-source; an edited manifest or source copy is reported as drift. `examples/counterfactual_session.py` runs
+source; an edited manifest or source copy is reported as drift. An open session checks the retained source
+against its pin again before each coverage, preparation and preparation check, and passes on exactly the
+bytes it checked; a source changed after creation stops with `SESSION_SOURCE_DRIFT`. `examples/counterfactual_session.py` runs
 the offline workflow end to end.
 
 ## CLI
@@ -54,7 +56,8 @@ rhook-cases --home HOME session-compare --session ID
 ```
 
 Exit code 0 means the step succeeded. Missing static state, a stop or an empty comparison exit with 1 and
-a JSON body that names the cause.
+a JSON body that names the cause. `session-coverage` exits with 0 only when every declared read resolves
+and the profile preconditions are `SATISFIED`.
 
 ## Identities
 
@@ -73,9 +76,10 @@ a JSON body that names the cause.
 |---|---|
 | `status` | `CONFIGURED`, `PREPARED_NOT_EXECUTED`, `RECORDED_RUN_VERIFIED`, `TEST_ONLY_BINDING_CHECKED`, `STOP` |
 | `staticCoverage` | `NOT_EVALUATED`, `COVERED`, `MISSING`, `STOP` |
+| `profilePreconditions` | `NOT_EVALUATED`, `SATISFIED`, `NOT_SATISFIED`, `UNKNOWN` |
 | `dynamicCoverage` | `UNKNOWN`, or `ESTABLISHED_FOR_THIS_EXACT_INPUT_BY_VERIFIED_RUN` |
 | `execution` | `NOT_PERFORMED`, or `RECORDED_NATIVE_RUN` |
-| `nextRequirement` | The next step, for example `NEEDS_AUTHENTICATED_STATE` when static reads are missing |
+| `nextRequirement` | The next step, for example `NEEDS_AUTHENTICATED_STATE` when static reads are missing or `PROFILE_PRECONDITIONS_NOT_SATISFIED` when the state is known but not admitted |
 
 A failed or incomplete preparation of one variant is that variant's `STOP`; other variants are unaffected.
 
@@ -94,6 +98,13 @@ check authenticates the original RulesConfig words against the LP100 baseline, p
 absent and recomputes the parent header hash. That capture is not distributed with this repository; its
 parity test runs only when `RHOOK_SESSION_REAL_CAPTURE` points at a local copy.
 
+The report keeps two results apart. `status` says whether the declared trie paths resolve.
+`preconditions.status` says whether the profile admits that authenticated state: for `hookr-buy/0.1` the
+parent header hashes to the checkpoint, the authenticated RulesConfig equals the LP100 baseline, and the
+simulation actor is proven absent. A different configuration or an existing actor is `NOT_SATISFIED` even
+when every path resolves; an unresolved check is `UNKNOWN`. A variant is pointed to a native run only when
+its static reads are `COVERED` and its preconditions are `SATISFIED`.
+
 Reporting rules:
 
 - `UNKNOWN` is never zero, empty code or absence. Proven absence and proven-zero storage are separate statuses.
@@ -110,6 +121,12 @@ and the exact prepared scenario commitment and bytes. A run of another variant, 
 rejected before any verifier is called. It then calls the existing scenario compare, which runs the existing
 recorded verifier through the registered worker's verify helper. That path needs a registered runtime and
 is not exercised by this release's tests.
+
+The result is recorded only when it is `VERIFIED_SCENARIO_COMPARISON` for the run's own scenario commitment
+and carries exactly one `SCENARIO_BASELINE` and one `SCENARIO_VARIANT` projection, in that order, with both
+receipt projections, both token nets and their exact difference. An unresolved, partial or unexpected result
+stops and writes nothing; the variant stays `PREPARED_NOT_EXECUTED`. The stored comparison is checked for
+the same shape again whenever the record is read.
 
 Offline tests pass `test_only_backend`. Such records have status `TEST_ONLY_BINDING_CHECKED`, assurance
 `TEST_ONLY_NOT_EVIDENCE`, and their comparison is `TEST_ONLY_COMPARISON_NOT_EVIDENCE`. A stored record whose

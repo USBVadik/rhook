@@ -5,6 +5,7 @@ preparation through the existing ExecutionSDK, the static read plan and the rece
 The session core never sees pool addresses, storage layouts or token details.
 """
 from pathlib import Path
+import re
 import shutil
 import subprocess
 
@@ -19,6 +20,11 @@ HERE = Path(__file__).resolve().parent
 COVERAGE_HELPER = HERE / 'hookr-coverage-main.mjs'
 # Fields a prepared variant may differ in from its source; everything else must stay byte-equal.
 VARIANT_FIELDS = {'configurations', 'origin', 'scenarioCommitment'}
+PRECONDITION_STATUSES = ('SATISFIED', 'NOT_SATISFIED', 'UNKNOWN')
+# The existing scenario compare returns exactly these two projections, BASELINE first; its delta is VARIANT - BASELINE.
+VERIFIED_STATUS = 'VERIFIED_SCENARIO_COMPARISON'
+WORLDS = ('SCENARIO_BASELINE', 'SCENARIO_VARIANT')
+DECIMAL = re.compile('-?[0-9]+')
 
 
 def _sdk_call(fn, *args, **kwargs):
@@ -93,13 +99,14 @@ class HookrScenarioAdapter:
         config = _sdk_call(sdk.configure, lp_bps=descriptor['replacement'], checkpoint=header['checkpoint'])
         return _sdk_call(sdk.prepare, config, source, expected_sha256=header['source']['sha256'], output=output)
 
-    def check_prepared(self, output, header, descriptor, source):
+    def check_prepared(self, output, header, descriptor, source_raw):
+        """source_raw: the retained source bytes, already checked against the session pin."""
         _, meta = _sdk_call(self._sdk()._prepared, output)
         check(meta['selectedLpBps'] == descriptor['replacement'] and meta['checkpoint'] == header['checkpoint']
               and meta['sourceWitnessSha256'] == header['source']['sha256'], 'PREPARED_VARIANT_MISMATCH',
               'The prepared directory belongs to a different variant, checkpoint or source.')
         prepared = load(output / 'SCENARIO.json', 8 << 20)
-        source = load(source, 8 << 20)
+        source = strict(source_raw)
         shared = sorted(set(source) - VARIANT_FIELDS)
         check(set(prepared) == set(source) and all(prepared[k] == source[k] for k in shared)
               and prepared['configurations']['baseline'] == source['configurations']['baseline'],
@@ -111,7 +118,8 @@ class HookrScenarioAdapter:
 
     # ----- static coverage ----------------------------------------------------------------------
 
-    def coverage(self, source, *, node=None):
+    def coverage(self, raw, *, node=None):
+        """raw: the retained source bytes, already checked against the session pin."""
         program = node or shutil.which('node')
         if program is None:
             return dict(status='NOT_EVALUATED', code='NODE_NOT_FOUND',
@@ -120,7 +128,6 @@ class HookrScenarioAdapter:
         if not all((deps / name / 'package.json').is_file() for name in ('viem', 'hookr-sdk')):
             return dict(status='NOT_EVALUATED', code='RUNTIME_DEPENDENCIES_MISSING',
                         nextStep='Run npm ci --ignore-scripts --prefix sdk/engine/adapters/hookr-case; nothing was inferred.')
-        raw = no_links(source).read_bytes()
         try:
             r = subprocess.run([str(program), str(COVERAGE_HELPER)], input=raw, stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE, timeout=60, check=False)
@@ -136,6 +143,14 @@ class HookrScenarioAdapter:
               'COVERAGE_OUTPUT_INVALID', 'The coverage helper returned an unknown status.')
         check(report.get('status') == 'STOP' or report.get('networkRequestsPerformed') == 0, 'COVERAGE_OUTPUT_INVALID',
               'Static coverage must not perform network requests.')
+        if report['status'] != 'STOP':
+            pre = report.get('preconditions')
+            checks = pre.get('checks') if type(pre) is dict else None
+            statuses = [c.get('status') for c in checks if type(c) is dict] if type(checks) is list else []
+            derived = ('NOT_SATISFIED' if 'NOT_SATISFIED' in statuses else 'UNKNOWN' if 'UNKNOWN' in statuses else 'SATISFIED')
+            check(statuses and len(statuses) == len(checks) and set(statuses) <= set(PRECONDITION_STATUSES)
+                  and pre.get('status') == derived, 'COVERAGE_OUTPUT_INVALID',
+                  'The coverage helper must report the profile preconditions, separately from trie coverage.')
         return report
 
     # ----- verification -------------------------------------------------------------------------
@@ -171,6 +186,30 @@ class HookrScenarioAdapter:
     def verify_run(self, run):
         # The existing scenario compare first runs the existing verifier on the retained run evidence.
         return _sdk_call(self._sdk().compare, run)
+
+    def admit_verification(self, outcome, binding):
+        """Admit only the verifier's complete comparison of exactly this run; anything else records nothing."""
+        check(type(outcome) is dict and outcome.get('status') == VERIFIED_STATUS, 'VERIFIER_RESULT_NOT_VERIFIED',
+              f'The verifier did not return {VERIFIED_STATUS}; nothing was recorded.',
+              {'status': str(outcome.get('status'))[:80] if type(outcome) is dict else type(outcome).__name__})
+        check(outcome.get('scenarioCommitment') == binding['scenarioCommitment'], 'VERIFIER_RESULT_NOT_BOUND',
+              'The verified comparison names a different scenario commitment than this run; nothing was recorded.')
+        view = self.comparison_view(outcome)
+        self.check_comparison(view, 'VERIFIER_RESULT_SHAPE')
+        return view
+
+    @staticmethod
+    def check_comparison(view, code):
+        worlds = view.get('worlds') if type(view) is dict else None
+        check(type(view) is dict and view.get('status') == 'FROM_VERIFIER_OUTPUT' and type(worlds) is list
+              and tuple(w.get('world') if type(w) is dict else None for w in worlds) == WORLDS, code,
+              'A verified comparison has exactly one SCENARIO_BASELINE and one SCENARIO_VARIANT projection, in that order.')
+        nets = [w.get('actorTargetTokenTransferNetBaseUnits') for w in worlds]
+        delta = view.get('targetTokenTransferNetDeltaBaseUnits')
+        check(all(type(n) is str and DECIMAL.fullmatch(n) for n in nets) and type(delta) is str and DECIMAL.fullmatch(delta)
+              and int(delta) == int(nets[1]) - int(nets[0])
+              and all(type(w.get('receiptStatus')) is int and type(w.get('gasUsed')) is int for w in worlds), code,
+              'A verified comparison carries both receipt projections, both token nets and their exact difference.')
 
     @staticmethod
     def comparison_view(outcome):

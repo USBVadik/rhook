@@ -13,7 +13,7 @@ const {hookrStaticPlan}=await load('rhook_alpha/session/hookr-plan.mjs');
 const {C}=await load('rhook_alpha/cases/witness/material.mjs');
 const {toRlp,keccak256}=await load('engine/adapters/hookr-case/primitives.mjs');
 const fixture=await import(pathToFileURL(path.join(path.dirname(fileURLToPath(import.meta.url)),'session-fixture.mjs')));
-const {syntheticScenarioParts,buildTrie,word,RULES_CODE,CONFIG_KEYS}=fixture;
+const {syntheticScenarioParts,buildTrie,word,RULES_CODE,CONFIG_KEYS,DIFFERING_CONFIG_WORDS}=fixture;
 const profile=JSON.parse(fs.readFileSync(path.join(lib,'rhook_alpha/cases/scenario/native/profile.json')));
 const OTHER='0x'+'12'.repeat(20),ACTOR='0xd2480fd61af9bc73b8c73e8fdcabceb6f21ea8ff';
 const rules=(slots=CONFIG_KEYS,code=true)=>({address:C.rules,slots,code});
@@ -117,10 +117,37 @@ test('the Hookr coverage helper reads stdin and reports the authenticated origin
  const out=JSON.parse(execFileSync(process.execPath,[helper],{input:JSON.stringify(spec)}));
  assert.equal(out.status,'STATIC_DEPENDENCIES_COVERED');assert.equal(out.profile.originalConfiguration,'AUTHENTICATED_EQUALS_BASELINE');
  assert.equal(out.profile.simulationActor,'PROVEN_ABSENT');
+ assert.equal(out.preconditions.status,'SATISFIED');
+ assert.deepEqual(out.preconditions.checks.map(c=>c.status),['SATISFIED','SATISFIED','SATISFIED']);
  const changed=JSON.parse(execFileSync(process.execPath,[helper],{input:JSON.stringify({...spec,configurations:{baseline:[word(1),...profile.baselineConfigWords.slice(1)]}})}));
  assert.equal(changed.profile.originalConfiguration,'AUTHENTICATED_DIFFERS_FROM_BASELINE');
+ assert.equal(changed.preconditions.status,'NOT_SATISFIED');
  const bad=JSON.parse(execFileSync(process.execPath,[helper],{input:'{"a":1,"a":2}'}));
  assert.deepEqual([bad.status,bad.code],['STOP','SOURCE_JSON_INVALID']);
+});
+
+test('covered trie paths and failed profile preconditions are reported separately',()=>{
+ const helper=path.join(lib,'rhook_alpha/session/hookr-coverage-main.mjs');
+ const run=parts=>JSON.parse(execFileSync(process.execPath,[helper],{input:JSON.stringify({checkpoint:parts.checkpoint,parent:parts.parent,
+  poolId:profile.poolId,actions:[{signedTransaction:'0xdead'}],commonSetup:{actor:ACTOR},chainConfig:'0x'+'00'.repeat(64),
+  inventory:parts.inventory,configurations:{baseline:profile.baselineConfigWords}})}));
+ const failed=out=>out.preconditions.checks.filter(c=>c.status!=='SATISFIED').map(c=>[c.id,c.status]);
+ // The trie holds a RulesConfig that is not the declared LP100 baseline: every path resolves, the profile does not admit it.
+ const config=run(syntheticScenarioParts({configWords:DIFFERING_CONFIG_WORDS}));
+ assert.equal(config.status,'STATIC_DEPENDENCIES_COVERED');assert.equal(config.unresolvedDependencies,0);
+ assert.equal(config.profile.originalConfiguration,'AUTHENTICATED_DIFFERS_FROM_BASELINE');
+ assert.equal(config.preconditions.status,'NOT_SATISFIED');
+ assert.deepEqual(failed(config),[['ORIGINAL_CONFIGURATION_EQUALS_LP100_BASELINE','NOT_SATISFIED']]);
+ // The simulation actor already exists at the checkpoint.
+ const actor=run(syntheticScenarioParts({presentAccounts:[ACTOR]}));
+ assert.equal(actor.status,'STATIC_DEPENDENCIES_COVERED');assert.equal(actor.profile.simulationActor,'PRESENT_NOT_ALLOWED');
+ assert.equal(actor.preconditions.status,'NOT_SATISFIED');
+ assert.deepEqual(failed(actor),[['SIMULATION_ACTOR_PROVEN_ABSENT','NOT_SATISFIED']]);
+ // An unknown actor path leaves the precondition UNKNOWN, never satisfied.
+ const unknown=run(syntheticScenarioParts({unknownSibling:true}));
+ assert.equal(unknown.status,'STATIC_DEPENDENCIES_MISSING');assert.equal(unknown.profile.simulationActor,'UNKNOWN');
+ assert.equal(unknown.preconditions.status,'UNKNOWN');
+ assert.deepEqual(failed(unknown),[['SIMULATION_ACTOR_PROVEN_ABSENT','UNKNOWN']]);
 });
 
 // Optional parity check against the accepted on-demand run's retained capture (not in Git).
@@ -131,4 +158,5 @@ test('static plan equals the recorded prefetch plan of the accepted run',{skip:!
  assert.deepEqual(plan.prefetchPlan.groups,JSON.parse(fs.readFileSync(path.join(REAL,'PREFETCH_PLAN.json'))).groups);
  const out=JSON.parse(execFileSync(process.execPath,[path.join(lib,'rhook_alpha/session/hookr-coverage-main.mjs')],{input:fs.readFileSync(path.join(REAL,'SCENARIO.json'))}));
  assert.equal(out.status,'STATIC_DEPENDENCIES_COVERED');assert.equal(out.networkRequestsPerformed,0);
+ assert.equal(out.preconditions.status,'SATISFIED');
 });

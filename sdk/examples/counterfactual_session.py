@@ -39,10 +39,11 @@ def main(argv=None):
     print(json.dumps(dict(
         sessionId=session.id, checkpoint=session.header['checkpoint'],
         staticCoverage=dict(status=coverage.get('status'), code=coverage.get('code'),
+                            preconditions=(coverage.get('preconditions') or {}).get('status'),
                             unresolvedDependencies=coverage.get('unresolvedDependencies'),
                             networkRequestsPerformed=coverage.get('networkRequestsPerformed')),
-        variants=[{k: v[k] for k in ('variantId', 'descriptor', 'status', 'staticCoverage', 'dynamicCoverage',
-                                     'execution', 'nextRequirement')} for v in inspection['variants']],
+        variants=[{k: v[k] for k in ('variantId', 'descriptor', 'status', 'staticCoverage', 'profilePreconditions',
+                                     'dynamicCoverage', 'execution', 'nextRequirement')} for v in inspection['variants']],
         preparedScenarioCommitments={str(r['selectedLpBps']): r['scenarioCommitment'] for r in prepared},
         limitations=inspection['limitations'], nativeExecutions=0, networkRequests=0), indent=2))
     return 0

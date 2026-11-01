@@ -296,8 +296,12 @@ def main(argv=None):
     print(json.dumps(value, ensure_ascii=True))
     if args.command.startswith('session-'):
         # Missing static state and unverified comparisons are honest results, but not readiness.
-        return 0 if value.get('status') in {'SESSION_INSPECTED','VARIANT_REGISTERED','VARIANT_PREPARED','SESSION_EXPORTED',
-                                            'STATIC_DEPENDENCIES_COVERED','VERIFIED_VARIANTS_COMPARED'} else 1
+        ok=value.get('status') in {'SESSION_INSPECTED','VARIANT_REGISTERED','VARIANT_PREPARED','SESSION_EXPORTED',
+                                   'STATIC_DEPENDENCIES_COVERED','VERIFIED_VARIANTS_COMPARED'}
+        if args.command=='session-coverage':
+            # Covered trie paths are not readiness: the profile preconditions must also be satisfied.
+            ok=ok and type(value.get('preconditions')) is dict and value['preconditions'].get('status')=='SATISFIED'
+        return 0 if ok else 1
     if args.command == 'scenario-diagnostic-prepare' and value.get('schema') == 'rhook/scenario-result-diagnostic/0.1':
         return 0
     if args.command == 'scenario-diagnose' and value.get('status') == 'DIAGNOSTIC_COMPLETED' and value.get('cleanupConfirmed') is True:

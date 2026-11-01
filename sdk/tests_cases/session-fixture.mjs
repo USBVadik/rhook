@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 const sdk=new URL('../',import.meta.url);
-const {toRlp,keccak256,EMPTY_ROOT}=await import(new URL('engine/adapters/hookr-case/primitives.mjs',sdk));
+const {toRlp,keccak256,EMPTY_ROOT,EMPTY_CODE}=await import(new URL('engine/adapters/hookr-case/primitives.mjs',sdk));
 const {headerHash}=await import(new URL('engine/plan_native/ethereum.mjs',sdk));
 const {C}=await import(new URL('rhook_alpha/cases/witness/material.mjs',sdk));
 const profile=JSON.parse(fs.readFileSync(new URL('rhook_alpha/cases/scenario/native/profile.json',sdk)));
@@ -33,14 +33,17 @@ export function buildTrie(entries,nodes){
 export const RULES_CODE='0x6000';
 export const CONFIG_KEYS=[0,1,2,3].map(i=>word(BigInt(C.slot)+BigInt(i)));
 
-export function syntheticState({unknownSibling=false}={}){
+// configWords: the RulesConfig words stored in the trie (default: the LP100 baseline).
+// presentAccounts: extra existing accounts with nonce 1 and no code, e.g. a simulation actor that must be absent.
+export function syntheticState({unknownSibling=false,configWords=profile.baselineConfigWords,presentAccounts=[]}={}){
  const nodes=[];
  // Zero words are absent from a storage trie, exactly as on chain.
- const storageRoot=buildTrie(CONFIG_KEYS.map((k,i)=>({key:keccak256(k),word:profile.baselineConfigWords[i]}))
+ const storageRoot=buildTrie(CONFIG_KEYS.map((k,i)=>({key:keccak256(k),word:configWords[i]}))
   .filter(e=>BigInt(e.word)!==0n).map(e=>({key:e.key,value:toRlp(minimal(e.word))})),nodes);
  const account=toRlp(['0x01','0x',storageRoot,keccak256(RULES_CODE)]);
+ const extra=presentAccounts.map(a=>({key:keccak256(a),value:toRlp(['0x01','0x',EMPTY_ROOT,EMPTY_CODE])}));
  let stateRoot,missing=null;
- if(!unknownSibling)stateRoot=buildTrie([{key:keccak256(C.rules),value:account}],nodes);
+ if(!unknownSibling)stateRoot=buildTrie([{key:keccak256(C.rules),value:account},...extra].sort((a,b)=>a.key<b.key?-1:1),nodes);
  else{
   // Root branch: the Rules account is known; every other first nibble points to an unknown node.
   const path=nibbles(keccak256(C.rules)),leaf=toRlp([compact(path.slice(1),true),account]);nodes.push(leaf);
@@ -64,6 +67,12 @@ export function syntheticScenarioParts(options={}){
   parent,inventory:{nodes:state.nodes,codes:state.codes},missingNodeHash:state.missing};
 }
 
+// Authenticated RulesConfig that is not the LP100 baseline: second word changed from zero.
+export const DIFFERING_CONFIG_WORDS=[profile.baselineConfigWords[0],word(1),...profile.baselineConfigWords.slice(2)];
+
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
- process.stdout.write(JSON.stringify(syntheticScenarioParts({unknownSibling:process.argv[2]==='unknown-sibling'}))+'\n');
+ const [mode,actor]=process.argv.slice(2);
+ const options={'unknown-sibling':{unknownSibling:true},'config-differs':{configWords:DIFFERING_CONFIG_WORDS},
+  'actor-present':{presentAccounts:[actor]}}[mode]??{};
+ process.stdout.write(JSON.stringify(syntheticScenarioParts(options))+'\n');
 }

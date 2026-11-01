@@ -29,6 +29,8 @@ LIMITATIONS = dict(nativeReexecution='NOT_PERFORMED', heterogeneousAgreement='NO
 HEADER_KEYS = {'schema', 'sessionId', 'profile', 'adapter', 'checkpoint', 'checkpointTrust', 'source',
                'common', 'baseline', 'limits', 'limitations', 'headerCommitment'}
 VARIANT_KEYS = {'schema', 'sessionId', 'variantId', 'descriptor', 'bindings', 'variantCommitment'}
+# Errors of the pinned source read that mean the retained file is no longer the pinned one.
+SOURCE_FILE_CODES = {'PREPARED_WITNESS_HASH_MISMATCH', 'PREPARED_WITNESS_MISSING', 'PREPARED_WITNESS_FILE_INVALID'}
 
 
 class SessionError(ValueError):
@@ -144,13 +146,25 @@ class CounterfactualSession:
         except (OSError, ValueError) as error:
             raise SessionError('SESSION_MANIFEST_DRIFT', 'Restore the unchanged SESSION.json.', {'error': str(error)[:300]}) from error
         _unseal(stored, SCHEMA, 'headerCommitment', HEADER_KEYS, 'SESSION_MANIFEST_DRIFT')
-        source = directory / 'source' / adapter.source_name
         check(stored.get('profile') == adapter.profile, 'WRONG_PROFILE', 'Open this session with its own profile adapter.')
-        info = adapter.load_source(source, stored['source']['sha256'])
-        fresh = cls._header(adapter, info)
-        check(fresh == stored and fresh['sessionId'] == session_id, 'SESSION_MANIFEST_DRIFT',
+        check(stored['sessionId'] == session_id, 'SESSION_MANIFEST_DRIFT', 'The manifest belongs to another session id.')
+        session = cls(directory, adapter, stored)
+        session._retained_source()
+        return session
+
+    def _retained_source(self):
+        """Re-read the retained source and check it against this session's pin before each use."""
+        try:
+            info = self.adapter.load_source(self.source_path, self.header['source']['sha256'])
+        except SessionError as error:
+            if error.code not in SOURCE_FILE_CODES:
+                raise
+            raise SessionError('SESSION_SOURCE_DRIFT', 'The retained source changed or disappeared after the session was '
+                               'created; restore it or create a new session. Nothing was evaluated.',
+                               {'cause': error.code}) from error
+        check(self._header(self.adapter, info) == self.header, 'SESSION_MANIFEST_DRIFT',
               'The manifest no longer matches its retained source; it was edited or the source changed.')
-        return cls(directory, adapter, stored)
+        return info
 
     # ----- variants -----------------------------------------------------------------------------
 
@@ -209,6 +223,7 @@ class CounterfactualSession:
     def prepare_variant(self, variant_id):
         """Produce the existing SDK's prepared input for one variant. No native work, no acquisition."""
         record = self._load_variant(variant_id)
+        self._retained_source()
         out = self._prepared_dir(variant_id)
         if out.exists():
             return dict(self._preparation(record), alreadyPrepared=True)
@@ -220,13 +235,18 @@ class CounterfactualSession:
         out = self._prepared_dir(record['variantId'])
         if not out.exists():
             return None
-        summary = self.adapter.check_prepared(out, self.header, record['descriptor'], self.source_path)
+        summary = self.adapter.check_prepared(out, self.header, record['descriptor'], self._retained_source()['raw'])
         return dict(summary, preparedDirectory=str(out.relative_to(self.directory)))
 
     def coverage(self, *, node=None):
-        """Check which declared original-state reads the retained witness answers, offline."""
+        """Check which declared original-state reads the retained witness answers, offline.
+
+        The report keeps two results apart: `status` says whether the declared trie paths resolve, and
+        `preconditions.status` says whether the profile admits that authenticated state.
+        """
         path = self.directory / 'COVERAGE.json'
-        report = self.adapter.coverage(self.source_path, node=node)
+        # Use exactly the bytes just checked against the pin, so a later edit cannot slip in between.
+        report = self.adapter.coverage(self._retained_source()['raw'], node=node)
         if report.get('status') in ('STATIC_DEPENDENCIES_COVERED', 'STATIC_DEPENDENCIES_MISSING', 'STOP'):
             record = _sealed(COVERAGE_RECORD_SCHEMA, dict(schema=COVERAGE_RECORD_SCHEMA, sessionId=self.id, report=report), 'coverageCommitment')
             if path.exists():
@@ -277,9 +297,11 @@ class CounterfactualSession:
         else:
             outcome, backend = test_only_backend(run), 'TEST_ONLY_INJECTED_BACKEND'
             status = 'TEST_ONLY_BINDING_CHECKED'
-        check(type(outcome) is dict, 'VERIFIER_RESULT_SHAPE', 'The verifier must return a result object.')
+        # Admission: the profile accepts only its verifier's complete, verified comparison of this exact run.
+        # An unresolved, partial or unexpected result raises here, before anything is written.
+        comparison = self.adapter.admit_verification(outcome, binding)
         body = dict(schema=VERIFICATION_SCHEMA, sessionId=self.id, variantId=variant_id, status=status, backend=backend,
-                    run=dict(binding, runDirectory=None), comparison=self.adapter.comparison_view(outcome),
+                    run=dict(binding, runDirectory=None), comparison=comparison,
                     assurance=self.adapter.verified_assurance(test_only=test_only_backend is not None))
         stored = _sealed(VERIFICATION_SCHEMA, body, 'verificationCommitment')
         save(path, stored)
@@ -300,6 +322,7 @@ class CounterfactualSession:
               and body['backend'] == ('EXISTING_PROFILE_VERIFIER' if production else 'TEST_ONLY_INJECTED_BACKEND')
               and body['assurance'] == self.adapter.verified_assurance(test_only=not production),
               'VERIFICATION_RECORD_DRIFT', 'Status, backend and assurance of a verification record must agree.')
+        self.adapter.check_comparison(body['comparison'], 'VERIFICATION_RECORD_DRIFT')
         return stored
 
     def compare_verified(self):
@@ -336,11 +359,13 @@ class CounterfactualSession:
         except (SessionError, ValueError, OSError, KeyError, TypeError) as error:
             code = getattr(error, 'code', 'PREPARED_ARTIFACT_INVALID')
             return dict(view, status='STOP', causeCode=code, staticCoverage='NOT_EVALUATED',
-                        dynamicCoverage='UNKNOWN', execution='NOT_PERFORMED',
-                        nextRequirement='Inspect the prepared directory; it is incomplete or changed after preparation.')
+                        profilePreconditions='NOT_EVALUATED', dynamicCoverage='UNKNOWN', execution='NOT_PERFORMED',
+                        nextRequirement=error.next_step if isinstance(error, SessionError)
+                        else 'Inspect the prepared directory; it is incomplete or changed after preparation.')
         verification = self._verification(record['variantId'])
         static = 'NOT_EVALUATED' if coverage is None else {'STATIC_DEPENDENCIES_COVERED': 'COVERED',
                                                            'STATIC_DEPENDENCIES_MISSING': 'MISSING'}.get(coverage.get('status'), 'STOP')
+        preconditions = self._preconditions(coverage)
         if verification is not None:
             status = verification['status']
         elif preparation is not None:
@@ -352,17 +377,31 @@ class CounterfactualSession:
             nxt = 'NEEDS_AUTHENTICATED_STATE: acquire the missing original-root reads under separate authorization.'
         elif static in ('NOT_EVALUATED', 'STOP'):
             nxt = 'Evaluate static coverage offline with coverage().'
+        elif preconditions == 'NOT_SATISFIED':
+            nxt = ('PROFILE_PRECONDITIONS_NOT_SATISFIED: the authenticated original state does not meet this profile\'s '
+                   'requirements (see the coverage preconditions); no native run of this session is admissible.')
+        elif preconditions != 'SATISFIED':
+            nxt = 'PROFILE_PRECONDITIONS_UNKNOWN: the profile requirements could not be established; readiness is not inferred.'
         elif preparation is None:
             nxt = 'Prepare the variant offline with prepare_variant().'
         elif not production:
             nxt = 'A separately authorized native run of this exact prepared input is required.'
         else:
             nxt = 'Verified; compare with compare_verified().'
-        return dict(view, status=status, staticCoverage=static,
+        return dict(view, status=status, staticCoverage=static, profilePreconditions=preconditions,
                     dynamicCoverage='ESTABLISHED_FOR_THIS_EXACT_INPUT_BY_VERIFIED_RUN' if production else 'UNKNOWN',
                     execution='RECORDED_NATIVE_RUN' if production else 'NOT_PERFORMED',
                     preparation=None if preparation is None else {k: preparation[k] for k in ('scenarioCommitment', 'scenarioSha256', 'preparedDirectory')},
                     nextRequirement=nxt)
+
+    @staticmethod
+    def _preconditions(coverage):
+        """Profile requirements on the authenticated state, kept apart from trie-path coverage."""
+        if coverage is None or coverage.get('status') not in ('STATIC_DEPENDENCIES_COVERED', 'STATIC_DEPENDENCIES_MISSING'):
+            return 'NOT_EVALUATED'
+        value = coverage.get('preconditions')
+        status = value.get('status') if type(value) is dict else None
+        return status if status in ('SATISFIED', 'NOT_SATISFIED') else 'UNKNOWN'
 
     def variants(self):
         coverage = self._coverage()
@@ -378,6 +417,7 @@ class CounterfactualSession:
                     staticCoverage=None if coverage is None else dict(status=coverage.get('status'),
                                                                       unresolvedDependencies=coverage.get('unresolvedDependencies'),
                                                                       summary=coverage.get('summary'), seed=coverage.get('seed'),
+                                                                      preconditions=coverage.get('preconditions'),
                                                                       networkRequestsPerformed=coverage.get('networkRequestsPerformed')),
                     variants=self.variants(), limitations=self.header['limitations'],
                     nativeExecutions=0, networkRequests=0)
@@ -393,4 +433,5 @@ class CounterfactualSession:
         coverage = self._coverage()
         return dict(schema=SCHEMA + '/export', header=self.header, variants=variants,
                     coverage=None if coverage is None else dict(status=coverage.get('status'), summary=coverage.get('summary'),
+                                                                 preconditions=coverage.get('preconditions'),
                                                                  dynamicClosure=coverage.get('dynamicClosure')))

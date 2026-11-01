@@ -33,8 +33,9 @@ def write(root, value, name='SCENARIO.json'):
 
 def hash_linked_fixture(mode='complete'):
     """Execution fixture whose parent header, checkpoint and inventory come from session-fixture.mjs."""
-    parts = json.loads(subprocess.run([NODE, str(FIXTURE_JS), mode], capture_output=True, check=True, timeout=30).stdout)
     v = execution_fixture()
+    extra = [v['commonSetup']['actor']] if mode == 'actor-present' else []
+    parts = json.loads(subprocess.run([NODE, str(FIXTURE_JS), mode, *extra], capture_output=True, check=True, timeout=30).stdout)
     cp = parts['checkpoint']
     v['checkpoint'] = cp
     v['parent'] = parts['parent']
@@ -152,7 +153,31 @@ class Identity(SessionTest):
         manifest.write_bytes(original)
         source = s.source_path
         source.chmod(0o600); source.write_bytes(source.read_bytes().replace(b'"nonce":0', b'"nonce":1', 1))
-        self.code(lambda: self.sdk().open_session(s.id), 'PREPARED_WITNESS_HASH_MISMATCH')
+        e = self.code(lambda: self.sdk().open_session(s.id), 'SESSION_SOURCE_DRIFT')
+        self.assertEqual(e.details['cause'], 'PREPARED_WITNESS_HASH_MISMATCH')
+
+    def test_source_changed_after_creation_stops_every_later_use(self):
+        s, _, _ = self.session()
+        v50 = s.add_variant({'lpBps': 50})['variantId']; v0 = s.add_variant({'lpBps': 0})['variantId']
+        s.prepare_variant(v50)
+        source = s.source_path
+        original = source.read_bytes()
+        source.chmod(0o600); source.write_bytes(original.replace(b'"nonce":0', b'"nonce":1', 1))
+        # The already open session re-checks the pin; the coverage helper is never reached.
+        with patch.object(hookr.HookrScenarioAdapter, 'coverage', side_effect=AssertionError('coverage must not run')):
+            e = self.code(lambda: s.coverage(), 'SESSION_SOURCE_DRIFT')
+        self.assertEqual(e.details['cause'], 'PREPARED_WITNESS_HASH_MISMATCH')
+        self.assertFalse((s.directory / 'COVERAGE.json').exists())
+        self.code(lambda: s.prepare_variant(v0), 'SESSION_SOURCE_DRIFT')
+        self.assertFalse((s.directory / 'variants' / v0 / 'prepared').exists())
+        view = {v['variantId']: v for v in s.variants()}
+        self.assertEqual((view[v50]['status'], view[v50]['causeCode']), ('STOP', 'SESSION_SOURCE_DRIFT'))
+        self.assertEqual(view[v0]['status'], 'CONFIGURED')
+        source.unlink()
+        self.assertEqual(self.code(lambda: s.coverage(), 'SESSION_SOURCE_DRIFT').details['cause'], 'PREPARED_WITNESS_MISSING')
+        # Restoring the pinned bytes restores the session; nothing was recorded meanwhile.
+        source.write_bytes(original)
+        self.assertEqual({v['variantId']: v['status'] for v in s.variants()}, {v50: 'PREPARED_NOT_EXECUTED', v0: 'CONFIGURED'})
 
     def test_unknown_profile_is_refused(self):
         from rhook_alpha import session
@@ -249,6 +274,46 @@ class Preparation(SessionTest):
         self.assertEqual({v['status'] for v in s.variants()}, {'STOP'})
 
 
+class Readiness(SessionTest):
+    """Readiness logic of the session core over a stored coverage report; no Node.js required."""
+    @staticmethod
+    def report(preconditions):
+        checks = [dict(id='A', status='SATISFIED'), dict(id='B', status=preconditions)]
+        return dict(status='STATIC_DEPENDENCIES_COVERED', networkRequestsPerformed=0, unresolvedDependencies=0,
+                    preconditions=dict(status=preconditions, checks=checks))
+
+    def test_only_satisfied_preconditions_lead_to_preparation_and_a_native_run(self):
+        expected = {'SATISFIED': 'A separately authorized native run', 'NOT_SATISFIED': 'PROFILE_PRECONDITIONS_NOT_SATISFIED',
+                    'UNKNOWN': 'PROFILE_PRECONDITIONS_UNKNOWN'}
+        for status, start in expected.items():
+            s, _, _ = self.session(name=status)
+            vid = s.add_variant({'lpBps': 50})['variantId']
+            s.prepare_variant(vid)
+            seen = []
+            def helper(raw, node=None, status=status):
+                seen.append(raw)
+                return self.report(status)
+            with patch.object(hookr.HookrScenarioAdapter, 'coverage', side_effect=helper):
+                s.coverage()
+            # The adapter receives exactly the pinned bytes, never a second read of the file.
+            self.assertEqual(seen, [s.source_path.read_bytes()])
+            [variant] = s.variants()
+            self.assertEqual((variant['status'], variant['staticCoverage'], variant['profilePreconditions']),
+                             ('PREPARED_NOT_EXECUTED', 'COVERED', status))
+            self.assertTrue(variant['nextRequirement'].startswith(start), variant['nextRequirement'])
+            self.assertEqual(s.manifest()['coverage']['preconditions']['status'], status)
+
+    def test_a_report_without_preconditions_is_never_read_as_satisfied(self):
+        s, _, _ = self.session()
+        s.add_variant({'lpBps': 50})
+        report = dict(self.report('SATISFIED')); report.pop('preconditions')
+        with patch.object(hookr.HookrScenarioAdapter, 'coverage', return_value=report):
+            s.coverage()
+        [variant] = s.variants()
+        self.assertEqual(variant['profilePreconditions'], 'UNKNOWN')
+        self.assertTrue(variant['nextRequirement'].startswith('PROFILE_PRECONDITIONS_UNKNOWN'))
+
+
 @COVERAGE
 class Coverage(SessionTest):
     def test_complete_seed_covers_every_static_read_without_network(self):
@@ -263,10 +328,54 @@ class Coverage(SessionTest):
         self.assertEqual(report['profile']['originalConfiguration'], 'AUTHENTICATED_EQUALS_BASELINE')
         self.assertEqual(report['profile']['simulationActor'], 'PROVEN_ABSENT')
         self.assertEqual(report['profile']['parentHeader'], 'HEADER_HASH_RECOMPUTED_EQUALS_CHECKPOINT')
+        self.assertEqual(report['preconditions']['status'], 'SATISFIED')
         self.assertTrue(all(cmd[1] == str(hookr.COVERAGE_HELPER) for cmd in guard.launched))
         for v in s.variants():
-            self.assertEqual((v['staticCoverage'], v['dynamicCoverage'], v['execution']), ('COVERED', 'UNKNOWN', 'NOT_PERFORMED'))
+            self.assertEqual((v['staticCoverage'], v['profilePreconditions'], v['dynamicCoverage'], v['execution']),
+                             ('COVERED', 'SATISFIED', 'UNKNOWN', 'NOT_PERFORMED'))
         self.assertEqual(s.coverage(), report)
+
+    def test_failed_profile_preconditions_are_not_readiness(self):
+        def cli(home, *args):
+            r = subprocess.run([sys.executable, '-B', '-m', 'rhook_alpha.cases', '--home', str(home), *args],
+                               cwd=SDK, capture_output=True, timeout=60)
+            return r.returncode, json.loads(r.stdout)
+        for mode, failed in [('config-differs', 'ORIGINAL_CONFIGURATION_EQUALS_LP100_BASELINE'),
+                             ('actor-present', 'SIMULATION_ACTOR_PROVEN_ABSENT'), ('complete', None)]:
+            value, _ = hash_linked_fixture(mode)
+            s, _, _ = self.session(value, name=mode)
+            vid = s.add_variant({'lpBps': 0})['variantId']
+            report = s.coverage()
+            # Every declared trie path resolves in all three states; only the profile verdict differs.
+            self.assertEqual((report['status'], report['unresolvedDependencies']), ('STATIC_DEPENDENCIES_COVERED', 0), mode)
+            code, out = cli(self.root / mode, 'session-coverage', '--session', s.id)
+            self.assertEqual(out, report)
+            variant = next(v for v in s.variants() if v['variantId'] == vid)
+            self.assertEqual(variant['staticCoverage'], 'COVERED')
+            if failed is None:
+                self.assertEqual((report['preconditions']['status'], variant['profilePreconditions'], code), ('SATISFIED', 'SATISFIED', 0))
+                self.assertTrue(variant['nextRequirement'].startswith('Prepare the variant'))
+                continue
+            self.assertEqual(report['preconditions']['status'], 'NOT_SATISFIED', mode)
+            self.assertEqual([c['id'] for c in report['preconditions']['checks'] if c['status'] != 'SATISFIED'], [failed])
+            self.assertEqual(variant['profilePreconditions'], 'NOT_SATISFIED')
+            self.assertTrue(variant['nextRequirement'].startswith('PROFILE_PRECONDITIONS_NOT_SATISFIED'), variant['nextRequirement'])
+            self.assertEqual(code, 1, mode)
+            self.assertEqual(s.inspect()['staticCoverage']['preconditions']['status'], 'NOT_SATISFIED')
+
+    def test_helper_output_without_separate_preconditions_is_refused(self):
+        value, _ = hash_linked_fixture('complete')
+        s, _, _ = self.session(value)
+        real = subprocess.run
+        good = json.loads(real([NODE, str(hookr.COVERAGE_HELPER)], input=s.source_path.read_bytes(), capture_output=True, check=True).stdout)
+        missing = dict(good); missing.pop('preconditions')
+        inconsistent = json.loads(json.dumps(good)); inconsistent['preconditions']['checks'][1]['status'] = 'NOT_SATISFIED'
+        unknown_status = json.loads(json.dumps(good)); unknown_status['preconditions']['status'] = 'ASSUMED'
+        for report in (missing, inconsistent, unknown_status):
+            done = subprocess.CompletedProcess([], 0, json.dumps(report).encode(), b'')
+            with patch.object(hookr.subprocess, 'run', return_value=done):
+                self.code(lambda: s.coverage(), 'COVERAGE_OUTPUT_INVALID')
+        self.assertFalse((s.directory / 'COVERAGE.json').exists())
 
     def test_unknown_original_state_is_reported_never_assumed(self):
         value, parts = hash_linked_fixture('unknown-sibling')
@@ -313,6 +422,7 @@ class Coverage(SessionTest):
         s = self.sdk().create_session(source=source, expected_sha256=hashlib.sha256(source.read_bytes()).hexdigest(), checkpoint=value['checkpoint'])
         report = s.coverage()
         self.assertEqual(report['status'], 'STATIC_DEPENDENCIES_COVERED')
+        self.assertEqual(report['preconditions']['status'], 'SATISFIED')
         self.assertEqual(report['profile']['prefetchPlan']['groups'], load(capture / 'PREFETCH_PLAN.json', 1 << 20)['groups'])
         v50 = s.add_variant({'lpBps': 50})['variantId']
         self.assertEqual(s.prepare_variant(v50)['scenarioCommitment'], value['scenarioCommitment'])
@@ -340,9 +450,59 @@ class Verification(SessionTest):
 
     @staticmethod
     def backend(run):
-        return dict(worlds=[dict(world='SCENARIO_BASELINE', receiptStatus=1, gasUsed=1, actorTargetTokenTransferNetBaseUnits='1000'),
+        """Shape of the existing scenario compare (ExecutionSDK.compare) for this run; synthetic numbers."""
+        return dict(status='VERIFIED_SCENARIO_COMPARISON', scenarioCommitment=load(Path(run) / 'RESULT.json', 65536)['scenarioCommitment'],
+                    worlds=[dict(world='SCENARIO_BASELINE', receiptStatus=1, gasUsed=1, actorTargetTokenTransferNetBaseUnits='1000'),
                             dict(world='SCENARIO_VARIANT', receiptStatus=1, gasUsed=1, actorTargetTokenTransferNetBaseUnits='1010')],
                     targetTokenTransferNetDeltaBaseUnits='10')
+
+    def test_only_a_complete_verified_comparison_of_this_run_is_recorded(self):
+        s, v50, v0 = self.prepared()
+        run = self.run_dir(s, v50)
+        good = self.backend(run)
+        other = load(s.directory / 'variants' / v0 / 'prepared/SCENARIO.json', 8 << 20)['scenarioCommitment']
+        base, var = good['worlds']
+        def edit(change):
+            value = json.loads(json.dumps(good)); change(value); return value
+        cases = [
+            (dict(status='UNRESOLVED'), 'VERIFIER_RESULT_NOT_VERIFIED'),
+            (edit(lambda v: v.pop('status')), 'VERIFIER_RESULT_NOT_VERIFIED'),
+            (edit(lambda v: v.update(status='SCENARIO_RECORDED_INTEGRITY_PASS')), 'VERIFIER_RESULT_NOT_VERIFIED'),
+            ([good], 'VERIFIER_RESULT_NOT_VERIFIED'),
+            (edit(lambda v: v.update(scenarioCommitment=other)), 'VERIFIER_RESULT_NOT_BOUND'),
+            (edit(lambda v: v.pop('scenarioCommitment')), 'VERIFIER_RESULT_NOT_BOUND'),
+            (edit(lambda v: v.pop('worlds')), 'VERIFIER_RESULT_SHAPE'),
+            (edit(lambda v: v.update(worlds=[base])), 'VERIFIER_RESULT_SHAPE'),
+            (edit(lambda v: v.update(worlds=[var, base])), 'VERIFIER_RESULT_SHAPE'),
+            (edit(lambda v: v.update(worlds=[base, var, var])), 'VERIFIER_RESULT_SHAPE'),
+            (edit(lambda v: v['worlds'][1].pop('actorTargetTokenTransferNetBaseUnits')), 'VERIFIER_RESULT_SHAPE'),
+            (edit(lambda v: v['worlds'][0].pop('receiptStatus')), 'VERIFIER_RESULT_SHAPE'),
+            (edit(lambda v: v.update(targetTokenTransferNetDeltaBaseUnits='11')), 'VERIFIER_RESULT_SHAPE'),
+            (edit(lambda v: v.pop('targetTokenTransferNetDeltaBaseUnits')), 'VERIFIER_RESULT_SHAPE'),
+        ]
+        target = s.directory / 'variants' / v50 / 'VERIFICATION.json'
+        for outcome, code in cases:
+            # Production path with the existing verifier replaced by an offline mock, and the test-only path.
+            with patch.object(hookr.HookrScenarioAdapter, 'verify_run', return_value=outcome):
+                self.code(lambda: s.verify_selected(v50, run), code)
+            self.code(lambda: s.verify_selected(v50, run, test_only_backend=lambda _: outcome), code)
+            self.assertFalse(target.exists(), code)
+        self.assertEqual({v['status'] for v in s.variants()}, {'PREPARED_NOT_EXECUTED'})
+        self.assertEqual(s.compare_verified()['status'], 'NO_VERIFIED_VARIANTS')
+        # The complete verified comparison of exactly this run is admitted (mocked verifier, temporary home).
+        with patch.object(hookr.HookrScenarioAdapter, 'verify_run', return_value=good) as verifier:
+            record = s.verify_selected(v50, run)
+        verifier.assert_called_once()
+        self.assertEqual((record['status'], record['backend']), ('RECORDED_RUN_VERIFIED', 'EXISTING_PROFILE_VERIFIER'))
+        self.assertEqual([w['world'] for w in record['comparison']['worlds']], ['SCENARIO_BASELINE', 'SCENARIO_VARIANT'])
+        self.assertEqual(record['comparison']['targetTokenTransferNetDeltaBaseUnits'], '10')
+        self.assertEqual(s.compare_verified()['status'], 'VERIFIED_VARIANTS_COMPARED')
+        # A stored comparison that lost a world is drift, even with a recomputed commitment.
+        value = json.loads(target.read_bytes()); value['comparison']['worlds'] = value['comparison']['worlds'][:1]
+        body = dict(value); body.pop('verificationCommitment')
+        value['verificationCommitment'] = digest(b'rhook/counterfactual-session/0.1/verification\n' + canonical(body))
+        target.chmod(0o600); target.write_bytes(canonical(value) + b'\n')
+        self.code(lambda: s.compare_verified(), 'VERIFICATION_RECORD_DRIFT')
 
     def test_unexecuted_session_has_nothing_to_compare(self):
         s, v50, v0 = self.prepared()

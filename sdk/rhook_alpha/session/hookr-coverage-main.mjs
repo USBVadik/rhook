@@ -29,6 +29,20 @@ try{
    groups:plan.prefetchPlan.groups},
   variantIndependent:plan.variantIndependent,
  };
+ // Covered trie paths say the state is known, not that this profile admits it. Report the profile's
+ // requirements on that state separately; the session uses only this status for readiness.
+ const checks=[
+  {id:'PARENT_HEADER_AUTHENTICATED',status:'SATISFIED'},
+  {id:'ORIGINAL_CONFIGURATION_EQUALS_LP100_BASELINE',
+   status:{AUTHENTICATED_EQUALS_BASELINE:'SATISFIED',AUTHENTICATED_DIFFERS_FROM_BASELINE:'NOT_SATISFIED'}[report.profile.originalConfiguration]??'UNKNOWN'},
+  {id:'SIMULATION_ACTOR_PROVEN_ABSENT',
+   status:{PROVEN_ABSENT:'SATISFIED',PRESENT_NOT_ALLOWED:'NOT_SATISFIED'}[report.profile.simulationActor]??'UNKNOWN'},
+ ];
+ report.preconditions={
+  status:checks.some(c=>c.status==='NOT_SATISFIED')?'NOT_SATISFIED':checks.some(c=>c.status==='UNKNOWN')?'UNKNOWN':'SATISFIED',
+  checks,
+  meaning:'Requirements of the hookr-buy/0.1 profile on the authenticated original state. A variant is admissible only when every check is SATISFIED.',
+ };
  process.stdout.write(JSON.stringify(report)+'\n');
 }catch(error){
  const code=error instanceof CoverageStop?error.code:error.code==='STRICT_JSON_SYNTAX'?'SOURCE_JSON_INVALID':'COVERAGE_STOP';
