@@ -17,6 +17,7 @@ PROFILE = 'hookr-buy/0.1'
 DOMAIN = 'rhook/hookr-scenario/0.1'
 CONFIG = 'rhook/developer-execution-config/0.1'
 TX = dict(amountInWei='1000000000000000', gas=10000000, fundingWei='1000000000000000000')
+HOST_PROFILES = ('v2', 'macos-host-admission-v3', 'macos-host-admission-v4')
 LIMITS = dict(nativeWallSeconds=120, nativeCPUSeconds=120, workerRSSBytes=1 << 30,
               stageWallSeconds=140, workflowWallSeconds=180, outputBytes=64 << 20, rpc=0, worlds=2)
 
@@ -265,14 +266,16 @@ class ExecutionSDK:
             except (ValueError,OSError,KeyError,TypeError) as error:absent('NATIVE_RUNTIME_INVALID','Re-register the runtime from a reviewed manifest.',{'error':str(error)[:400]})
         host['admissionProfiles']={
             'v2':dict(default=True,registered=runtime['configured'] and components['sensor']['available'],validation='REGISTERED_RUNTIME_FILES_ONLY'),
-            'macos-host-admission-v3':dict(default=False,optIn=True,registered=False,validation='NOT_REGISTERED')}
-        if (self.home/'scenarios/HOST_V3.json').exists():
+            'macos-host-admission-v3':dict(default=False,optIn=True,registered=False,validation='NOT_REGISTERED'),
+            'macos-host-admission-v4':dict(default=False,optIn=True,registered=False,validation='NOT_REGISTERED')}
+        for name,record in (('macos-host-admission-v3','HOST_V3.json'),('macos-host-admission-v4','HOST_V4.json')):
+            if not (self.home/'scenarios'/record).exists():continue
             try:
                 from .cases.scenario import api
-                api.select_host(self._sdk(),'macos-host-admission-v3')
-                host['admissionProfiles']['macos-host-admission-v3'].update(registered=True,validation='STATIC_SOURCE_AND_SENSOR_PINS_ONLY')
+                api.select_host(self._sdk(),name)
+                host['admissionProfiles'][name].update(registered=True,validation='STATIC_SOURCE_AND_SENSOR_PINS_ONLY')
             except (ExecutionError,OSError,ValueError,KeyError,TypeError) as error:
-                host['admissionProfiles']['macos-host-admission-v3'].update(validation='INVALID_OR_DRIFTED',causeCode=str(error)[:400],nextStep='Register the matching v3 sensor against this SDK version; no resource observation was made.')
+                host['admissionProfiles'][name].update(validation='INVALID_OR_DRIFTED',causeCode=str(error)[:400],nextStep='Register the matching sensor for this profile against this SDK version; no resource observation was made.')
         deps=SDK_ROOT/'engine/adapters/hookr-case/node_modules';dependencies=all((deps/n/'package.json').is_file() for n in ('viem','hookr-sdk'))
         if not dependencies:absent('RUNTIME_DEPENDENCIES_MISSING','Install the existing pinned Node dependencies locally; no automatic download is performed.')
         prepared=dict(available=False,authentication='NOT_EVALUATED',closure='NOT_EVALUATED')
@@ -350,16 +353,17 @@ class ExecutionSDK:
         self._host()
         return self._backend(lambda:self._sdk().register_scenario_runtime(path))
 
-    def register_host(self, sensor):
+    def register_host(self, sensor, *, profile='macos-host-admission-v3'):
         self._host()
-        return self._backend(lambda:self._sdk().register_scenario_host(sensor))
+        check(profile in HOST_PROFILES[1:],'UNSUPPORTED_HOST_PROFILE','Register macos-host-admission-v3 or macos-host-admission-v4.')
+        return self._backend(lambda:self._sdk().register_scenario_host(sensor,profile=profile))
 
     def authenticate(self, prepared):
         self._host();path,_=self._prepared(prepared)
         return self._backend(lambda:self._sdk().check_scenario(path))
 
     def operation(self, prepared, *, host_profile='v2'):
-        check(host_profile in ('v2','macos-host-admission-v3'),'UNSUPPORTED_HOST_PROFILE','Choose v2 or the separately registered opt-in macos-host-admission-v3.')
+        check(host_profile in HOST_PROFILES,'UNSUPPORTED_HOST_PROFILE','Choose v2 or a separately registered opt-in macos-host-admission-v3 or -v4.')
         path,_=self._prepared(prepared)
         result=self._backend(lambda:self._sdk().prepare_scenario(path,host_profile=host_profile))
         return dict(status='EXECUTION_OPERATION_PREPARED',binding=result,

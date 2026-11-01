@@ -51,7 +51,7 @@ explicitly. Read the [historical workflow](sdk/HISTORICAL_EXECUTION.md),
 [source-sync boundary](sdk/SOURCE_SYNC.md).
 
 The [clean-room guide](sdk/CLEAN_ROOM.md) covers installation with a pinned
-324-file source inventory and explicit missing-runtime diagnostics. Installation,
+326-file source inventory and explicit missing-runtime diagnostics. Installation,
 case import and planning do not require a private worker. Native replay still
 requires separately supplied, matching runtime and authenticated case data.
 

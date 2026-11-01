@@ -143,6 +143,18 @@ available RAM without blocking admission or runtime on those values. Pressure,
 sample validity/freshness, swap, RSS, CPU/wall, power and cleanup checks remain
 active. Its distinct policy/code hashes require fresh host/runtime registration
 and a newly bound operation. Previously sealed strict-v3 evidence is unchanged.
+
+V4 (`--host-admission macos-host-admission-v4`, registered with
+`scenario-register-host SENSOR --profile macos-host-admission-v4`, record
+`HOST_V4.json`) is a separate experimental revision, `pressure-telemetry/0.1`, using
+the same sensor. macOS WARN pressure (2), swap-in/out growth and swap-used changes
+are recorded in the admission decision and in `runtime/HOST_RUNTIME/SUMMARY.json`
+instead of stopping the run. CRITICAL pressure (4) or an unknown value stops it, at
+admission or in any runtime sample, as do invalid or stale sensor packets, a changed
+boot/page size/physical memory, and decreasing VM counters. Worker limits are those
+of v2/v3: sampled RSS ≤1GiB, native CPU/wall ≤120s, stage ≤140s, workflow ≤180s,
+power/lid, owned process-group cleanup. V3 is unchanged; a v3 operation never becomes
+a v4 operation. V4 needs its own registration and a newly bound operation.
 The outer SDK workflow owns/reaps the complete process group; the original native
 supervisor enforces RSS≤1GiB, native CPU/wall≤120s, stage≤140s, workflow≤180s,
 fresh power/lid/resource checks and owned cleanup. V2 and the native worker are unchanged.

@@ -37,7 +37,7 @@ a session to another installation, use a [session handoff](HANDOFF.md) package
 pinned by its manifest SHA-256.
 
 For source-only installation, use the [clean-room guide](CLEAN_ROOM.md) and
-[case installer](install_cases.py). Its exact 324-file inventory excludes private
+[case installer](install_cases.py). Its exact 326-file inventory excludes private
 calibration modules and preserves the approved default resource policy. The
 bootstrap authenticates its validation helper before executing it. Unknown
 source files, changed policy bytes and edited inventory pins fail closed.

@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 import subprocess
 from .api import CaseSDK
-from ..execution import ExecutionSDK, ExecutionError
+from ..execution import ExecutionSDK, ExecutionError, HOST_PROFILES
 from ..session.core import SessionError
 
 def main(argv=None):
@@ -17,8 +17,8 @@ def main(argv=None):
     p=sub.add_parser('execution-configure');p.add_argument('--profile',default='hookr-buy/0.1');p.add_argument('--lp-bps',type=int,default=50);p.add_argument('--checkpoint',type=Path);p.add_argument('--transaction',type=Path)
     p=sub.add_parser('execution-prepare');p.add_argument('--configuration',type=Path,required=True);p.add_argument('--witness',type=Path,required=True);p.add_argument('--witness-sha256',required=True);p.add_argument('--output',type=Path,required=True)
     p=sub.add_parser('execution-authenticate');p.add_argument('--prepared',type=Path,required=True)
-    p=sub.add_parser('execution-operation');p.add_argument('--prepared',type=Path,required=True);p.add_argument('--host-admission',choices=['v2','macos-host-admission-v3'],default='v2')
-    p=sub.add_parser('execution-run');p.add_argument('--prepared',type=Path,required=True);p.add_argument('--operation',required=True);p.add_argument('--evidence',type=Path,required=True);p.add_argument('--host-admission',choices=['v2','macos-host-admission-v3'],default='v2');p.add_argument('--local-owner',action='store_true',required=True);p.add_argument('--mac-ready',action='store_true',required=True)
+    p=sub.add_parser('execution-operation');p.add_argument('--prepared',type=Path,required=True);p.add_argument('--host-admission',choices=list(HOST_PROFILES),default='v2')
+    p=sub.add_parser('execution-run');p.add_argument('--prepared',type=Path,required=True);p.add_argument('--operation',required=True);p.add_argument('--evidence',type=Path,required=True);p.add_argument('--host-admission',choices=list(HOST_PROFILES),default='v2');p.add_argument('--local-owner',action='store_true',required=True);p.add_argument('--mac-ready',action='store_true',required=True)
     for command in ('execution-verify','execution-compare'):
         p=sub.add_parser(command);p.add_argument('--run',type=Path,required=True)
     # Counterfactual Session 0.1: offline lifecycle only; no native worker, RPC or consent.
@@ -63,6 +63,7 @@ def main(argv=None):
     p.add_argument('path', type=Path)
     p = sub.add_parser('scenario-register-host')
     p.add_argument('sensor', type=Path)
+    p.add_argument('--profile', choices=list(HOST_PROFILES[1:]), default='macos-host-admission-v3')
     p = sub.add_parser('scenario-acquire')
     p.add_argument('--plan', required=True)
     p.add_argument('--output', type=Path, required=True)
@@ -75,11 +76,11 @@ def main(argv=None):
     p.add_argument('capture', type=Path)
     p.add_argument('--local-owner', action='store_true', required=True)
     p.add_argument('--mac-ready', action='store_true', required=True)
-    p.add_argument('--host-admission', choices=['v2', 'macos-host-admission-v3'], default='v2')
+    p.add_argument('--host-admission', choices=list(HOST_PROFILES), default='v2')
     p.add_argument('--operation')
     p = sub.add_parser('scenario-prepare')
     p.add_argument('capture', type=Path)
-    p.add_argument('--host-admission', choices=['v2', 'macos-host-admission-v3'], default='v2')
+    p.add_argument('--host-admission', choices=list(HOST_PROFILES), default='v2')
     for command in ['scenario-verify', 'scenario-compare']:
         p = sub.add_parser(command)
         p.add_argument('--run', type=Path, required=True)
@@ -225,7 +226,7 @@ def main(argv=None):
         elif args.command == 'scenario-register-runtime':
             value = sdk.register_scenario_runtime(args.path)
         elif args.command == 'scenario-register-host':
-            value = sdk.register_scenario_host(args.sensor)
+            value = sdk.register_scenario_host(args.sensor, profile=args.profile)
         elif args.command == 'scenario-acquire':
             value = sdk.acquire_scenario(args.plan, args.output, credential_file=args.credential_file,
                                          account_assertions=args.account_assertions, read_only=args.allow_read_only)

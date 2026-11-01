@@ -1,0 +1,23 @@
+{
+  "profile": "macos-host-admission-v4",
+  "experimental": true,
+  "policyRevision": "pressure-telemetry/0.1",
+  "availabilityMode": "TELEMETRY_ONLY",
+  "pressureMode": "WARN_TELEMETRY_CRITICAL_STOP",
+  "swapMode": "TELEMETRY_MONOTONIC_COUNTERS",
+  "normalPressure": 1,
+  "warningPressure": 2,
+  "criticalPressure": 4,
+  "admissionSpacingSeconds": 1,
+  "runtimeSampleSpacingSeconds": 0.25,
+  "maximumSampleSeconds": 0.25,
+  "maximumSampleGapSeconds": 2,
+  "sensorProcessWallSeconds": 1,
+  "reserveModel": "FREE_PLUS_CAPPED_INACTIVE_ESTIMATE",
+  "reservedMemory": false,
+  "workerRssBytes": 1073741824,
+  "workerAndObserverCpuSeconds": 120,
+  "nativeWallSeconds": 120,
+  "nativeStageSeconds": 140,
+  "workflowSeconds": 180
+}
