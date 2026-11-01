@@ -133,13 +133,30 @@ class Runtime(unittest.TestCase):
                     guard.poll(force=True)
             self.assertEqual(guard.count, 5)
             summary = guard.summary()
-            self.assertEqual((summary['maximumPressure'], summary['warningPressureReadings'], summary['stopped']), (WARN, 10, False))
+            self.assertEqual((summary['runtimeTelemetry'], summary['maximumRuntimePressure'], summary['warningPressureReadings']),
+                             ('MEASURED', WARN, 10))
+            self.assertEqual((summary['hostGuardStopped'], summary['hostGuardStopCause']), (False, None))
             self.assertEqual((summary['swapInDeltaPages'], summary['swapOutDeltaPages']), (200, 28))
+            self.assertEqual(summary['scope'], 'HOST_TELEMETRY_ONLY_NOT_RUN_OUTCOME')
             with patch.object(host_v4, 'capture_sensor', return_value=busy(5, pressureAfter=CRITICAL)):
                 with self.assertRaisesRegex(ValueError, 'CRITICAL_MEMORY_PRESSURE'):
                     guard.poll(force=True)
             self.assertEqual(load(directory / 'STOP.json')['sample'], 5)
-            self.assertTrue(guard.summary()['stopped'])
+            stopped = guard.summary()
+            self.assertTrue(stopped['hostGuardStopped'])
+            self.assertIn('CRITICAL_MEMORY_PRESSURE', stopped['hostGuardStopCause'])
+            # The stopping packet is not folded into the accepted telemetry.
+            self.assertEqual((stopped['runtimeSamples'], stopped['maximumRuntimePressure']), (5, WARN))
+
+    def test_no_runtime_samples_is_not_measured_never_zero(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            guard = host_v4.RuntimeGuard(Path('/unused'), Path(tmp).resolve() / 'HOST_RUNTIME',
+                                         packet(pressureBefore=WARN, pressureAfter=WARN))
+            summary = guard.summary()
+        self.assertEqual((summary['runtimeSamples'], summary['runtimeTelemetry']), (0, 'NOT_MEASURED'))
+        for key in ('maximumRuntimePressure', 'warningPressureReadings', 'swapInDeltaPages', 'swapOutDeltaPages', 'swapUsedBytes'):
+            self.assertIsNone(summary[key], key)
+        self.assertFalse(summary['hostGuardStopped'])
 
     def _supervise(self, helper_body, packets, rss=1):
         from rhook_alpha.cases import native
@@ -164,7 +181,8 @@ class Runtime(unittest.TestCase):
         self.assertFalse((root / 'runtime/HOST_RUNTIME/STOP.json').exists())
         summary = load(root / 'runtime/HOST_RUNTIME/SUMMARY.json')
         self.assertGreater(summary['runtimeSamples'], 0)
-        self.assertEqual((summary['maximumPressure'], summary['stopped']), (WARN, False))
+        self.assertEqual((summary['runtimeTelemetry'], summary['maximumRuntimePressure'], summary['hostGuardStopped']),
+                         ('MEASURED', WARN, False))
         self.assertGreater(summary['swapInDeltaPages'], 0)
 
     def test_critical_pressure_during_the_run_kills_and_reaps_the_worker(self):
@@ -173,13 +191,19 @@ class Runtime(unittest.TestCase):
         self.assertIsNotNone(result['stop'])
         self.assertNotEqual(result['exitCode'], 0)
         self.assertIn('CRITICAL_MEMORY_PRESSURE', load(root / 'runtime/HOST_RUNTIME/STOP.json')['cause'])
-        self.assertTrue(load(root / 'runtime/HOST_RUNTIME/SUMMARY.json')['stopped'])
+        summary = load(root / 'runtime/HOST_RUNTIME/SUMMARY.json')
+        self.assertTrue(summary['hostGuardStopped'])
+        self.assertIn('CRITICAL_MEMORY_PRESSURE', summary['hostGuardStopCause'])
 
     def test_worker_rss_limit_still_stops_under_v4(self):
         root, result, portable = self._supervise('time.sleep(10)\n', [busy(i) for i in range(200)], rss=(1 << 30) + 1)
         self.assertEqual(result['stop'], 'SAMPLED_WORKER_RSS_LIMIT')
         self.assertTrue(result['workerReaped'])
         self.assertNotEqual(result['exitCode'], 0)
+        # The host summary describes host telemetry only; it never reads as a successful run.
+        summary = load(root / 'runtime/HOST_RUNTIME/SUMMARY.json')
+        self.assertEqual((summary['scope'], summary['hostGuardStopped']), ('HOST_TELEMETRY_ONLY_NOT_RUN_OUTCOME', False))
+        self.assertNotIn('status', summary)
         # CPU and wall are the unchanged reviewed limits of the native supervisor.
         self.assertEqual((portable.LIMITS['pairWallSeconds'], portable.LIMITS['workerKernelCpuSeconds'],
                           portable.LIMITS['workerSampledRssBytes']), (120, 120, 1 << 30))

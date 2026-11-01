@@ -149,7 +149,9 @@ V4 (`--host-admission macos-host-admission-v4`, registered with
 `HOST_V4.json`) is a separate experimental revision, `pressure-telemetry/0.1`, using
 the same sensor. macOS WARN pressure (2), swap-in/out growth and swap-used changes
 are recorded in the admission decision and in `runtime/HOST_RUNTIME/SUMMARY.json`
-instead of stopping the run. CRITICAL pressure (4) or an unknown value stops it, at
+instead of stopping the run. The summary is host telemetry only, not the run outcome
+(`RESULT.json` is): with no runtime packet its values are null and
+`runtimeTelemetry` is `NOT_MEASURED`, and `hostGuardStopped` covers host stops only. CRITICAL pressure (4) or an unknown value stops it, at
 admission or in any runtime sample, as do invalid or stale sensor packets, a changed
 boot/page size/physical memory, and decreasing VM counters. Worker limits are those
 of v2/v3: sampled RSS ≤1GiB, native CPU/wall ≤120s, stage ≤140s, workflow ≤180s,

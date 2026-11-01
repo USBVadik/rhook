@@ -117,10 +117,10 @@ def admission(sensor, directory):
 
 class RuntimeGuard:
     def __init__(self, sensor, directory, previous):
+        # `first` is the last admission packet; runtime deltas are measured from it.
         self.sensor, self.directory, self.previous, self.first = sensor, directory, previous, previous
         self.last, self.count = 0.0, 0
-        self.maximum = max(previous['pressureBefore'], previous['pressureAfter'])
-        self.warnings = 0
+        self.maximum, self.warnings = None, 0
         directory.mkdir()
 
     def poll(self, force=False):
@@ -128,9 +128,11 @@ class RuntimeGuard:
             return
         try:
             current = capture_sensor(self.sensor, self.directory / str(self.count))
-            decision = assess([self.previous, current], runtime=True)
-            self.maximum = max(self.maximum, decision['maximumPressure'])
-            self.warnings += (current['pressureBefore'] == POLICY['warningPressure']) + (current['pressureAfter'] == POLICY['warningPressure'])
+            assess([self.previous, current], runtime=True)
+            # Only accepted runtime packets count; a stopping packet is reported through STOP.json.
+            readings = (current['pressureBefore'], current['pressureAfter'])
+            self.maximum = max(readings) if self.maximum is None else max(self.maximum, *readings)
+            self.warnings += sum(p == POLICY['warningPressure'] for p in readings)
             self.previous, self.last = current, time.monotonic()
             self.count += 1
         except BaseException as error:
@@ -138,12 +140,24 @@ class RuntimeGuard:
             raise
 
     def summary(self):
-        return dict(profile=PROFILE, policyRevision=POLICY['policyRevision'], runtimeSamples=self.count,
-                    maximumPressure=self.maximum, warningPressureReadings=self.warnings,
-                    swapInDeltaPages=self.previous['swapInPages'] - self.first['swapInPages'],
-                    swapOutDeltaPages=self.previous['swapOutPages'] - self.first['swapOutPages'],
-                    swapUsedBytes=dict(first=self.first['swapUsedBytes'], last=self.previous['swapUsedBytes']),
-                    stopped=(self.directory / 'STOP.json').exists())
+        """Host telemetry of the runtime window. It is not the run outcome: RESULT.json is."""
+        stop = self.directory / 'STOP.json'
+        cause = None
+        if stop.exists():
+            try:
+                cause = load(stop, 65536)['cause']
+            except (OSError, ValueError, KeyError, TypeError):
+                cause = 'STOP_RECORD_UNREADABLE'
+        measured = self.count > 0
+        return dict(schema='rhook/host-v4-runtime-summary/0.1', profile=PROFILE, policyRevision=POLICY['policyRevision'],
+                    scope='HOST_TELEMETRY_ONLY_NOT_RUN_OUTCOME', runtimeSamples=self.count,
+                    runtimeTelemetry='MEASURED' if measured else 'NOT_MEASURED',
+                    maximumRuntimePressure=self.maximum,
+                    warningPressureReadings=self.warnings if measured else None,
+                    swapInDeltaPages=self.previous['swapInPages'] - self.first['swapInPages'] if measured else None,
+                    swapOutDeltaPages=self.previous['swapOutPages'] - self.first['swapOutPages'] if measured else None,
+                    swapUsedBytes=dict(admission=self.first['swapUsedBytes'], last=self.previous['swapUsedBytes']) if measured else None,
+                    hostGuardStopped=cause is not None, hostGuardStopCause=cause)
 
 
 def supervise(raw, out, sensor, previous):

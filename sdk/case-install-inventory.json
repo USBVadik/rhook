@@ -331,7 +331,7 @@
     "rhook_alpha/session/hookr-plan.mjs": "37e937ab619043a46f55656f9fc2cbc5d365e2b23e6206483afbbda5e42ae255",
     "rhook_alpha/session/hookr.py": "7ba8b5ea0b66e74ed8aba7d327a387d674200cea039c5246a84485493e2bbf6b",
     "rhook_alpha/session/handoff.py": "8f9243163e44a7c4db50d90cc4b01a47fd0a1ba80c138647a3475ce5ff78e563",
-    "rhook_alpha/cases/scenario/host_v4.py": "832290bd13c3422a98b4843566380da2018289b8cf87758c254b31e9f72eb444",
+    "rhook_alpha/cases/scenario/host_v4.py": "fdc11ecc7ad3b6375f90e63b2dce771ec4c5ccb0333751e889555c2cbbce474a",
     "rhook_alpha/cases/scenario/host_v4_policy.json": "387f58fae87ff8263611bbb1c99fabd89212e41bcd9e4fe03d4dfc87a6759e96"
   },
   "nativeAssetsIncluded": false,
