@@ -330,7 +330,7 @@
     "rhook_alpha/session/hookr-coverage-main.mjs": "490215038b5a04957a04d0044d2015d0df29a5f25ac8fedb25b9b12b740782b6",
     "rhook_alpha/session/hookr-plan.mjs": "37e937ab619043a46f55656f9fc2cbc5d365e2b23e6206483afbbda5e42ae255",
     "rhook_alpha/session/hookr.py": "7ba8b5ea0b66e74ed8aba7d327a387d674200cea039c5246a84485493e2bbf6b",
-    "rhook_alpha/session/handoff.py": "a55346ec28ab0ddb551614b14285f134e604b6cc99e2de3022b80873baab5961"
+    "rhook_alpha/session/handoff.py": "ab1e42b017556e4950f4c7bd3bd40b9a78e1214ca041ade3d62fa6ff7035c400"
   },
   "nativeAssetsIncluded": false,
   "roots": [

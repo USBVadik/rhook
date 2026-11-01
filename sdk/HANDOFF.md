@@ -72,10 +72,13 @@ limit and with its declared SHA-256. A complete package's source must pass the e
 and derive exactly the declared session header; each variant record must derive from that session and
 its descriptor. Inspection without a pin reports `HANDOFF_NOT_PINNED` and cannot be imported.
 
-A new session appears in one rename with all its variants, or not at all; an interrupted import leaves
-only a `.handoff-import-*` staging directory, which is never a session. Importing the same package again
-reuses the session. A stored session or variant that differs from the package stops the import and is not
-changed. A metadata-only package is refused with `HANDOFF_SOURCE_NOT_INCLUDED`.
+The session is built from the source bytes that were authenticated, copied into a private staging
+directory; the package file is not opened again. A new session appears in one rename with all its
+variants, or not at all; an interrupted import leaves only a `.handoff-import-*` staging directory, which
+is never a session. Importing the same package again reuses the session. Every stored counterpart of a
+package variant is checked before anything is added, so a stored session or variant that differs from the
+package, or is incomplete, stops the import and leaves the session unchanged. A metadata-only package is
+refused with `HANDOFF_SOURCE_NOT_INCLUDED`.
 
 With `--prepare` (or by calling `prepare_variant`), each variant is prepared locally and compared with the
 exporter's reference: `MATCHES_EXPORTER_REFERENCE`, `NO_EXPORTER_REFERENCE` or

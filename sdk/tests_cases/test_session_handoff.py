@@ -203,6 +203,44 @@ class Import(HandoffTest):
         self.code(lambda: self.receiver().import_session_handoff(package, expected_manifest_sha256=pin), 'SESSION_MANIFEST_DRIFT')
         self.assertEqual(json.loads(manifest.read_bytes()), changed)
 
+    def test_import_builds_from_the_authenticated_bytes_not_a_reopened_package_file(self):
+        s, _, result = self.exported()
+        package, pin = self.root / 'package', result['manifestSha256']
+        original = s.source_path.read_bytes()
+        real = handoff.authenticate
+        def swap_after_check(*args):
+            parts = real(*args)
+            # The package source is replaced after it was checked and before the session is built.
+            source = package / 'source/SCENARIO.json'
+            source.chmod(0o600); source.write_bytes(original.replace(b'"nonce":0', b'"nonce":1', 1))
+            return parts
+        with patch.object(handoff, 'authenticate', side_effect=swap_after_check):
+            imported = self.receiver().import_session_handoff(package, expected_manifest_sha256=pin)
+        self.assertEqual(imported.source_path.read_bytes(), original)
+        self.assertEqual(imported.header, s.header)
+        self.assertEqual(sorted(p.name for p in (self.root / 'receiver/sessions').iterdir()), [s.id])
+        # The changed package itself no longer authenticates.
+        self.code(lambda: self.receiver('other').import_session_handoff(package, expected_manifest_sha256=pin),
+                  'HANDOFF_FILE_HASH_MISMATCH')
+
+    def test_a_conflict_on_the_last_variant_adds_nothing_to_an_existing_session(self):
+        _, ids, result = self.exported()
+        package, pin = self.root / 'package', result['manifestSha256']
+        for name, damage, code in [
+                ('changed', lambda path: (path.chmod(0o600), path.write_bytes(canonical(reseal_variant(
+                    dict(json.loads(path.read_bytes()), descriptor=dict(json.loads(path.read_bytes())['descriptor'], replacement=49)))) + b'\n')),
+                 'VARIANT_RECORD_DRIFT'),
+                ('incomplete', lambda path: path.unlink(), 'VARIANT_UNKNOWN')]:
+            with self.subTest(name):
+                # The receiver already holds the session with LP50 only; LP0 sorts first in the package.
+                local, _, _ = self.session(name=f'{name}-receiver')
+                local.add_variant({'lpBps': 50})
+                damage(local.directory / 'variants' / ids[50] / 'VARIANT.json')
+                before = tree(local.directory), sorted(p.name for p in (local.directory / 'variants').iterdir())
+                self.code(lambda: self.receiver(f'{name}-receiver').import_session_handoff(package, expected_manifest_sha256=pin), code)
+                self.assertEqual((tree(local.directory), sorted(p.name for p in (local.directory / 'variants').iterdir())), before)
+                self.assertFalse((local.directory / 'variants' / ids[0]).exists())
+
     def test_package_variants_beyond_the_session_limit_add_nothing(self):
         _, ids, result = self.exported()
         local, _, _ = self.session(name='receiver')
@@ -446,6 +484,30 @@ class ImportedCoverage(HandoffTest):
                 self.assertTrue(all(v['nextRequirement'].startswith('NEEDS_AUTHENTICATED_STATE') for v in imported.variants()))
             else:
                 self.assertEqual(report['preconditions']['status'], 'SATISFIED')
+
+    def test_installed_sdk_with_pinned_dependencies_recomputes_the_same_coverage(self):
+        prefix = self.root / 'installed'
+        p = subprocess.run([sys.executable, '-B', str(SDK / 'install_cases.py'), '--prefix', str(prefix),
+                            '--dependencies', str(SDK / 'engine/adapters/hookr-case/node_modules')],
+                           capture_output=True, text=True, timeout=300)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        value, _ = hash_linked_fixture('complete')
+        s, ids, result = self.exported(value=value)
+        exported = s.coverage()
+        home = self.root / 'installed-home'
+        code, report = self.cli(home, 'session-handoff-import', '--package', str(self.root / 'package'),
+                                '--manifest-sha256', result['manifestSha256'], '--prepare', prefix=prefix)
+        self.assertEqual((code, report['status'], report['sessionId']), (0, 'SESSION_HANDOFF_IMPORTED', s.id))
+        code, coverage = self.cli(home, 'session-coverage', '--session', s.id, prefix=prefix)
+        self.assertEqual(code, 0, coverage)
+        self.assertEqual(coverage, exported)
+        self.assertEqual((coverage['status'], coverage['preconditions']['status'], coverage['networkRequestsPerformed']),
+                         ('STATIC_DEPENDENCIES_COVERED', 'SATISFIED', 0))
+        code, view = self.cli(home, 'session-inspect', '--session', s.id, prefix=prefix)
+        self.assertEqual({v['descriptor']['replacement']: (v['staticCoverage'], v['profilePreconditions'], v['status'],
+                                                           v['dynamicCoverage'], v['execution']) for v in view['variants']},
+                         {lp: ('COVERED', 'SATISFIED', 'PREPARED_NOT_EXECUTED', 'UNKNOWN', 'NOT_PERFORMED') for lp in ids})
+        self.assertFalse((home / 'scenarios/consents').exists())
 
 
 class CleanRoomInstallation(HandoffTest):

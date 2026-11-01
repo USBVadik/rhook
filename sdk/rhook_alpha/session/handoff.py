@@ -173,11 +173,13 @@ def authenticate(home, package, expected_manifest_sha256):
           'The package was written by another adapter version.', {'package': header['adapter'], 'installed': adapter.adapter_version})
     expected_files = [dict(path=SOURCE, bytes=source['bytes'], sha256=source['sha256'])] if mode == COMPLETE else []
     check(manifest['files'] == expected_files, 'HANDOFF_MANIFEST_FILES', 'The file list must name exactly the pinned session source.')
+    content = None
     if mode == COMPLETE:
         content = _read(root / SOURCE, MAX_SOURCE_BYTES)
         check(len(content) == source['bytes'] and digest(content) == source['sha256'], 'HANDOFF_FILE_HASH_MISMATCH',
               'source/SCENARIO.json differs from the pinned session source.')
         # The existing source validation, against the same pin; a different checkpoint or commitment cannot pass.
+        # It reads the file again, so it sees either these exact bytes or fails on the pin. Import uses `content`.
         try:
             fresh = CounterfactualSession._header(adapter, adapter.load_source(root / SOURCE, source['sha256']))
         except SessionError as error:
@@ -187,7 +189,7 @@ def authenticate(home, package, expected_manifest_sha256):
               'The included source does not derive the declared session: checkpoint, commitment or bindings differ.')
     records = _variants(adapter, header, manifest['variants'])
     return dict(root=root, manifest=manifest, manifestSha256=actual, pinned=pinned, mode=mode, header=header,
-                adapter=adapter, records=records)
+                adapter=adapter, records=records, content=content)
 
 
 def _variants(adapter, header, entries):
@@ -263,17 +265,25 @@ def import_package(home, package, expected_manifest_sha256, *, prepare=False):
     final = root / header['sessionId']
     reused = final.exists()
     if not reused:
-        _stage_and_place(root, final, adapter, parts['root'] / SOURCE, header, records)
+        # Built from the authenticated bytes; the package file is not opened again.
+        _stage_and_place(root, final, adapter, parts['content'], header, records)
     session = CounterfactualSession.open(home, adapter, header['sessionId'])
     check(session.header == header, 'HANDOFF_SESSION_CONFLICT', 'An existing session with this id differs; nothing was changed.')
     existing = set(session._variant_ids())
     check(len(existing | {r['variantId'] for r in records}) <= MAX_VARIANTS, 'VARIANT_LIMIT',
           f'The existing session plus this package would exceed {MAX_VARIANTS} variants; nothing was added.')
+    # Every stored counterpart is checked before the first missing variant is added, so a conflict on
+    # any record, including the last, leaves the existing session exactly as it was.
     for record in records:
-        # Idempotent for identical records; a conflicting stored record raises VARIANT_RECORD_DRIFT.
-        added = session.add_variant(adapter.parameters(record['descriptor']))
-        check(added['variantId'] == record['variantId'] and session._load_variant(record['variantId']) == record,
-              'HANDOFF_VARIANT_CONFLICT', 'A stored variant differs from the package.')
+        if record['variantId'] in existing:
+            # A changed or incomplete stored record raises VARIANT_RECORD_DRIFT or VARIANT_UNKNOWN here.
+            check(session._load_variant(record['variantId']) == record, 'HANDOFF_VARIANT_CONFLICT',
+                  'A stored variant differs from the package; nothing was added.')
+    for record in records:
+        if record['variantId'] not in existing:
+            added = session.add_variant(adapter.parameters(record['descriptor']))
+            check(added['variantId'] == record['variantId'] and session._load_variant(record['variantId']) == record,
+                  'HANDOFF_VARIANT_CONFLICT', 'A stored variant differs from the package.')
     rows, mismatched = [], False
     references = {e['record']['variantId']: e['exporterPreparation'] for e in parts['manifest']['variants']}
     for record in records:
@@ -300,15 +310,21 @@ def import_package(home, package, expected_manifest_sha256, *, prepare=False):
     return session, report
 
 
-def _stage_and_place(root, final, adapter, source, header, records):
-    """Build the complete session in a private staging home, then move it into place in one rename."""
+def _stage_and_place(root, final, adapter, content, header, records):
+    """Build the complete session in a private staging home, then move it into place in one rename.
+
+    content: the source bytes authenticate() checked. They are written into the private staging
+    directory first, so the session is created from them rather than from the package.
+    """
     check(root.parent.parent.is_dir(), 'SDK_HOME_PARENT_MISSING', 'Create the parent directory of the SDK home first.')
     root.parent.mkdir(mode=0o700, exist_ok=True)
     root.mkdir(mode=0o700, exist_ok=True)
     staging = root / ('.handoff-import-' + secrets.token_hex(8))  # never a valid session id, never openable
     staging.mkdir(mode=0o700)
     try:
-        staged = CounterfactualSession.create(staging, adapter, source=source, expected_sha256=header['source']['sha256'],
+        incoming = staging / 'incoming-SCENARIO.json'
+        _write(incoming, content)
+        staged = CounterfactualSession.create(staging, adapter, source=incoming, expected_sha256=header['source']['sha256'],
                                               checkpoint=header['checkpoint'])
         check(staged.header == header, 'HANDOFF_SESSION_MISMATCH', 'The rebuilt session differs from the package.')
         for record in records:
