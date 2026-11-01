@@ -187,6 +187,16 @@ class ExecutionSDK:
         configuration=execution_configuration(d,self)
         return self.prepare(configuration,witness,expected_sha256=expected_sha256,output=output)
 
+    def create_session(self, *, source, expected_sha256, checkpoint, profile=PROFILE):
+        """Counterfactual Session over one pinned prepared input; offline, no native work."""
+        from .session import create_session
+        return create_session(self.home, source=source, expected_sha256=expected_sha256,
+                              checkpoint=checkpoint, profile=profile)
+
+    def open_session(self, session_id, *, profile=PROFILE):
+        from .session import open_session
+        return open_session(self.home, session_id, profile=profile)
+
     def _sdk(self):
         check(os.name == 'posix', 'UNSUPPORTED_NATIVE_HOST', 'Use a supported POSIX installation; native execution currently requires macOS arm64.')
         from .cases.api import CaseSDK

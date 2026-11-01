@@ -6,6 +6,7 @@ import re
 import subprocess
 from .api import CaseSDK
 from ..execution import ExecutionSDK, ExecutionError
+from ..session.core import SessionError
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
@@ -20,6 +21,12 @@ def main(argv=None):
     p=sub.add_parser('execution-run');p.add_argument('--prepared',type=Path,required=True);p.add_argument('--operation',required=True);p.add_argument('--evidence',type=Path,required=True);p.add_argument('--host-admission',choices=['v2','macos-host-admission-v3'],default='v2');p.add_argument('--local-owner',action='store_true',required=True);p.add_argument('--mac-ready',action='store_true',required=True)
     for command in ('execution-verify','execution-compare'):
         p=sub.add_parser(command);p.add_argument('--run',type=Path,required=True)
+    # Counterfactual Session 0.1: offline lifecycle only; no native worker, RPC or consent.
+    p=sub.add_parser('session-create',help='Pin one SCENARIO.json and its checkpoint; offline');p.add_argument('--scenario',type=Path,required=True);p.add_argument('--sha256',required=True);p.add_argument('--checkpoint',type=Path,required=True)
+    p=sub.add_parser('session-add-variant');p.add_argument('--session',required=True);p.add_argument('--lp-bps',type=int,required=True)
+    for command in ('session-inspect','session-coverage','session-export','session-compare'):
+        p=sub.add_parser(command);p.add_argument('--session',required=True)
+    p=sub.add_parser('session-prepare',help='Prepare one variant through ExecutionSDK; no native run');p.add_argument('--session',required=True);p.add_argument('--variant',required=True)
     for command in ('scenario-evidence-inspect', 'scenario-evidence-verify', 'scenario-evidence-compare'):
         p = sub.add_parser(command, help='Worker-free pinned recorded-evidence inspection')
         p.add_argument('--bundle', type=Path, required=True)
@@ -166,6 +173,20 @@ def main(argv=None):
             elif args.command=='execution-run':value=executor.run(args.prepared,operation=args.operation,evidence=args.evidence,local_owner=args.local_owner,mac_ready=args.mac_ready,host_profile=args.host_admission)
             elif args.command=='execution-verify':value=executor.verify(args.run)
             else:value=executor.compare(args.run)
+        elif args.command.startswith('session-'):
+            executor=ExecutionSDK(args.home)
+            from developer.files import load
+            if args.command=='session-create':
+                value=executor.create_session(source=args.scenario,expected_sha256=args.sha256,checkpoint=load(args.checkpoint,65536)).inspect()
+            else:
+                session=executor.open_session(args.session)
+                if args.command=='session-inspect':value=session.inspect()
+                elif args.command=='session-add-variant':value=dict(session.add_variant({'lpBps':args.lp_bps}),status='VARIANT_REGISTERED',sessionId=session.id)
+                elif args.command=='session-coverage':value=session.coverage()
+                elif args.command=='session-prepare':
+                    value=session.prepare_variant(args.variant);value.pop('sdkResult',None);value=dict(value,status='VARIANT_PREPARED',variantId=args.variant)
+                elif args.command=='session-export':value=dict(session.manifest(),status='SESSION_EXPORTED')
+                else:value=session.compare_verified()
         elif args.command == 'scenario-evidence-inspect':
             value = sdk.inspect_recorded_scenario(args.bundle)
         elif args.command == 'scenario-evidence-verify':
@@ -265,6 +286,7 @@ def main(argv=None):
             value = sdk.compare(args.run)
     except (ValueError, OSError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
         if isinstance(error,ExecutionError):value=error.as_result()
+        elif isinstance(error,SessionError):value=error.as_result()
         elif type(getattr(error,'report',None)) is dict:
             value={'status':'INPUT_OR_RUNTIME_STOP','causeCode':str(error)[:1024],'automaticRetry':False,
                    'details':error.report,'nextStep':'Inspect retained native helper diagnostics; do not retry a closed operation or invent missing state.'}
@@ -272,6 +294,10 @@ def main(argv=None):
             value=ExecutionError('EXECUTION_INPUT_OR_RUNTIME_ERROR','Check the selected paths/configuration and complete local installation; no execution was inferred from this error.',{'error':str(error)[:1024]}).as_result()
         else:value={'status': 'INPUT_OR_RUNTIME_STOP', 'causeCode': str(error)[:1024], 'automaticRetry': False}
     print(json.dumps(value, ensure_ascii=True))
+    if args.command.startswith('session-'):
+        # Missing static state and unverified comparisons are honest results, but not readiness.
+        return 0 if value.get('status') in {'SESSION_INSPECTED','VARIANT_REGISTERED','VARIANT_PREPARED','SESSION_EXPORTED',
+                                            'STATIC_DEPENDENCIES_COVERED','VERIFIED_VARIANTS_COMPARED'} else 1
     if args.command == 'scenario-diagnostic-prepare' and value.get('schema') == 'rhook/scenario-result-diagnostic/0.1':
         return 0
     if args.command == 'scenario-diagnose' and value.get('status') == 'DIAGNOSTIC_COMPLETED' and value.get('cleanupConfirmed') is True:

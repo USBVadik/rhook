@@ -30,8 +30,12 @@ To check a recorded ACTUAL/BRANCH result offline without the witness or a worker
 use [verify-pack](verify-pack/README.md). It anchors ACTUAL to a block hash you
 supply and reports BRANCH as an RHOOK engine record, not a re-executed result.
 
+To ask several questions against one authenticated checkpoint, use a
+[Counterfactual Session](SESSIONS.md): it reuses the retained witness, reports
+which original-state reads it covers and prepares each variant offline.
+
 For source-only installation, use the [clean-room guide](CLEAN_ROOM.md) and
-[case installer](install_cases.py). Its exact 317-file inventory excludes private
+[case installer](install_cases.py). Its exact 323-file inventory excludes private
 calibration modules and preserves the approved default resource policy. The
 bootstrap authenticates its validation helper before executing it. Unknown
 source files, changed policy bytes and edited inventory pins fail closed.
