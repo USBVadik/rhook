@@ -203,7 +203,11 @@ class ExecutionSDK:
         return handoff.inspect(self.home, package, expected_manifest_sha256)
 
     def import_session_handoff(self, package, *, expected_manifest_sha256, prepare=False):
-        """Rebuild a session from a complete, pinned handoff package. Offline; grants no authority."""
+        """Rebuild a session from a complete, pinned handoff package. Offline; grants no authority.
+
+        With prepare=True every variant is prepared locally and compared with the exporter's reference;
+        a mismatch raises SessionError HANDOFF_PREPARED_RECONSTRUCTION_MISMATCH instead of returning.
+        """
         from .session import handoff
         return handoff.import_package(self.home, package, expected_manifest_sha256, prepare=prepare)[0]
 

@@ -181,6 +181,74 @@ class Import(HandoffTest):
         self.assertEqual((code, view['status']), (1, 'HANDOFF_NOT_PINNED'))
         self.assertFalse((self.root / 'cli-home-2').exists())
 
+    def forged_reference(self, field, tag):
+        """A complete package whose LP50 exporter reference is edited and re-pinned: authentic bytes, wrong claim."""
+        s, ids, result = self.exported(name=f'{tag}-home', out=f'{tag}-package')
+        package = self.root / f'{tag}-package'
+        honest = s._preparation(s._load_variant(ids[50]))
+        forged = 'ab' * 32
+        self.assertNotEqual(honest[field], forged)
+        self.writable(package)
+        def edit(m):
+            entry = next(e for e in m['variants'] if e['record']['variantId'] == ids[50])
+            entry['exporterPreparation'][field] = forged
+        pin = self.tamper(package, edit)
+        self.assertNotEqual(pin, result['manifestSha256'])
+        # Under its new pin the edited package is authentic: package integrity alone cannot catch a wrong claim.
+        view = self.receiver(f'{tag}-inspect').inspect_session_handoff(package, expected_manifest_sha256=pin)
+        self.assertEqual(view['status'], 'HANDOFF_AUTHENTICATED')
+        return s, ids, honest, package, pin, forged
+
+    def test_a_wrong_preparation_reference_in_an_authentic_package_never_imports_as_success(self):
+        for field in ('scenarioCommitment', 'scenarioSha256'):
+            with self.subTest(field):
+                s, ids, honest, package, pin, forged = self.forged_reference(field, field)
+                home = self.root / f'{field}-receiver'
+                local = {k: honest[k] for k in ('scenarioCommitment', 'scenarioSha256')}
+                # The public Python API raises instead of returning a session.
+                call = lambda: ExecutionSDK(home).import_session_handoff(package, expected_manifest_sha256=pin, prepare=True)
+                e = self.code(call, 'HANDOFF_PREPARED_RECONSTRUCTION_MISMATCH')
+                self.assertEqual((e.details['sessionId'], e.details['sessionImported'], e.details['manifestSha256']), (s.id, True, pin))
+                [row] = e.details['variants']
+                self.assertEqual((row['variantId'], row['descriptor']['replacement']), (ids[50], 50))
+                self.assertEqual(row['exporterPreparation'][field], forged)
+                self.assertEqual(row['localPreparation'], local)
+                # The session keeps the preparation derived from the authenticated source, not the exporter's claim.
+                kept = {v['variantId']: v for v in ExecutionSDK(home).open_session(s.id).variants()}
+                self.assertEqual({k: kept[ids[50]]['preparation'][k] for k in local}, local)
+                self.assertEqual({v['status'] for v in kept.values()}, {'PREPARED_NOT_EXECUTED'})
+                # Running it again gives the same stop, never success.
+                self.code(call, 'HANDOFF_PREPARED_RECONSTRUCTION_MISMATCH')
+                # The CLI exits non-zero and shows both preparations.
+                code, out = self.cli(self.root / f'{field}-cli', 'session-handoff-import', '--package', str(package),
+                                     '--manifest-sha256', pin, '--prepare')
+                self.assertEqual((code, out['status'], out['causeCode']), (1, 'SESSION_STOP', 'HANDOFF_PREPARED_RECONSTRUCTION_MISMATCH'))
+                [cli_row] = out['details']['variants']
+                self.assertEqual((cli_row['exporterPreparation'][field], cli_row['localPreparation']), (forged, local))
+
+    def test_without_prepare_the_exporter_reference_is_reported_never_adopted(self):
+        s, ids, honest, package, pin, forged = self.forged_reference('scenarioCommitment', 'noprep')
+        imported, report = handoff.import_package(self.root / 'noprep-receiver', package, pin)
+        self.assertEqual((report['status'], report['packageIntegrity'], report['preparedReconstruction']),
+                         ('SESSION_HANDOFF_IMPORTED', 'MATCHES_EXTERNAL_MANIFEST_PIN', 'NOT_REQUESTED'))
+        rows = {r['variantId']: r for r in report['variants']}
+        self.assertEqual({r['reconstruction'] for r in rows.values()}, {'NOT_REQUESTED'})
+        self.assertTrue(all('localPreparation' not in r for r in rows.values()))
+        self.assertEqual(rows[ids[50]]['exporterPreparation']['scenarioCommitment'], forged)
+        self.assertEqual(report['assurance']['exporterPreparation'], 'REFERENCE_ONLY_RECONSTRUCT_LOCALLY_WITH_EXECUTIONSDK_PREPARE')
+        # The public API returns the session; the reference is stored nowhere in it.
+        api = ExecutionSDK(self.root / 'noprep-api').import_session_handoff(package, expected_manifest_sha256=pin)
+        for session in (imported, api):
+            self.assertEqual({(v['status'], v['preparation']) for v in session.variants()}, {('CONFIGURED', None)})
+            self.assertFalse(any((session.directory / 'variants' / v / 'prepared').exists() for v in ids.values()))
+            stored = b''.join(p.read_bytes() for p in session.directory.rglob('*') if p.is_file())
+            self.assertNotIn(forged.encode(), stored)
+        # Re-exporting the imported session does not pass the claim on.
+        imported.export_handoff(self.root / 'noprep-reexport', include_source=True)
+        self.assertEqual({e['exporterPreparation'] is None for e in load(self.root / 'noprep-reexport/HANDOFF.json', 1 << 20)['variants']}, {True})
+        # A later local preparation is a fresh one and yields the honest commitment, not the claim.
+        self.assertEqual(imported.prepare_variant(ids[50])['scenarioCommitment'], honest['scenarioCommitment'])
+
     def test_reimport_is_deterministic_and_conflicts_are_never_overwritten(self):
         _, ids, result = self.exported()
         pin, package = result['manifestSha256'], self.root / 'package'

@@ -312,8 +312,6 @@ def main(argv=None):
         if args.command=='session-coverage':
             # Covered trie paths are not readiness: the profile preconditions must also be satisfied.
             ok=ok and type(value.get('preconditions')) is dict and value['preconditions'].get('status')=='SATISFIED'
-        if args.command=='session-handoff-import':
-            ok=ok and value.get('preparedReconstruction')!='DIFFERS_FROM_EXPORTER_REFERENCE'
         return 0 if ok else 1
     if args.command == 'scenario-diagnostic-prepare' and value.get('schema') == 'rhook/scenario-result-diagnostic/0.1':
         return 0

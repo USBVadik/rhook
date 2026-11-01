@@ -284,24 +284,35 @@ def import_package(home, package, expected_manifest_sha256, *, prepare=False):
             added = session.add_variant(adapter.parameters(record['descriptor']))
             check(added['variantId'] == record['variantId'] and session._load_variant(record['variantId']) == record,
                   'HANDOFF_VARIANT_CONFLICT', 'A stored variant differs from the package.')
-    rows, mismatched = [], False
+    rows = []
     references = {e['record']['variantId']: e['exporterPreparation'] for e in parts['manifest']['variants']}
     for record in records:
         reference = references[record['variantId']]
-        row = dict(variantId=record['variantId'], descriptor=record['descriptor'], exporterPreparation=reference)
+        # The exporter's reference is only reported; it is never stored in the session or treated as checked.
+        row = dict(variantId=record['variantId'], descriptor=record['descriptor'], exporterPreparation=reference,
+                   reconstruction='NOT_REQUESTED')
         if prepare:
             local = session.prepare_variant(record['variantId'])
             row['localPreparation'] = dict(scenarioCommitment=local['scenarioCommitment'], scenarioSha256=local['scenarioSha256'])
             row['reconstruction'] = ('NO_EXPORTER_REFERENCE' if reference is None else 'MATCHES_EXPORTER_REFERENCE'
                                      if reference == row['localPreparation'] else 'DIFFERS_FROM_EXPORTER_REFERENCE')
-            mismatched |= row['reconstruction'] == 'DIFFERS_FROM_EXPORTER_REFERENCE'
         rows.append(row)
+    differing = [r for r in rows if r['reconstruction'] == 'DIFFERS_FROM_EXPORTER_REFERENCE']
+    # An authentic package can still carry a wrong preparation reference: the pin covers the bytes, not the
+    # exporter's claim. A mismatch is a stop for every caller, Python API and CLI alike.
+    check(not differing, 'HANDOFF_PREPARED_RECONSTRUCTION_MISMATCH',
+          'The package is authentic, but a variant prepared here from its authenticated source differs from the '
+          "exporter's recorded preparation. Do not rely on the exporter's reference. The session stays imported with "
+          'the local preparation; ask the exporter to re-export, or check that both installations run the same SDK.',
+          dict(sessionId=session.id, manifestSha256=parts['manifestSha256'], sessionImported=True,
+               localPreparationRetained=True,
+               variants=[{k: r[k] for k in ('variantId', 'descriptor', 'exporterPreparation', 'localPreparation')}
+                         for r in differing]))
     report = dict(status='SESSION_HANDOFF_IMPORTED', packageIntegrity='MATCHES_EXTERNAL_MANIFEST_PIN',
                   manifestSha256=parts['manifestSha256'], mode=COMPLETE, sessionId=session.id,
                   existingSessionReused=reused, checkpoint=header['checkpoint'], checkpointTrust=header['checkpointTrust'],
                   source=header['source'], variants=rows,
-                  preparedReconstruction=('NOT_REQUESTED' if not prepare else 'DIFFERS_FROM_EXPORTER_REFERENCE' if mismatched
-                                          else 'LOCALLY_PREPARED'),
+                  preparedReconstruction='LOCALLY_PREPARED' if prepare else 'NOT_REQUESTED',
                   assurance=parts['manifest']['assurance'], importedRecords=dict(verifications=0, preparedDirectories=0),
                   nativeExecutions=0, networkRequests=0,
                   nextStep=('Evaluate static coverage with session-coverage (needs Node.js and the pinned adapter '

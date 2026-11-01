@@ -82,9 +82,17 @@ added one by one, each in one rename: if the process dies part-way, no import re
 session holds only complete variants of the package, and running the same import again completes it. A
 metadata-only package is refused with `HANDOFF_SOURCE_NOT_INCLUDED`.
 
-With `--prepare` (or by calling `prepare_variant`), each variant is prepared locally and compared with the
-exporter's reference: `MATCHES_EXPORTER_REFERENCE`, `NO_EXPORTER_REFERENCE` or
-`DIFFERS_FROM_EXPORTER_REFERENCE` (exit code 1). The importer never copies a prepared result.
+With `--prepare` (Python: `prepare=True`), each variant is prepared locally with `ExecutionSDK.prepare` and
+compared with the exporter's reference: `MATCHES_EXPORTER_REFERENCE` or `NO_EXPORTER_REFERENCE`. The external
+pin covers the package bytes, not the correctness of the exporter's reference, so a difference stops the
+import with `HANDOFF_PREPARED_RECONSTRUCTION_MISMATCH`: the Python API raises `SessionError` instead of
+returning a session, and the CLI exits 1. Its details name each differing variant with both preparations.
+The session stays imported with the local preparation, which is the one derived from the authenticated
+source. The importer never copies a prepared result.
+
+Without `--prepare`, each variant row reports `reconstruction: NOT_REQUESTED` and the exporter's reference
+only as `exporterPreparation`. References are never stored in the imported session: its variants are
+`CONFIGURED` until you prepare them, and a later `prepare_variant` is a fresh local preparation.
 
 ## What an import establishes
 
