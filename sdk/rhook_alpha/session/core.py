@@ -87,10 +87,13 @@ class CounterfactualSession:
             source=dict(sha256=info['sha256'], bytes=info['bytes'], scenarioCommitment=info['scenarioCommitment']),
             common=info['common'], baseline=info['baseline'], limits=dict(maxVariants=MAX_VARIANTS),
             limitations=dict(LIMITATIONS))
-        body['sessionId'] = commit(SCHEMA, dict(profile=body['profile'], adapter=body['adapter'],
-                                                checkpoint=body['checkpoint'], source=body['source'],
-                                                common=body['common'], baseline=body['baseline']))
+        body['sessionId'] = cls._session_id(body)
         return _sealed(SCHEMA, body, 'headerCommitment')
+
+    @staticmethod
+    def _session_id(body):
+        return commit(SCHEMA, dict(profile=body['profile'], adapter=body['adapter'], checkpoint=body['checkpoint'],
+                                   source=body['source'], common=body['common'], baseline=body['baseline']))
 
     @classmethod
     def create(cls, home, adapter, *, source, expected_sha256, checkpoint):
@@ -351,6 +354,11 @@ class CounterfactualSession:
                     meaning='Each row is one independent BASELINE/VARIANT pair from the same checkpoint and common action.')
 
     # ----- inspection and export ----------------------------------------------------------------
+
+    def export_handoff(self, output, *, include_source=False):
+        """Write a handoff package (handoff.py). The pinned source is included only with include_source=True."""
+        from . import handoff
+        return handoff.export(self, output, include_source=include_source)
 
     def _variant_status(self, record, coverage):
         view = self._variant_view(record)

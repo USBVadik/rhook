@@ -27,6 +27,10 @@ def main(argv=None):
     for command in ('session-inspect','session-coverage','session-export','session-compare'):
         p=sub.add_parser(command);p.add_argument('--session',required=True)
     p=sub.add_parser('session-prepare',help='Prepare one variant through ExecutionSDK; no native run');p.add_argument('--session',required=True);p.add_argument('--variant',required=True)
+    # Session Handoff 0.1: same validation as the Python API; a package is data, not authorization.
+    p=sub.add_parser('session-handoff-export',help='Write a handoff package; source material only with --include-source');p.add_argument('--session',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--include-source',action='store_true')
+    p=sub.add_parser('session-handoff-inspect',help='Read-only package check; authenticated only with --manifest-sha256');p.add_argument('--package',type=Path,required=True);p.add_argument('--manifest-sha256')
+    p=sub.add_parser('session-handoff-import',help='Rebuild a session from a complete pinned package; offline');p.add_argument('--package',type=Path,required=True);p.add_argument('--manifest-sha256',required=True);p.add_argument('--prepare',action='store_true')
     for command in ('scenario-evidence-inspect', 'scenario-evidence-verify', 'scenario-evidence-compare'):
         p = sub.add_parser(command, help='Worker-free pinned recorded-evidence inspection')
         p.add_argument('--bundle', type=Path, required=True)
@@ -173,6 +177,12 @@ def main(argv=None):
             elif args.command=='execution-run':value=executor.run(args.prepared,operation=args.operation,evidence=args.evidence,local_owner=args.local_owner,mac_ready=args.mac_ready,host_profile=args.host_admission)
             elif args.command=='execution-verify':value=executor.verify(args.run)
             else:value=executor.compare(args.run)
+        elif args.command.startswith('session-handoff-'):
+            from ..session import handoff
+            executor=ExecutionSDK(args.home)
+            if args.command=='session-handoff-export':value=executor.open_session(args.session).export_handoff(args.output,include_source=args.include_source)
+            elif args.command=='session-handoff-inspect':value=executor.inspect_session_handoff(args.package,expected_manifest_sha256=args.manifest_sha256)
+            else:value=handoff.import_package(executor.home,args.package,args.manifest_sha256,prepare=args.prepare)[1]
         elif args.command.startswith('session-'):
             executor=ExecutionSDK(args.home)
             from developer.files import load
@@ -297,10 +307,13 @@ def main(argv=None):
     if args.command.startswith('session-'):
         # Missing static state and unverified comparisons are honest results, but not readiness.
         ok=value.get('status') in {'SESSION_INSPECTED','VARIANT_REGISTERED','VARIANT_PREPARED','SESSION_EXPORTED',
-                                   'STATIC_DEPENDENCIES_COVERED','VERIFIED_VARIANTS_COMPARED'}
+                                   'STATIC_DEPENDENCIES_COVERED','VERIFIED_VARIANTS_COMPARED',
+                                   'SESSION_HANDOFF_EXPORTED','HANDOFF_AUTHENTICATED','SESSION_HANDOFF_IMPORTED'}
         if args.command=='session-coverage':
             # Covered trie paths are not readiness: the profile preconditions must also be satisfied.
             ok=ok and type(value.get('preconditions')) is dict and value['preconditions'].get('status')=='SATISFIED'
+        if args.command=='session-handoff-import':
+            ok=ok and value.get('preparedReconstruction')!='DIFFERS_FROM_EXPORTER_REFERENCE'
         return 0 if ok else 1
     if args.command == 'scenario-diagnostic-prepare' and value.get('schema') == 'rhook/scenario-result-diagnostic/0.1':
         return 0

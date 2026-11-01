@@ -217,7 +217,7 @@
     "rhook_alpha/__init__.py": "8f6a7fe0a480866057f9672232edc808997c322b75ce287707444e6d7d5389fe",
     "rhook_alpha/api.py": "1e38c1e91dde3807ada30987da6b7dea71e2309edbbbd5c846eab49638721f05",
     "rhook_alpha/cases/__init__.py": "e018c912fbca7afd96f309a163bf86b72e669158cb902a37dd0d2186d7472902",
-    "rhook_alpha/cases/__main__.py": "123bdd76840bd4929a706bb2054fe63a2aedce9a1fa59e31946c2d94c619c5fe",
+    "rhook_alpha/cases/__main__.py": "73bc28c820de39333533622ee64d165dcceb7666a67651f4b342380d6ef20437",
     "rhook_alpha/cases/adapters.py": "07241650ee86c648405a0eab650647b6c24f19af7c6c30bb15343e437ce05cf6",
     "rhook_alpha/cases/adapters/code.mjs": "145304b5428fab021f5d9386f22c55324c9494d7f5f91df2c750e68a37a277dc",
     "rhook_alpha/cases/adapters/hookr.mjs": "29705622872e2748b4f67392684b48fb767f4297f7890d30d19ee32526ab1d43",
@@ -319,17 +319,18 @@
     "rhook_alpha/cli.py": "6f426c9e534a130ee33f307107c9e641b1ba0e34da520336e8708cac6d45ff16",
     "rhook_alpha/consent.py": "43ab18bd01dc7eb99bfbae5628c2dd6c70f2076e48c324be8eece6f75f481cf6",
     "rhook_alpha/dynamic_fee.py": "78cb31316dc0087db970835488531fd57ebc79c1a56a7cbb8673171663f36f0a",
-    "rhook_alpha/execution.py": "23efd9dfc252438accb2db7db92cd9fb437c0f8b31919d598cd60d4059736955",
+    "rhook_alpha/execution.py": "ad1ae0967378dbce42bc819d0e748ed75f6b3d5c101974de28d3f3cb437f91dc",
     "rhook_alpha/install.py": "64e0026d242c5b0fc1f2191c42e53493314ed75f418d24bf82526f25b949ea88",
     "rhook_alpha/intervention-state.mjs": "808c11474349d864f4c5e18a9959aefcf148aab2e522927642adb95597dac77a",
     "rhook_alpha/interventions.py": "a9aab80838918db59a4ae1e8a395ea64c7b1957bfea6e50d3e401974ea3f8a11",
     "rhook_alpha/runtime.py": "6e7f673251d021976340eb2adadd2a41d27cd79dd1c69812a5e1972e9161144e",
     "rhook_alpha/session/__init__.py": "cb1626ea9baa9ad05783e5a9c23117c6ac7a04ed8cfcc69b7f174a14729c99cd",
-    "rhook_alpha/session/core.py": "b79550810cc642ebc1227ebea58c56a9aea5536ae8a56ae65c5c5e6597fee475",
+    "rhook_alpha/session/core.py": "3146c15ca431eeb228a4e0e06fbc4fa53dab395d6d772ebd008f692f163677be",
     "rhook_alpha/session/coverage.mjs": "3fb0bbd88159abf130854350bb252504da8c1f881b48f49e68762fb876e2483f",
     "rhook_alpha/session/hookr-coverage-main.mjs": "490215038b5a04957a04d0044d2015d0df29a5f25ac8fedb25b9b12b740782b6",
     "rhook_alpha/session/hookr-plan.mjs": "37e937ab619043a46f55656f9fc2cbc5d365e2b23e6206483afbbda5e42ae255",
-    "rhook_alpha/session/hookr.py": "7ba8b5ea0b66e74ed8aba7d327a387d674200cea039c5246a84485493e2bbf6b"
+    "rhook_alpha/session/hookr.py": "7ba8b5ea0b66e74ed8aba7d327a387d674200cea039c5246a84485493e2bbf6b",
+    "rhook_alpha/session/handoff.py": "a55346ec28ab0ddb551614b14285f134e604b6cc99e2de3022b80873baab5961"
   },
   "nativeAssetsIncluded": false,
   "roots": [
@@ -339,9 +340,9 @@
   ],
   "schema": "rhook/case-install-source/0.1",
   "sourceChanges": {
-    "rhook_alpha/cases/__main__.py": "Add offline session-* commands; existing commands unchanged.",
+    "rhook_alpha/cases/__main__.py": "Add offline session-* and session-handoff-* commands; existing commands unchanged.",
     "rhook_alpha/cases/native.py": "Explicit missing-runtime setup error; no execution or admission change.",
     "rhook_alpha/cases/scenario/closure.py": "Installed CLI entry to existing owned workflow; inner acquisition/producer/guards unchanged.",
-    "rhook_alpha/execution.py": "Add create_session/open_session entry points to the existing offline facade."
+    "rhook_alpha/execution.py": "Add create_session/open_session and session handoff inspect/import entry points to the existing offline facade."
   }
 }

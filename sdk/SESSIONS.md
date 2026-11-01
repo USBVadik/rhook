@@ -150,6 +150,9 @@ HOME/sessions/<sessionId>/
 
 Every file is created exclusively. Nothing is overwritten; a second verification of a variant is refused.
 
+To move a session to another installation, export a [handoff package](HANDOFF.md) and import it there with
+its manifest SHA-256. An imported session uses this same storage.
+
 ## Limits
 
 One profile (`hookr-buy/0.1`), the fixed 0.001 ETH action, `lpBps` replacements 0 to 99 against LP100, and at
