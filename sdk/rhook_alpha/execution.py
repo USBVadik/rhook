@@ -198,6 +198,54 @@ class ExecutionSDK:
         from .session import open_session
         return open_session(self.home, session_id, profile=profile)
 
+    def plan_lp_variant(self, lp_bps, *, session_id=None, source=None, expected_sha256=None, checkpoint=None, node=None):
+        """Parameterized LP Rewards plan: session (reused or created once), variant, static coverage and
+        preparation for one lpBps 0-99. Offline; binds no operation and runs nothing native."""
+        from .session.plan import plan_lp_variant
+        return plan_lp_variant(self, lp_bps, session_id=session_id, source=source, expected_sha256=expected_sha256,
+                               checkpoint=checkpoint, node=node)
+
+    def plan_dynamic_fee_variant(self, value='OFF', *, session_id=None, source=None, expected_sha256=None, checkpoint=None, node=None):
+        """Dynamic Fee OFF plan in the same session: static coverage, read-only MPT authentication of the
+        original Root/Rules targets and preparation for the reviewed derivative worker. Offline; no binding."""
+        from .session.plan import plan_dynamic_fee_variant
+        return plan_dynamic_fee_variant(self, value, session_id=session_id, source=source, expected_sha256=expected_sha256,
+                                        checkpoint=checkpoint, node=node)
+
+    def plan_config_overlay_variant(self, *, lp_bps=None, dynamic_fee=None, session_id=None, source=None, expected_sha256=None, checkpoint=None, node=None):
+        """SDK 0.4 plan of one canonical typed set (lpBps 0-99 and/or Dynamic Fee OFF) for the parameterized
+        config-overlay worker, in the same session: static coverage, read-only MPT authentication of the original
+        Root/Rules targets and preparation of the derived masked overlay. Offline; no binding."""
+        from .session.plan import plan_config_overlay_variant
+        return plan_config_overlay_variant(self, lp_bps=lp_bps, dynamic_fee=dynamic_fee, session_id=session_id, source=source,
+                                           expected_sha256=expected_sha256, checkpoint=checkpoint, node=node)
+
+    def doctor(self):
+        """Read-only check that this machine can run the native supervisor: platform, /bin/ps telemetry of an
+        owned child, power and lid; registration is reported. No worker, sensor, consent or network."""
+        from .session.workflow import doctor
+        return doctor(self)
+
+    def ready_lp_variant(self, session_id, *, variant_id=None, lp_bps=None, dynamic_fee=None, runtime=None, sensor=None):
+        """Stage B for one planned variant (LP Rewards or Dynamic Fee OFF): registration (once), input
+        authentication and the exact operationCommitment, with the doctor report. Runs worker checks, no EVM;
+        creates no consent. A Dynamic Fee variant registers and binds in its derivative's own SDK home."""
+        from .session.workflow import ready
+        return ready(self, session_id, variant_id=variant_id, lp_bps=lp_bps, dynamic_fee=dynamic_fee, runtime=runtime, sensor=sensor)
+
+    def run_lp_variant(self, session_id, *, operation, local_owner=False, mac_ready=False, variant_id=None, lp_bps=None,
+                       dynamic_fee=None, evidence=None):
+        """Doctor first (nothing consumed when it fails), then one unchanged run() of the exact operation, then
+        verify() and session.verify_selected(). Never retried."""
+        from .session.workflow import run
+        return run(self, session_id, operation=operation, local_owner=local_owner, mac_ready=mac_ready,
+                   variant_id=variant_id, lp_bps=lp_bps, dynamic_fee=dynamic_fee, evidence=evidence)
+
+    def lp_variant_result(self, session_id, *, variant_id=None, lp_bps=None, dynamic_fee=None):
+        """One read-only view of a verified variant: both worlds, difference, commitments and assurance."""
+        from .session.workflow import result
+        return result(self, session_id, variant_id=variant_id, lp_bps=lp_bps, dynamic_fee=dynamic_fee)
+
     def inspect_session_handoff(self, package, *, expected_manifest_sha256=None):
         """Read-only check of a session handoff package; authenticated only with the external manifest pin."""
         from .session import handoff

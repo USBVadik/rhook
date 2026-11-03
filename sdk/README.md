@@ -26,6 +26,13 @@ The tests use synthetic inputs and mocked native dispatch. They start no worker,
 sensor or network client, and need no private runtime bundle or provider account.
 A passing test suite is not a new EVM replay.
 
+To inspect and plan with the reviewed **profile descriptor** (SDK 0.6 Developer Preview), run
+`python3 -B sdk/examples/profile_descriptor_preview.py catalogue`, then `inspect` and `plan`; the
+[quickstart](QUICKSTART.md#profile-descriptor-developer-preview-sdk-06) walks through it. It prints the storage
+writes and commitments of an intervention set offline, and the commitments of the G5 configurations equal those of
+their native runs. The [specification](PROFILE_DESCRIPTOR_SPEC.md) describes the format, the catalogue review and
+the native gates; the [G5 case study](../docs/research/sdk06-g5-descriptor-parity.md) the native results.
+
 To check a recorded ACTUAL/BRANCH result offline without the witness or a worker,
 use [verify-pack](verify-pack/README.md). It anchors ACTUAL to a block hash you
 supply and reports BRANCH as an RHOOK engine record, not a re-executed result.
@@ -74,6 +81,7 @@ runtime release. `qualifiedClaims=0`; `nativeRecorderCoverage=UNKNOWN`.
 | Public clone | SDK/API source, adapter and offline tests. No self-contained native Pair03 replay. |
 | Private developer pilot | Install → inspect → plan → local consent → replay → verify → compare passed locally on 25 October 2026. Recipient handoff is prepared, not sent. |
 | Installed on-demand Scenario SDK | One local installed CLI completed fresh acquisition → discovery2 → witness freeze → offline2 → verify/compare on 30 October 2026. Worker/witness remain private; arbitrary amounts/pools are unsupported. |
+| Profile descriptors (SDK 0.6) | Public clone: catalogue, inspection, offline planning with writes and commitments, validation. Native: the reviewed descriptor worker completed LP23/DF ON, LP100/DF OFF and LP23/DF OFF on 3 November 2026 with full parity against SDK 0.4; worker and witness remain private. |
 | Independent developer reproduction | Not yet performed. This is the next milestone. |
 
 The [quickstart](QUICKSTART.md) keeps private-pilot instructions separate from

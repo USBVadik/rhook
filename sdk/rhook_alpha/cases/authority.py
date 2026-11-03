@@ -10,16 +10,20 @@ def directory(root, binding):
     require(type(ref) is str and re.fullmatch('c-[0-9a-f]{32}', ref), 'PLAN_ID')
     return no_links(root) / ref
 
-def issue(root, binding, key, *, now=None):
+def issue(root, binding, key, *, now=None, not_after=None):
+    """not_after (optional, SDK 0.6 profile overlay): the grant expires no later than this Unix time, which must
+    leave at least the 180 s consume() requires. Omitted: the unchanged 600 s grant."""
     require(type(key) is bytes and len(key) == 32, 'CONSENT_KEY')
     now = int(time.time()) if now is None else now
     require(type(now) is int, 'CONSENT_TIME')
+    require(not_after is None or (type(not_after) is int and not_after - now >= 180), 'CONSENT_AUTHORIZATION_WINDOW')
     d = directory(root, binding)
     d.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     sync(d.parent.parent)
     d.mkdir(mode=0o700)
     sync(d.parent)
-    body = {'schema': 'rhook/case-consent/0.1', 'binding': binding, 'notBeforeUnix': now, 'expiresUnix': now + 600, 'localOwnerConfirmed': True, 'noRetry': True}
+    expires = now + 600 if not_after is None else min(now + 600, not_after)
+    body = {'schema': 'rhook/case-consent/0.1', 'binding': binding, 'notBeforeUnix': now, 'expiresUnix': expires, 'localOwnerConfirmed': True, 'noRetry': True}
     save(d / 'GRANT.json', {'body': body, 'hmacSha256': hmac.digest(key, canonical(body), 'sha256').hex()})
     (d / 'GRANT.json').chmod(0o600)
     return d / 'GRANT.json'

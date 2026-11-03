@@ -15,7 +15,7 @@ worker, or with an independent engine, tests that.
 
 ## Quick start with the synthetic example
 
-Requires Node.js 22 or newer (CI runs these tests on Node 24) and npm. From the repository root:
+Requires Node.js 24 or newer, the minimum the adapter declares (CI runs these tests on Node 24), and npm. From the repository root:
 
 ```sh
 npm ci --ignore-scripts --no-audit --no-fund --prefix sdk/engine/adapters/hookr-case

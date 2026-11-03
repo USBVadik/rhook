@@ -19,6 +19,16 @@ Its source commitment is
 It preserves the case and v2 policy while using its own artifact registration.
 See the [case study](../docs/research/hookr-pair03-100-to-50.md).
 
+## SDK 0.6 descriptor worker
+
+The descriptor-driven worker (`nitro-hook-profile-overlay/0.1`) that ran the
+[G5 configurations](../docs/research/sdk06-g5-descriptor-parity.md) is not distributed. Its reviewed identity is
+public in `rhook_alpha/profile_descriptor.py` (`PROFILE_ENGINE_RECORD`): source commitment
+`4db4269aad9e28970eb3b13508366771c12827aa8fc5687399e28ff418251546`, binary
+`a56db9e53a13331e21c8e45fbb20632a7bc13ef12c864afedf4169a90b35ae04`, policy
+`792b13a533f79d8d66ade565a5ad41cdb45bd1da4684e06dcdc1825c1a04abc6`. The same conditions as below apply to it.
+Neither the SDK 0.4 input with its witness for block 101935336 nor any G5 run record is published.
+
 ## Existing public-source registration
 
 `developer/artifacts.json` and `source-provenance.json` still describe the earlier

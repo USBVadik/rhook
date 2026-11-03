@@ -21,6 +21,9 @@ def prepare(sdk, ref, scenario, output):
     pin = body.pop('scenarioCommitment')
     require(pin == digest(b'rhook/hookr-scenario/0.1\n' + canonical(body)), 'DIAGNOSTIC_INPUT_COMMITMENT')
     r = api.runtime(sdk)
+    # The diagnostic is defined for the LP scenario worker only; another registered runtime (e.g. the
+    # descriptor worker, whose native runs need a per-operation owner authorization) is refused here.
+    require(plan['profile'] == api.PROFILE and r['profile'] == api.PROFILE, 'DIAGNOSTIC_LP_RUNTIME_REQUIRED')
     host = api.select_host(sdk, host_v3.PROFILE)
     b = dict(schema=PROFILE, profile=api.PROFILE, planId=plan['planId'], diagnosticProfile=PROFILE,
              diagnosticOf=pin, maximumProducerEntries=1, maximumInvocations={'SCENARIO_BASELINE': 1, 'SCENARIO_VARIANT': 0},

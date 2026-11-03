@@ -92,6 +92,8 @@ def prepare(sdk, ref, output):
     plan = api.describe(sdk, ref)
     require(plan.get('assumptions',{}).get('gas')==10000000,'STALE_SCENARIO_PLAN_GAS')
     r = api.runtime(sdk)
+    # Closure is defined for the LP scenario worker only; other registered runtimes are refused here.
+    require(plan['profile'] == api.PROFILE and r['profile'] == api.PROFILE, 'CLOSURE_LP_RUNTIME_REQUIRED')
     host = api.select_host(sdk, host_v3.PROFILE)
     output = no_links(output)
     require(len(str(output / 'broker.sock').encode()) <= 103, 'SHORT_PRIVATE_SOCKET_PATH_REQUIRED')

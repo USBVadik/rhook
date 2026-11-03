@@ -15,7 +15,13 @@ sys.path.insert(0,str(SDK))
 from developer.files import canonical,digest,no_links,require,save,sha
 
 
-def build(retained,output,sensor,node):
+LP_PROFILE='nitro-hookr-scenario/0.1'
+# Profiles a separately identified derivative may be linked as; the LP worker keeps its unflagged build.
+LINKED_PROFILES=(LP_PROFILE,'nitro-hookr-dynamic-fee-off/0.1','nitro-hookr-config-overlay/0.1','nitro-hook-profile-overlay/0.1')
+
+
+def build(retained,output,sensor,node,profile=LP_PROFILE,gocache=None):
+    require(profile in LINKED_PROFILES,'UNSUPPORTED_LINKED_PROFILE')
     retained=no_links(retained);output=no_links(output)
     require(not output.exists() and not output.is_relative_to(SDK),'FRESH_EXTERNAL_BUILD_REQUIRED')
     output.mkdir(mode=0o700)
@@ -25,6 +31,8 @@ def build(retained,output,sensor,node):
     for p in sources.iterdir():
         if p.suffix=='.go' or p.name=='profile.json':
             shutil.copyfile(p,(output/'prestate' if p.name=='scenario_setup.go' else module)/p.name)
+    # SDK 0.6: the reviewed descriptors and their catalogue are embedded compiler inputs of every scenario worker.
+    if (sources/'descriptors').is_dir():shutil.copytree(sources/'descriptors',module/'descriptors')
     (module/'cmd').mkdir()
     (module/'cmd/main.go').write_text('package main\nimport("fmt";"os";scenario "local/rhook-scenario")\nvar sourceCommitment,policyCommitment string\nfunc main(){if e:=scenario.WorkerEntry(sourceCommitment,policyCommitment,os.Args[1:]);e!=nil{fmt.Fprintln(os.Stderr,e);os.Exit(1)}}\n')
     for folder,original,name in [(output/'prestate',retained/'application/prestate','local/rhook-robinhood'),(module,retained/'application/worker','local/rhook-scenario')]:
@@ -34,10 +42,12 @@ def build(retained,output,sensor,node):
         (folder/'go.mod').write_text(text);shutil.copyfile(original/'go.sum',folder/'go.sum')
     files={str(p.relative_to(output)):sha(p) for folder in ['prestate','scenario'] for p in sorted((output/folder).rglob('*')) if p.is_file()}
     identity=digest(canonical(files));policy=sha(SDK/'rhook_alpha/cases/scenario/policy.json');go=retained/'go/bin/go'
-    env={'PATH':str(go.parent)+':/usr/bin:/bin:/usr/sbin:/sbin','HOME':str(output),'GOENV':'off','GOWORK':'off','GOTOOLCHAIN':'local','GOPROXY':'off','GOSUMDB':'off','GOMODCACHE':str(retained/'go-mod'),'GOCACHE':str(retained/'go-cache-clean'),'GOMAXPROCS':'2','GOMEMLIMIT':'536870912','CGO_ENABLED':'1','CGO_LDFLAGS':'-Wl,-no_warn_duplicate_libraries','LANG':'C','TZ':'UTC'}
+    cache=no_links(gocache) if gocache is not None else retained/'go-cache-clean'
+    env={'PATH':str(go.parent)+':/usr/bin:/bin:/usr/sbin:/sbin','HOME':str(output),'GOENV':'off','GOWORK':'off','GOTOOLCHAIN':'local','GOPROXY':'off','GOSUMDB':'off','GOMODCACHE':str(retained/'go-mod'),'GOCACHE':str(cache),'GOMAXPROCS':'2','GOMEMLIMIT':'536870912','CGO_ENABLED':'1','CGO_LDFLAGS':'-Wl,-no_warn_duplicate_libraries','LANG':'C','TZ':'UTC'}
     def caps():
         resource.setrlimit(resource.RLIMIT_CPU,(300,300));resource.setrlimit(resource.RLIMIT_FSIZE,(256<<20,256<<20));resource.setrlimit(resource.RLIMIT_CORE,(0,0))
     ld='-s -w -X main.sourceCommitment='+identity+' -X main.policyCommitment='+policy
+    if profile!=LP_PROFILE:ld+=' -X local/rhook-scenario.LinkedProfile='+profile
     for name,args in [('tests',['test','-mod=readonly','-count=1','-p','2','-v','.']),('graph',['list','-mod=readonly','-deps','-json','./cmd']),('build',['build','-mod=readonly','-trimpath','-p','2','-ldflags='+ld,'-o',str(output/'worker.bin'),'./cmd'])]:
         with (output/(name+'.log')).open('xb') as log:
             child=subprocess.Popen([str(go),*args],cwd=module,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True,preexec_fn=caps)
@@ -52,12 +62,16 @@ def build(retained,output,sensor,node):
         for key in ['GoFiles','CgoFiles','CFiles','CXXFiles','MFiles','HFiles','FFiles','SFiles','SysoFiles','EmbedFiles']:
             for name in row.get(key,[]):p=Path(row['Dir'])/name;compiled[str(p)]=sha(p)
     require(files=={str(p.relative_to(output)):sha(p) for folder in ['prestate','scenario'] for p in sorted((output/folder).rglob('*')) if p.is_file()},'BUILD_SOURCE_DRIFT')
-    save(output/'BUILD.json',{'schema':'rhook/scenario-worker-build/0.1','sourceCommitment':identity,'sourceFiles':files,'compiledFiles':compiled,'binarySha256':sha(output/'worker.bin'),'toolchainSha256':sha(go),'policySha256':policy,'nativeExecutions':0,'limitations':'Direct compiler inputs/embeds; indirect C/assembly include closure is not exhaustive'})
-    runtime={'schema':'rhook/scenario-runtime/0.1','profile':'nitro-hookr-scenario/0.1','sourceCommitment':identity,'policySha256':policy,'files':{name:{'path':str(no_links(path)),'sha256':sha(path)} for name,path in [('worker',output/'worker.bin'),('sensor',sensor),('node',node)]}}
+    record={'schema':'rhook/scenario-worker-build/0.1','sourceCommitment':identity,'sourceFiles':files,'compiledFiles':compiled,'binarySha256':sha(output/'worker.bin'),'toolchainSha256':sha(go),'policySha256':policy,'nativeExecutions':0,'limitations':'Direct compiler inputs/embeds; indirect C/assembly include closure is not exhaustive'}
+    if profile!=LP_PROFILE:record.update(profile=profile,ldflags=ld,goCache=str(cache))
+    save(output/'BUILD.json',record)
+    runtime={'schema':'rhook/scenario-runtime/0.1','profile':profile,'sourceCommitment':identity,'policySha256':policy,'files':{name:{'path':str(no_links(path)),'sha256':sha(path)} for name,path in [('worker',output/'worker.bin'),('sensor',sensor),('node',node)]}}
     save(output/'RUNTIME.json',runtime)
     return {'status':'BUILD_ONLY_PASS','sourceCommitment':identity,'binarySha256':sha(output/'worker.bin'),'runtime':str(output/'RUNTIME.json'),'nativeExecutions':0}
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ['retained','output','sensor','node']:parser.add_argument('--'+name,type=Path,required=True)
-    a=parser.parse_args();print(json.dumps(build(a.retained,a.output,a.sensor,a.node)))
+    parser.add_argument('--profile',choices=LINKED_PROFILES,default=LP_PROFILE,help='Linked runtime profile; the LP worker is built without a profile flag')
+    parser.add_argument('--gocache',type=Path,help='Build cache directory; a fresh one makes embedded paths depend only on this layout')
+    a=parser.parse_args();print(json.dumps(build(a.retained,a.output,a.sensor,a.node,a.profile,a.gocache)))

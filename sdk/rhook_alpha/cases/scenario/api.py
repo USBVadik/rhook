@@ -12,6 +12,26 @@ from .. import authority,native,forge
 PROFILE='nitro-hookr-scenario/0.1'
 DYNAMIC_PROFILE='nitro-hookr-dynamic-fee-off/0.1'
 DYNAMIC_DOMAIN='rhook/hookr-dynamic-fee-off/0.1'
+OVERLAY_PROFILE='nitro-hookr-config-overlay/0.1'
+OVERLAY_DOMAIN='rhook/hookr-config-overlay/0.1'
+# SDK 0.6: descriptor-driven overlays. An operation binding needs a descriptor the catalogue admits for
+# NATIVE_EXECUTION, kinds reviewed for it and the reviewed engine identity (profile_descriptor.native_operation_ref).
+# That identity authorizes nothing: run() also requires the owner's per-operation authorization record below.
+PROFILE_OVERLAY_PROFILE='nitro-hook-profile-overlay/0.1'
+PROFILE_OVERLAY_DOMAIN='rhook/hookr-profile-overlay/0.1'
+PROFILE_AUTHORIZATION_SCHEMA='rhook/profile-native-authorization/0.1'
+PROFILE_AUTHORIZATIONS='scenarios/profile-native-authorizations'
+PROFILE_HOST='macos-host-admission-v4'
+PROFILE_AUTHORIZATION_SECONDS=86400
+# Minimum remaining authorization lifetime when run() opens the attempt (a full 600 s grant plus 60 s), and in the
+# ProfileOverlayExecutionSDK launcher (advisory: it writes no marker; a later refusal by run() consumes nothing).
+# The consent grant of a profile-overlay operation never expires after the authorization (authority.issue not_after).
+PROFILE_RUN_MARGIN_SECONDS=660
+PROFILE_LAUNCH_MARGIN_SECONDS=900
+# Every runtime profile this backend binds, runs and verifies; each one is a separately pinned worker.
+PROFILES=(PROFILE,DYNAMIC_PROFILE,OVERLAY_PROFILE,PROFILE_OVERLAY_PROFILE)
+DOMAINS={PROFILE:'rhook/hookr-scenario/0.1',DYNAMIC_PROFILE:DYNAMIC_DOMAIN,OVERLAY_PROFILE:OVERLAY_DOMAIN,PROFILE_OVERLAY_PROFILE:PROFILE_OVERLAY_DOMAIN}
+_DEFAULT_LP_BPS=object()
 HERE=Path(__file__).resolve().parent
 POLICY_SHA=sha(HERE/'policy.json')
 
@@ -34,9 +54,25 @@ def select_pool(pool_id=None):
             'profile':PROFILE,'amountInWei':'1000000000000000','mode':'HYPOTHETICAL_NOT_HISTORICAL_REPLAY'}
 
 
-def configure(sdk,*,pool_id=None,lp_bps=50,profile=PROFILE):
+def configure(sdk,*,pool_id=None,lp_bps=_DEFAULT_LP_BPS,profile=PROFILE,interventions=None,descriptor=None):
     p=select_pool(pool_id)
-    require((profile==PROFILE and type(lp_bps) is int and 0<=lp_bps<=99) or (profile==DYNAMIC_PROFILE and type(lp_bps) is int and lp_bps==100),'LP_BPS_0_TO_99_REQUIRED')
+    require(descriptor is None or profile==PROFILE_OVERLAY_PROFILE,'DESCRIPTOR_ONLY_FOR_PROFILE_OVERLAY')
+    if profile==PROFILE_OVERLAY_PROFILE:
+        # The descriptor states every word; an LP value outside its intervention set is refused, not ignored.
+        from ...profile_descriptor import load_accepted,intent as profile_intent
+        require(lp_bps is _DEFAULT_LP_BPS and type(descriptor) is str and interventions is not None,'PROFILE_OVERLAY_DESCRIPTOR_AND_INTERVENTIONS_REQUIRED')
+        _,raw,_=load_accepted(descriptor,'OFFLINE_PREPARATION')
+        value=profile_intent(raw,p['poolId'],interventions)
+        require(value['interventions']==interventions,'PROFILE_CANONICAL_SET_REQUIRED')
+        return _save_plan(sdk,PROFILE_OVERLAY_PROFILE,value)
+    if lp_bps is _DEFAULT_LP_BPS:lp_bps=50
+    if profile==OVERLAY_PROFILE:
+        from ...config_overlay import canonical_interventions,intent as overlay_intent
+        require(interventions is not None and interventions==canonical_interventions(interventions),'CONFIG_OVERLAY_CANONICAL_SET_REQUIRED')
+        lp_bps=overlay_intent(p['poolId'],interventions)['lpBps']
+    else:require(interventions is None,'INTERVENTIONS_ONLY_FOR_CONFIG_OVERLAY')
+    require((profile==PROFILE and type(lp_bps) is int and 0<=lp_bps<=99) or (profile in (DYNAMIC_PROFILE,OVERLAY_PROFILE) and type(lp_bps) is int and 0<=lp_bps<=100),'LP_BPS_0_TO_99_REQUIRED')
+    require(profile!=DYNAMIC_PROFILE or lp_bps==100,'LP_BPS_0_TO_99_REQUIRED')
     sdk.registry._prepare();ref='c-'+secrets.token_hex(16)
     directory=sdk.home/'scenarios/plans'/ref;directory.mkdir(mode=0o700,parents=True);sync(directory.parent)
     value={'schema':'rhook/scenario-plan/0.1','planId':ref,'profile':PROFILE,'intent':{'schema':'rhook/on-demand-hookr-intent/0.1','poolId':p['poolId'],'lpBps':lp_bps},
@@ -44,6 +80,17 @@ def configure(sdk,*,pool_id=None,lp_bps=50,profile=PROFILE):
     if profile==DYNAMIC_PROFILE:
         from ...dynamic_fee import intent
         value.update(profile=profile,intent=intent(p['poolId']))
+    if profile==OVERLAY_PROFILE:
+        value.update(profile=profile,intent=overlay_intent(p['poolId'],interventions))
+    value['planCommitment']=digest(canonical(value));save(directory/'PLAN.json',value)
+    return dict(value,status='SCENARIO_PLANNED',executionAuthorized=False,results=None)
+
+
+def _save_plan(sdk,profile,intent):
+    sdk.registry._prepare();ref='c-'+secrets.token_hex(16)
+    directory=sdk.home/'scenarios/plans'/ref;directory.mkdir(mode=0o700,parents=True);sync(directory.parent)
+    value={'schema':'rhook/scenario-plan/0.1','planId':ref,'profile':profile,'intent':intent,
+           'assumptions':{'simulatedBuyWei':'1000000000000000','commonFundingMintWei':'1000000000000000000','caller':'PUBLIC_SIMULATION_SIGNER_NEVER_FUND_OR_BROADCAST','nonce':0,'gas':10000000,'syntheticL1BaseFeeWei':'1000000000','independentWorlds':True,'canonicalActualComparison':'NOT_APPLICABLE'}}
     value['planCommitment']=digest(canonical(value));save(directory/'PLAN.json',value)
     return dict(value,status='SCENARIO_PLANNED',executionAuthorized=False,results=None)
 
@@ -51,11 +98,17 @@ def configure(sdk,*,pool_id=None,lp_bps=50,profile=PROFILE):
 def describe(sdk,ref):
     require(type(ref) is str and re.fullmatch('c-[0-9a-f]{32}',ref),'SCENARIO_PLAN_ID')
     value=load(sdk.home/'scenarios/plans'/ref/'PLAN.json',65536);body=dict(value);pin=body.pop('planCommitment')
-    require(pin==digest(canonical(body)) and value['planId']==ref and value['profile'] in (PROFILE,DYNAMIC_PROFILE) and value['schema']=='rhook/scenario-plan/0.1','SCENARIO_PLAN_DRIFT')
+    require(pin==digest(canonical(body)) and value['planId']==ref and value['profile'] in PROFILES and value['schema']=='rhook/scenario-plan/0.1','SCENARIO_PLAN_DRIFT')
     select_pool(value['intent']['poolId'])
     if value['profile']==DYNAMIC_PROFILE:
         from ...dynamic_fee import intent
         require(value['intent']==intent(value['intent']['poolId']),'DYNAMIC_PLAN_INTENT')
+    elif value['profile']==OVERLAY_PROFILE:
+        from ...config_overlay import canonical_interventions,intent
+        items=value['intent']['interventions'];require(items==canonical_interventions(items) and value['intent']==intent(value['intent']['poolId'],items),'CONFIG_OVERLAY_PLAN_INTENT')
+    elif value['profile']==PROFILE_OVERLAY_PROFILE:
+        from ...profile_descriptor import load_for_intent
+        load_for_intent(value['intent'],'OFFLINE_PREPARATION')
     else:require(type(value['intent']['lpBps']) is int and 0<=value['intent']['lpBps']<=99,'LP_BPS_DOMAIN')
     return value
 
@@ -63,7 +116,7 @@ def describe(sdk,ref):
 def _identity(runtime):
     native.python_required()
     require(type(runtime) is dict and set(runtime)=={'schema','profile','sourceCommitment','policySha256','files'},'SCENARIO_RUNTIME_FIELDS')
-    require(runtime['schema']=='rhook/scenario-runtime/0.1' and runtime['profile'] in (PROFILE,DYNAMIC_PROFILE) and runtime['policySha256']==POLICY_SHA,'SCENARIO_RUNTIME_PROFILE')
+    require(runtime['schema']=='rhook/scenario-runtime/0.1' and runtime['profile'] in PROFILES and runtime['policySha256']==POLICY_SHA,'SCENARIO_RUNTIME_PROFILE')
     require(re.fullmatch('[0-9a-f]{64}',runtime['sourceCommitment']) and set(runtime['files'])=={'worker','node','sensor'},'SCENARIO_RUNTIME_ARTIFACTS')
     for row in runtime['files'].values():require(set(row)=={'path','sha256'} and sha(no_links(row['path']))==row['sha256'],'SCENARIO_RUNTIME_ARTIFACT_DRIFT')
     import tempfile
@@ -121,12 +174,21 @@ def _input(sdk,capture):
     plan=describe(sdk,v['planId']);require(v['planCommitment']==plan['planCommitment'] and sha(capture/'SCENARIO.json')==v['scenarioSha256'],'SCENARIO_CAPTURE_DRIFT')
     spec=load(capture/'SCENARIO.json',8<<20);body=dict(spec);pin=body.pop('scenarioCommitment')
     require(type(spec.get('actions')) is list and len(spec['actions'])==1,'ON_DEMAND_SINGLE_ACTION_REQUIRED')
-    domain=DYNAMIC_DOMAIN if plan['profile']==DYNAMIC_PROFILE else 'rhook/hookr-scenario/0.1'
+    domain=DOMAINS[plan['profile']]
     require(spec['schema']==domain and pin==digest((domain+'\n').encode()+canonical(body)) and pin==v['scenarioCommitment'],'SCENARIO_SPEC_COMMITMENT')
     if plan['profile']==DYNAMIC_PROFILE:
         from ...dynamic_fee import validate_spec
         validate_spec(spec)
-    require(spec['poolId']==plan['intent']['poolId'] and (int(spec['configurations']['variant'][0],16)>>160)&65535==plan['intent']['lpBps'],'SCENARIO_PLAN_LINK')
+    if plan['profile']==OVERLAY_PROFILE:
+        from ...config_overlay import validate_spec as validate_overlay
+        validate_overlay(spec);require(spec['configOverlay']['interventions']==plan['intent']['interventions'],'SCENARIO_PLAN_LINK')
+    if plan['profile']==PROFILE_OVERLAY_PROFILE:
+        # The plan names the descriptor and the interventions; the input must be exactly their derivation.
+        from ...profile_descriptor import load_for_intent,validate_input
+        _,raw,_=load_for_intent(plan['intent'],'OFFLINE_PREPARATION');validate_input(spec,raw)
+        require(spec['poolId']==plan['intent']['poolId'] and spec['profileOverlay']['interventions']==plan['intent']['interventions']
+                and spec['profileOverlay']['descriptor']['sha256']==plan['intent']['profile']['sha256'],'SCENARIO_PLAN_LINK')
+    else:require(spec['poolId']==plan['intent']['poolId'] and (int(spec['configurations']['variant'][0],16)>>160)&65535==plan['intent']['lpBps'],'SCENARIO_PLAN_LINK')
     require(spec['actions'][0].get('gas')==plan.get('assumptions',{}).get('gas'),'SCENARIO_PLAN_GAS_LINK')
     return capture,v,plan,spec
 
@@ -193,7 +255,7 @@ def prepare(sdk,capture,*,host_profile='v2'):
 
 def operation_binding(sdk,plan,v,r,host,*,host_profile='v2'):
     """Pure proposal identity, not runtime registration/admission or authority."""
-    require(plan['profile'] in (PROFILE,DYNAMIC_PROFILE) and r['profile']==plan['profile'],'SCENARIO_CAPTURE_RUNTIME_PROFILE')
+    require(plan['profile'] in PROFILES and r['profile']==plan['profile'],'SCENARIO_CAPTURE_RUNTIME_PROFILE')
     ref=plan['planId'];out=sdk.home/'scenarios/runs'/ref
     b={'schema':'rhook/scenario-operation/0.1','profile':plan['profile'],'planId':ref,'scenarioCommitment':v['scenarioCommitment'],'scenarioSha256':v['scenarioSha256'],
        'binarySha256':r['files']['worker']['sha256'],'sourceCommitment':r['sourceCommitment'],'policySha256':POLICY_SHA,'outputPath':str(out),'ownerUid':os.getuid(),'host':os.uname().nodename,
@@ -201,8 +263,101 @@ def operation_binding(sdk,plan,v,r,host,*,host_profile='v2'):
     if host_profile!='v2':
         from ..workflow import PROFILE as WORKFLOW_PROFILE
         b.update(hostAdmission=host,sdkFilesCommitment=host['sdkFilesCommitment'],workflowCaptureProfile=WORKFLOW_PROFILE)
+    if plan['profile']==PROFILE_OVERLAY_PROFILE:
+        # The worker refuses a profile operation without this exact descriptor binding (PROFILE_OPERATION_BINDING).
+        from ...profile_descriptor import native_operation_ref
+        # The engine is the identity this operation binds (source, binary, policy), compared exactly with the accepted one.
+        b['profileDescriptor']=native_operation_ref(plan['intent'],{'sourceSha256':b['sourceCommitment'],'binarySha256':b['binarySha256'],'policySha256':b['policySha256']})
     b['operationCommitment']=digest(b'rhook/scenario-operation/0.1\n'+canonical(b))
     return b
+
+
+# ----- profile-overlay native gate (SDK 0.6, G5) -------------------------------------------------
+# Three separate things: the G4B build verification (records outside the SDK), the reviewed engine identity
+# (profile_descriptor.PROFILE_ENGINE_RECORD; it makes an operation bindable) and the owner's authorization of
+# one exact operation (this record). Without the record no profile-overlay authority is issued. The record is
+# data in the SDK home, so authorizing a reviewed operation needs no code change (which would alter the SDK
+# files commitment inside every operation binding).
+
+def _profile_authorization_fields(b):
+    from ...profile_descriptor import PROFILE_ENGINE_RECORD
+    return {'schema':PROFILE_AUTHORIZATION_SCHEMA,'profile':PROFILE_OVERLAY_PROFILE,'operationCommitment':b['operationCommitment'],
+            'planId':b['planId'],'scenarioCommitment':b['scenarioCommitment'],'scenarioSha256':b['scenarioSha256'],
+            'engine':{'sourceSha256':b['sourceCommitment'],'binarySha256':b['binarySha256'],'policySha256':b['policySha256']},
+            'profileDescriptor':b['profileDescriptor'],'catalogueSha256':PROFILE_ENGINE_RECORD['catalogueSha256'],
+            'hostAdmissionProfile':PROFILE_HOST,'maximumRuns':1,'automaticRetry':False,'localOwnerConfirmed':True}
+
+
+def _profile_scope(b,host_profile):
+    require(b.get('profile')==PROFILE_OVERLAY_PROFILE and type(b.get('profileDescriptor')) is dict,'PROFILE_NATIVE_AUTHORIZATION_SCOPE')
+    require(host_profile==PROFILE_HOST and type(b.get('hostAdmission')) is dict and b['hostAdmission'].get('profile')==PROFILE_HOST,'PROFILE_NATIVE_HOST_V4_REQUIRED')
+
+
+def profile_authorization_path(sdk,b):
+    require(type(b.get('operationCommitment')) is str and re.fullmatch('[0-9a-f]{64}',b['operationCommitment']),'OPERATION_COMMITMENT_REQUIRED')
+    return sdk.home/PROFILE_AUTHORIZATIONS/(b['operationCommitment']+'.json')
+
+
+def require_profile_authorization(sdk,b,host_profile,*,now=None,remaining=PROFILE_RUN_MARGIN_SECONDS):
+    """Fail closed unless the owner authorized exactly this operation: a private record whose every field equals
+    the binding's and that stays valid for at least `remaining` more seconds. run() checks it before any worker
+    check, consent key or authority, and again under the operation lock immediately before authority; the margin
+    there exceeds the consent grant's lifetime, so the grant cannot outlive the authorization."""
+    _profile_scope(b,host_profile)
+    path=profile_authorization_path(sdk,b)
+    try:info=os.lstat(no_links(path))
+    except FileNotFoundError:
+        raise ValueError('PROFILE_NATIVE_AUTHORIZATION_REQUIRED: no owner authorization for operation '+b['operationCommitment']) from None
+    import stat
+    require(stat.S_ISREG(info.st_mode) and info.st_uid==os.getuid() and info.st_mode&0o077==0,'PROFILE_NATIVE_AUTHORIZATION_REQUIRED')
+    value=load(path,65536);expected=_profile_authorization_fields(b)
+    now=int(time.time()) if now is None else now
+    require(type(value) is dict and set(value)==set(expected)|{'notBeforeUnix','expiresUnix'}
+            and {k:value[k] for k in expected}==expected,'PROFILE_NATIVE_AUTHORIZATION_REQUIRED')
+    begin,end=value['notBeforeUnix'],value['expiresUnix']
+    require(type(now) is int and type(begin) is int and type(end) is int and type(remaining) is int and remaining>=0
+            and begin<=now<end and end-now>=remaining and 0<end-begin<=PROFILE_AUTHORIZATION_SECONDS,'PROFILE_NATIVE_AUTHORIZATION_EXPIRED')
+    return value
+
+
+def _open_profile_attempt(sdk,b,authorization):
+    """The one-shot attempt of a profile-overlay operation, opened by run() itself under the operation lock right
+    after the authoritative authorization check and before any host observation, consent or worker: an
+    authorization refusal never consumes the attempt, and everything after this marker closes the operation."""
+    attempts=sdk.home/'scenarios/execution-attempts';attempts.mkdir(mode=0o700,exist_ok=True);sync(attempts.parent)
+    marker=attempts/(b['operationCommitment']+'.json')
+    try:save(marker,{'operationCommitment':b['operationCommitment'],'status':'ATTEMPT_STARTED','openedBy':'cases.scenario.api.run','automaticRetry':False,
+                     'profileAuthorizationSha256':digest(canonical(authorization)),'profileAuthorizationExpiresUnix':authorization['expiresUnix']})
+    except FileExistsError:
+        raise ValueError('OPERATION_ALREADY_ATTEMPTED') from None
+    return marker
+
+
+def authorize_profile(sdk,capture,*,expected_operation,local_owner=False,now=None):
+    """The owner's authorization of one exact profile-overlay operation, written once. It runs the worker's
+    identity and input checks (no EVM) and creates no consent, attempt marker or run directory."""
+    require(local_owner is True,'EXPLICIT_LOCAL_OWNER_REQUIRED')
+    require(type(expected_operation) is str and re.fullmatch('[0-9a-f]{64}',expected_operation),'OPERATION_COMMITMENT_REQUIRED')
+    b=prepare(sdk,capture,host_profile=PROFILE_HOST)
+    _profile_scope(b,PROFILE_HOST)
+    require(expected_operation==b['operationCommitment'],'EXACT_PROFILE_OPERATION_REQUIRED')
+    checked=check(sdk,capture)
+    closed=[Path(b['outputPath']).exists(),(sdk.home/'scenarios/consents'/b['planId']).exists(),
+            (sdk.home/'scenarios/execution-attempts'/(expected_operation+'.json')).exists()]
+    require(not any(closed),'OPERATION_ALREADY_CLOSED_OR_STARTED')
+    now=int(time.time()) if now is None else now
+    value=dict(_profile_authorization_fields(b),notBeforeUnix=now,expiresUnix=now+PROFILE_AUTHORIZATION_SECONDS)
+    sdk.registry._prepare();directory=sdk.home/PROFILE_AUTHORIZATIONS
+    directory.mkdir(mode=0o700,parents=True,exist_ok=True);sync(directory.parent)
+    require(directory.stat().st_mode&0o077==0,'PRIVATE_AUTHORIZATION_DIRECTORY_REQUIRED')
+    path=profile_authorization_path(sdk,b)
+    try:save(path,value)
+    except FileExistsError:
+        raise ValueError('PROFILE_NATIVE_AUTHORIZATION_EXISTS') from None
+    path.chmod(0o600);sync(directory)
+    return {'status':'PROFILE_NATIVE_AUTHORIZATION_RECORDED','operationCommitment':expected_operation,'scenarioCommitment':b['scenarioCommitment'],
+            'authorization':str(path),'notBeforeUnix':value['notBeforeUnix'],'expiresUnix':value['expiresUnix'],'inputAuthentication':checked['status'],
+            'scope':'ONE_RUN_OF_THIS_OPERATION','consent':'NOT_CREATED','attemptMarker':'NOT_CREATED','nativeExecutions':0}
 
 
 def run(sdk,capture,*,local_owner=False,mac_ready=False,host_profile='v2',expected_operation=None):
@@ -215,11 +370,17 @@ def run(sdk,capture,*,local_owner=False,mac_ready=False,host_profile='v2',expect
     b=prepare(sdk,capture,host_profile=host_profile)
     if host_profile!='v2':require(expected_operation==b['operationCommitment'],'EXACT_V3_OPERATION_REQUIRED')
     elif expected_operation is not None:require(expected_operation==b['operationCommitment'],'EXACT_V2_OPERATION_REQUIRED')
+    profile_gate=b['profile']==PROFILE_OVERLAY_PROFILE
+    if profile_gate:require_profile_authorization(sdk,b,host_profile)
     capture,v,plan,spec=_input(sdk,capture);r=runtime(sdk);check(sdk,capture)
     out=Path(b['outputPath']);out.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
     key_path=sdk.home/'scenarios/.consent.key';require(key_path.stat().st_uid==os.getuid() and key_path.stat().st_mode&0o077==0,'PRIVATE_SCENARIO_KEY_REQUIRED');key=read(key_path,32);require(len(key)==32,'SCENARIO_KEY_SIZE')
     lock,supervise,cleanup,admission=native.guards();began=time.monotonic()
     with lock(sdk.home):
+        if profile_gate:
+            # Authoritative check, then the attempt marker, before anything else under the lock.
+            authorization=require_profile_authorization(sdk,b,host_profile)
+            _open_profile_attempt(sdk,b,authorization)
         from . import power
         preflight=sdk.home/'scenarios/preflight';preflight.mkdir(mode=0o700,exist_ok=True)
         power_dir=preflight/plan['planId'];power.observe(power_dir)
@@ -229,7 +390,11 @@ def run(sdk,capture,*,local_owner=False,mac_ready=False,host_profile='v2',expect
             host=host_profile_module(host_profile)[0]
             admission,supervise=host.admission,host.supervise
             r=dict(r,files=dict(r['files'],sensor=b['hostAdmission']['sensor']))
-        grant=authority.issue(sdk.home/'scenarios/consents',b,key)
+        if profile_gate:
+            # The same record, still valid; the grant cannot outlive it.
+            require(require_profile_authorization(sdk,b,host_profile,remaining=180)==authorization,'PROFILE_NATIVE_AUTHORIZATION_CHANGED')
+            grant=authority.issue(sdk.home/'scenarios/consents',b,key,not_after=authorization['expiresUnix'])
+        else:grant=authority.issue(sdk.home/'scenarios/consents',b,key)
         body=authority.consume(grant,sdk.home/'scenarios/consents',b,key)
         return _execute(sdk,capture,out,b,r,body,began,supervise,cleanup,admission,power_dir)
 
@@ -291,7 +456,7 @@ def verify(sdk,run):
     result=load(out/'RESULT.json',65536);require(result['status']=='SCENARIO_COMPLETED' and result['cleanupConfirmed'] is True,'COMPLETED_SCENARIO_REQUIRED')
     manifest=load(out/'MANIFEST.json',1<<20)['files']
     for name,pin in manifest.items():require(sha(out/name)==pin,'SCENARIO_RUN_INTEGRITY')
-    b=load(out/'BINDING.json',65536);require(b['profile'] in (PROFILE,DYNAMIC_PROFILE) and b['operationCommitment']==result['operationCommitment'] and b['scenarioSha256']==sha(out/'inputs/SCENARIO.json'),'SCENARIO_RUN_BINDING')
+    b=load(out/'BINDING.json',65536);require(b['profile'] in PROFILES and b['operationCommitment']==result['operationCommitment'] and b['scenarioSha256']==sha(out/'inputs/SCENARIO.json'),'SCENARIO_RUN_BINDING')
     body=dict(b);pin=body.pop('operationCommitment')
     require(pin==digest(b'rhook/scenario-operation/0.1\n'+canonical(body)),'SCENARIO_OPERATION_DRIFT')
     if 'hostAdmission' in b:
@@ -299,7 +464,7 @@ def verify(sdk,run):
                 and b['sdkFilesCommitment']==b['hostAdmission']['sdkFilesCommitment'],'SCENARIO_HOST_BINDING_DRIFT')
         require(sha(out/'artifacts/rhook-host-sensor')==b['hostAdmission']['sensor']['sha256'],'SCENARIO_HOST_SENSOR_DRIFT')
     spec=load(out/'inputs/SCENARIO.json',8<<20);registered=runtime(sdk)
-    domain=DYNAMIC_DOMAIN if b['profile']==DYNAMIC_PROFILE else 'rhook/hookr-scenario/0.1'
+    domain=DOMAINS[b['profile']]
     require(spec.get('schema')==domain and registered['profile']==b['profile'],'SCENARIO_VERIFICATION_PROFILE')
     checked=_helper(sdk,['--verify',out/'inputs/SCENARIO.json',out/'runtime/scenario/FINAL.json'],45)
     return dict(checked,runDirectory=str(out),scenarioCommitment=result['scenarioCommitment'],executionMode='HYPOTHETICAL_SCENARIO',canonicalActualComparison='NOT_APPLICABLE',hostAdmission=b.get('hostAdmission',{'profile':'v2'}))

@@ -8,6 +8,12 @@ from .interventions import DYNAMIC_OFF,describe,validate,_writes
 DOMAIN='rhook/hookr-dynamic-fee-off/0.1'
 PROFILE='nitro-hookr-dynamic-fee-off/0.1'
 KIND='AUTHENTICATED_CHECKPOINT_DYNAMIC_FEE_OFF'
+# Engine identity of the reviewed Dynamic Fee OFF derivative worker (size-fixed build accepted by the
+# Dynamic Fee native Run02). Preparation may bind it before registration; authentication, binding and
+# run still require a registered runtime with exactly this identity (SCENARIO_CAPTURE_RUNTIME_DRIFT).
+ACCEPTED_DERIVATIVE_ENGINE=dict(sourceSha256='7c5c5d3a53d16a04ac84ee591184ab69da82319f725c99053355523e251c893e',
+                                binarySha256='7b088aa53645d8d26f6422a17060345ca192700c7d0acff3ba3f210f42c05906',
+                                policySha256='792b13a533f79d8d66ade565a5ad41cdb45bd1da4684e06dcdc1825c1a04abc6')
 ROOT_ON='0x030101000000000000000bb84a71c270b1520f94064268102aebd744b0de7942'
 ROOT_OFF='0x020101000000000000000bb84a71c270b1520f94064268102aebd744b0de7942'
 
@@ -95,22 +101,31 @@ class DynamicFeeExecutionSDK(ExecutionSDK):
     value['missing'].append(dict(code='DYNAMIC_PREPARED_WITNESS_MISSING_OR_INVALID',nextStep='Use the prepared Dynamic Fee OFF input.'))
   value['staticDependenciesPresent']=not value['missing'];return value
 
- def prepare_intervention(self,descriptor,witness,*,expected_sha256,output,node=None,candidate_runtime=None):
+ def prepare_intervention(self,descriptor,witness,*,expected_sha256,output,node=None,candidate_runtime=None,engine=None):
+  """engine=ACCEPTED_DERIVATIVE_ENGINE prepares offline for that pinned derivative without running a worker."""
   from .cases.scenario import api
   d=validate(descriptor);check(d['kind']==DYNAMIC_OFF and d['sourceInputSha256']==expected_sha256,
         'INTERVENTION_SOURCE_PIN','Use the original pinned witness and Dynamic Fee descriptor.')
+  pinned=engine is not None
+  check(not pinned or (candidate_runtime is None and engine==ACCEPTED_DERIVATIVE_ENGINE),'DYNAMIC_DERIVATIVE_ENGINE_PIN',
+        'Offline preparation binds only the reviewed derivative engine identity; register any other runtime first.')
   fresh=self.plan_intervention(witness,expected_sha256=expected_sha256,kind=DYNAMIC_OFF,node=node)
   check(fresh['descriptor']==d,'INTERVENTION_PLAN_MISMATCH','Reauthenticate and preserve the complete saved plan.')
   raw,original=_input(witness,expected_sha256);sdk=self._sdk()
-  r=api.runtime(sdk) if candidate_runtime is None else api._identity(load(no_links(candidate_runtime),65536))
-  check(r['profile']==PROFILE,'DYNAMIC_DERIVATIVE_RUNTIME_REQUIRED','Register the separately pinned Dynamic Fee derivative in a fresh SDK home; accepted LP worker is incompatible.')
+  if engine is None:
+   r=api.runtime(sdk) if candidate_runtime is None else api._identity(load(no_links(candidate_runtime),65536))
+   check(r['profile']==PROFILE,'DYNAMIC_DERIVATIVE_RUNTIME_REQUIRED','Register the separately pinned Dynamic Fee derivative in a fresh SDK home; accepted LP worker is incompatible.')
   out=no_links(output);check(not out.exists(),'FRESH_PREPARED_OUTPUT_REQUIRED','Choose a fresh prepared directory.')
-  engine=dict(sourceSha256=r['sourceCommitment'],binarySha256=r['files']['worker']['sha256'],policySha256=r['policySha256'])
+  if engine is None:
+   engine=dict(sourceSha256=r['sourceCommitment'],binarySha256=r['files']['worker']['sha256'],policySha256=r['policySha256'])
+  else:
+   engine=dict(engine)
   spec=build_spec(original,d,engine)
   plan=api.configure(sdk,pool_id=spec['poolId'],lp_bps=100,profile=PROFILE)
   out.mkdir(mode=0o700,parents=True);sync(out.parent);save(out/'SCENARIO.json',spec);save(out/'INTERVENTION.json',d)
   save(out/'SDK_RESULT.json',dict(status='PREPARED_SCENARIO_INPUT',authentication='PENDING_NATIVE_ADMISSION',nativeExecutions=0,cleanupConfirmed=True,planId=plan['planId'],planCommitment=plan['planCommitment'],scenarioSha256=sha(out/'SCENARIO.json'),scenarioCommitment=spec['scenarioCommitment']))
-  result=dict(status='EXECUTION_PREPARED' if candidate_runtime is None else 'EXECUTION_CANDIDATE_PREPARED',runtimeRegistration='REGISTERED' if candidate_runtime is None else 'PENDING',schema=DOMAIN+'/prepared',profile=PROFILE,prepared=str(out),planId=plan['planId'],checkpoint=spec['checkpoint'],scenarioSha256=sha(out/'SCENARIO.json'),scenarioCommitment=spec['scenarioCommitment'],interventionCommitment=spec['intervention']['interventionCommitment'],descriptorCommitment=d['interventionCommitment'],sourceWitnessSha256=digest(raw),nativeRunDirectory=str(sdk.home/'scenarios/runs'/plan['planId']),authentication='PENDING_NATIVE_ADMISSION',witnessClosure='NOT_EVALUATED',nativeExecutions=0,executionAuthorized=False)
+  registered=candidate_runtime is None and not pinned
+  result=dict(status='EXECUTION_PREPARED' if registered else 'EXECUTION_CANDIDATE_PREPARED',runtimeRegistration='REGISTERED' if registered else 'PENDING',schema=DOMAIN+'/prepared',profile=PROFILE,prepared=str(out),planId=plan['planId'],checkpoint=spec['checkpoint'],scenarioSha256=sha(out/'SCENARIO.json'),scenarioCommitment=spec['scenarioCommitment'],interventionCommitment=spec['intervention']['interventionCommitment'],descriptorCommitment=d['interventionCommitment'],sourceWitnessSha256=digest(raw),nativeRunDirectory=str(sdk.home/'scenarios/runs'/plan['planId']),authentication='PENDING_NATIVE_ADMISSION',witnessClosure='NOT_EVALUATED',nativeExecutions=0,executionAuthorized=False)
   save(out/'PREPARATION.json',result);return result
 
  def _prepared(self,prepared):

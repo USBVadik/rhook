@@ -132,6 +132,15 @@ def validate(plan_value):
 
 def plan(prepared_input, *, expected_sha256, kind, lp_bps=None, node=None):
     """Read-only original-target MPT authentication + descriptor; no EVM/authority."""
+    raw,spec,projection=authenticated_projection(prepared_input,expected_sha256,node)
+    d=describe(spec,projection,kind=kind,source_sha256=digest(raw),lp_bps=lp_bps)
+    return dict(status='TARGET_FIELDS_MPT_AUTHENTICATED_PLAN_ONLY',descriptor=d,
+                authenticationScope='Original Root/Rules account paths, runtime code preimages and five target storage leaves only. Checkpoint trust is supplied, not consensus-verified.',
+                witnessClosure='UNKNOWN_FOR_NEW_INTERVENTION',nativeExecutions=0)
+
+
+def authenticated_projection(prepared_input, expected_sha256, node=None):
+    """Read-only MPT authentication of the original Root/Rules target leaves; kind-independent."""
     raw,spec=_input(prepared_input,_pin(expected_sha256));_validate_spec(spec,_profile())
     program=node or shutil.which('node')
     check(program is not None, 'INTERVENTION_AUTHENTICATOR_UNAVAILABLE', 'Install the pinned Node runtime and SDK proof dependencies.')
@@ -146,10 +155,7 @@ def plan(prepared_input, *, expected_sha256, kind, lp_bps=None, node=None):
         projection=strict(r.stdout)
     except (OSError,subprocess.TimeoutExpired) as error:
         raise ExecutionError('INTERVENTION_AUTHENTICATOR_UNAVAILABLE','Use the complete pinned Node/proof runtime; no native worker is needed.') from error
-    d=describe(spec,projection,kind=kind,source_sha256=digest(raw),lp_bps=lp_bps)
-    return dict(status='TARGET_FIELDS_MPT_AUTHENTICATED_PLAN_ONLY',descriptor=d,
-                authenticationScope='Original Root/Rules account paths, runtime code preimages and five target storage leaves only. Checkpoint trust is supplied, not consensus-verified.',
-                witnessClosure='UNKNOWN_FOR_NEW_INTERVENTION',nativeExecutions=0)
+    return raw,spec,projection
 
 
 def fixture_worlds(descriptor, state):
