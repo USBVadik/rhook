@@ -21,12 +21,38 @@ def main(argv=None):
     p=sub.add_parser('execution-run');p.add_argument('--prepared',type=Path,required=True);p.add_argument('--operation',required=True);p.add_argument('--evidence',type=Path,required=True);p.add_argument('--host-admission',choices=list(HOST_PROFILES),default='v2');p.add_argument('--local-owner',action='store_true',required=True);p.add_argument('--mac-ready',action='store_true',required=True)
     for command in ('execution-verify','execution-compare'):
         p=sub.add_parser(command);p.add_argument('--run',type=Path,required=True)
+    # SDK 0.6 profile overlay, in the descriptor worker's own SDK home: offline preparation, worker input checks (no EVM),
+    # the exact operation, the owner's authorization of that one operation, and one gated run. Verify/compare: execution-*.
+    p=sub.add_parser('profile-prepare',help='Offline: prepare one canonical intervention set from a pinned SDK 0.4 input');p.add_argument('--witness',type=Path,required=True);p.add_argument('--witness-sha256',required=True)
+    p.add_argument('--interventions',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--node',type=Path)
+    p=sub.add_parser('profile-authenticate',help='Worker --authenticate and --profile-state; no EVM, consent or network');p.add_argument('--prepared',type=Path,required=True)
+    p=sub.add_parser('profile-operation',help='The exact operation binding (host admission v4); no consent');p.add_argument('--prepared',type=Path,required=True)
+    p=sub.add_parser('profile-authorize',help="Owner's authorization of one exact operation; no consent, attempt marker or run");p.add_argument('--prepared',type=Path,required=True)
+    p.add_argument('--operation',required=True);p.add_argument('--local-owner',action='store_true',required=True)
+    p=sub.add_parser('profile-run',help='Doctor, then one native run of the exact authorized operation, then verification; never retried');p.add_argument('--prepared',type=Path,required=True)
+    p.add_argument('--operation',required=True);p.add_argument('--evidence',type=Path,required=True);p.add_argument('--local-owner',action='store_true',required=True);p.add_argument('--mac-ready',action='store_true',required=True)
     # Counterfactual Session 0.1: offline lifecycle only; no native worker, RPC or consent.
     p=sub.add_parser('session-create',help='Pin one SCENARIO.json and its checkpoint; offline');p.add_argument('--scenario',type=Path,required=True);p.add_argument('--sha256',required=True);p.add_argument('--checkpoint',type=Path,required=True)
     p=sub.add_parser('session-add-variant');p.add_argument('--session',required=True);p.add_argument('--lp-bps',type=int,required=True)
     for command in ('session-inspect','session-coverage','session-export','session-compare'):
         p=sub.add_parser(command);p.add_argument('--session',required=True)
     p=sub.add_parser('session-prepare',help='Prepare one variant through ExecutionSDK; no native run');p.add_argument('--session',required=True);p.add_argument('--variant',required=True)
+    # Parameterized LP Rewards plan 0.1: session, variant, coverage and preparation for one lpBps; offline.
+    p=sub.add_parser('session-plan',help='Plan lpBps 0-99, Dynamic Fee OFF, or both together (config-overlay worker) against an existing or newly pinned session; no native run, no operation binding')
+    p.add_argument('--lp-bps');p.add_argument('--dynamic-fee',help='OFF (the recorded baseline is ON)')
+    p.add_argument('--config-overlay',action='store_true',help='Plan a single setting on the parameterized config-overlay worker; both settings together always use it')
+    p.add_argument('--session');p.add_argument('--scenario',type=Path);p.add_argument('--sha256');p.add_argument('--checkpoint',type=Path)
+    # Parameterized Execution workflow 0.2: doctor, Stage B in one call, one owner-consented run, one result view.
+    sub.add_parser('doctor',help='Read-only: can this machine run the native supervisor (platform, /bin/ps, power, lid)')
+    for command,text in (('session-ready','Stage B for one planned variant: registration, authentication, exact operation; no consent'),
+                         ('session-run','One native run of the exact operation from session-ready, then verification; never retried'),
+                         ('session-result','Read-only result view of one verified variant')):
+        p=sub.add_parser(command,help=text);p.add_argument('--session',required=True)
+        p.add_argument('--variant');p.add_argument('--lp-bps');p.add_argument('--dynamic-fee',help='--lp-bps with --dynamic-fee selects the combined variant')
+    p=sub.choices['session-ready'];p.add_argument('--runtime',type=Path);p.add_argument('--sensor',type=Path)
+    p=sub.choices['session-run'];p.add_argument('--operation',required=True);p.add_argument('--evidence',type=Path)
+    p.add_argument('--local-owner',action='store_true',required=True);p.add_argument('--mac-ready',action='store_true',required=True)
+    sub.choices['session-result'].add_argument('--text',action='store_true',help='Print a terminal table instead of JSON')
     # Session Handoff 0.1: same validation as the Python API; a package is data, not authorization.
     p=sub.add_parser('session-handoff-export',help='Write a handoff package; source material only with --include-source');p.add_argument('--session',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--include-source',action='store_true')
     p=sub.add_parser('session-handoff-inspect',help='Read-only package check; authenticated only with --manifest-sha256');p.add_argument('--package',type=Path,required=True);p.add_argument('--manifest-sha256')
@@ -178,6 +204,22 @@ def main(argv=None):
             elif args.command=='execution-run':value=executor.run(args.prepared,operation=args.operation,evidence=args.evidence,local_owner=args.local_owner,mac_ready=args.mac_ready,host_profile=args.host_admission)
             elif args.command=='execution-verify':value=executor.verify(args.run)
             else:value=executor.compare(args.run)
+        elif args.command.startswith('profile-'):
+            from ..profile_overlay import ProfileOverlayExecutionSDK
+            from developer.files import load
+            executor=ProfileOverlayExecutionSDK(args.home)
+            if args.command=='profile-prepare':
+                value=executor.prepare_profile(args.witness,expected_sha256=args.witness_sha256,interventions=load(args.interventions,65536),output=args.output,node=args.node)
+            elif args.command=='profile-authenticate':
+                auth=executor.authenticate(args.prepared);state=executor.profile_state(args.prepared)
+                ok=(auth.get('status')=='AUTHENTICATED_SCENARIO_INPUT' and state.get('status')=='PROFILE_OVERLAY_STATE_AUTHENTICATED'
+                    and auth.get('nativeExecutions')==0 and state.get('nativeExecutions')==0)
+                value=dict(status='PROFILE_INPUT_AUTHENTICATED' if ok else 'PROFILE_INPUT_NOT_AUTHENTICATED',authentication=auth,profileState=state,nativeExecutions=0)
+            elif args.command=='profile-operation':value=executor.operation(args.prepared)
+            elif args.command=='profile-authorize':value=executor.authorize(args.prepared,operation=args.operation,local_owner=args.local_owner)
+            else:value=executor.run_profile(args.prepared,operation=args.operation,evidence=args.evidence,local_owner=args.local_owner,mac_ready=args.mac_ready)
+        elif args.command=='doctor':
+            value=ExecutionSDK(args.home).doctor()
         elif args.command.startswith('session-handoff-'):
             from ..session import handoff
             executor=ExecutionSDK(args.home)
@@ -189,6 +231,27 @@ def main(argv=None):
             from developer.files import load
             if args.command=='session-create':
                 value=executor.create_session(source=args.scenario,expected_sha256=args.sha256,checkpoint=load(args.checkpoint,65536)).inspect()
+            elif args.command=='session-plan':
+                from ..session.plan import lp_bps_text
+                where=dict(session_id=args.session,source=args.scenario,expected_sha256=args.sha256,
+                           checkpoint=None if args.checkpoint is None else load(args.checkpoint,65536))
+                from ..session.hookr import dynamic_fee_value
+                if args.lp_bps is None and args.dynamic_fee is None:
+                    raise SessionError('VARIANT_SETTING_REQUIRED','Pass --lp-bps, --dynamic-fee, or both.')
+                if args.config_overlay or (args.lp_bps is not None and args.dynamic_fee is not None):
+                    value=executor.plan_config_overlay_variant(lp_bps=None if args.lp_bps is None else lp_bps_text(args.lp_bps),
+                                                               dynamic_fee=None if args.dynamic_fee is None else dynamic_fee_value(args.dynamic_fee),**where)
+                elif args.dynamic_fee is not None:
+                    value=executor.plan_dynamic_fee_variant(dynamic_fee_value(args.dynamic_fee),**where)
+                else:value=executor.plan_lp_variant(lp_bps_text(args.lp_bps),**where)
+            elif args.command in ('session-ready','session-run','session-result'):
+                from ..session.plan import lp_bps_text
+                pick=dict(variant_id=args.variant,lp_bps=None if args.lp_bps is None else lp_bps_text(args.lp_bps),dynamic_fee=args.dynamic_fee)
+                if args.command=='session-ready':value=executor.ready_lp_variant(args.session,runtime=args.runtime,sensor=args.sensor,**pick)
+                elif args.command=='session-run':
+                    value=executor.run_lp_variant(args.session,operation=args.operation,local_owner=args.local_owner,
+                                                  mac_ready=args.mac_ready,evidence=args.evidence,**pick)
+                else:value=executor.lp_variant_result(args.session,**pick)
             else:
                 session=executor.open_session(args.session)
                 if args.command=='session-inspect':value=session.inspect()
@@ -304,16 +367,27 @@ def main(argv=None):
         elif args.command.startswith('execution-'):
             value=ExecutionError('EXECUTION_INPUT_OR_RUNTIME_ERROR','Check the selected paths/configuration and complete local installation; no execution was inferred from this error.',{'error':str(error)[:1024]}).as_result()
         else:value={'status': 'INPUT_OR_RUNTIME_STOP', 'causeCode': str(error)[:1024], 'automaticRetry': False}
-    print(json.dumps(value, ensure_ascii=True))
+    if getattr(args,'text',False) and value.get('schema')=='rhook/parameterized-result/0.2':
+        from ..session.workflow import render
+        print(render(value))
+    else:
+        print(json.dumps(value, ensure_ascii=True))
+    if args.command=='doctor':
+        return 0 if value.get('status')=='READY' else 1
     if args.command.startswith('session-'):
         # Missing static state and unverified comparisons are honest results, but not readiness.
         ok=value.get('status') in {'SESSION_INSPECTED','VARIANT_REGISTERED','VARIANT_PREPARED','SESSION_EXPORTED',
                                    'STATIC_DEPENDENCIES_COVERED','VERIFIED_VARIANTS_COMPARED',
+                                   'PLAN_READY_FOR_SEPARATELY_AUTHORIZED_NATIVE_RUN','PLAN_ALREADY_VERIFIED',
+                                   'RUN_READY','RUN_VERIFIED','VERIFIED_RESULT',
                                    'SESSION_HANDOFF_EXPORTED','HANDOFF_AUTHENTICATED','SESSION_HANDOFF_IMPORTED'}
         if args.command=='session-coverage':
             # Covered trie paths are not readiness: the profile preconditions must also be satisfied.
             ok=ok and type(value.get('preconditions')) is dict and value['preconditions'].get('status')=='SATISFIED'
         return 0 if ok else 1
+    if args.command.startswith('profile-'):
+        return 0 if value.get('status') in {'EXECUTION_CANDIDATE_PREPARED','PROFILE_INPUT_AUTHENTICATED','EXECUTION_OPERATION_PREPARED',
+                                            'PROFILE_NATIVE_AUTHORIZATION_RECORDED','RUN_VERIFIED'} else 1
     if args.command == 'scenario-diagnostic-prepare' and value.get('schema') == 'rhook/scenario-result-diagnostic/0.1':
         return 0
     if args.command == 'scenario-diagnose' and value.get('status') == 'DIAGNOSTIC_COMPLETED' and value.get('cleanupConfirmed') is True:

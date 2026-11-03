@@ -92,6 +92,24 @@ func decode(raw []byte, out any) error {
 	return nil
 }
 
+// offlinePairOnly refuses discovery and diagnostic modes for the derivative
+// profiles: they run exactly the offline BASELINE/VARIANT pair.
+func offlinePairOnly(linked string, b map[string]any) error {
+	if b["discoveryProfile"] == nil && b["diagnosticProfile"] == nil {
+		return nil
+	}
+	if linked == DynamicRuntimeProfile {
+		return errors.New("DYNAMIC_OFFLINE_PAIR_ONLY")
+	}
+	if linked == OverlayRuntimeProfile {
+		return errors.New("CONFIG_OVERLAY_OFFLINE_PAIR_ONLY")
+	}
+	if linked == ProfileRuntimeProfile {
+		return errors.New("PROFILE_OVERLAY_OFFLINE_PAIR_ONLY")
+	}
+	return nil
+}
+
 // WorkerEntry is separate from historical replay. Source and policy are linked
 // into a derivative binary; no authenticated chain outcome is fabricated.
 func WorkerEntry(source, policy string, args []string) (resultError error) {
@@ -109,17 +127,41 @@ func WorkerEntry(source, policy string, args []string) (resultError error) {
 		}
 		return json.NewEncoder(os.Stdout).Encode(map[string]any{"status": "AUTHENTICATED_SCENARIO_INPUT", "scenarioCommitment": a.input.spec.Commitment, "nativeExecutions": 0, "coverage": "KNOWN_PREREQUISITES_ONLY"})
 	}
+	if len(args) == 2 && args[0] == "--profile-state" {
+		raw, e := boundedFile(args[1], 8<<20)
+		if e != nil {
+			return e
+		}
+		out, e := profileStateReport(raw)
+		if e != nil {
+			return e
+		}
+		return json.NewEncoder(os.Stdout).Encode(out)
+	}
 	if len(args) == 2 && args[0] == "--authenticate-overlay" {
 		raw, e := boundedFile(args[1], 8<<20)
 		if e != nil {
 			return e
 		}
-		if LinkedProfile != DynamicRuntimeProfile {
+		if LinkedProfile != DynamicRuntimeProfile && LinkedProfile != OverlayRuntimeProfile {
 			return errors.New("DYNAMIC_DERIVATIVE_REQUIRED")
 		}
 		a, e := admitRuntime(raw)
 		if e != nil {
 			return e
+		}
+		if LinkedProfile == OverlayRuntimeProfile {
+			base, baseFields, e := deriveConfigOverlay(a.input, Baseline)
+			if e != nil {
+				return e
+			}
+			variant, variantFields, e := deriveConfigOverlay(a.input, Variant)
+			if e != nil {
+				return e
+			}
+			return json.NewEncoder(os.Stdout).Encode(map[string]any{"status": "CONFIG_OVERLAY_STATE_AUTHENTICATED", "profile": LinkedProfile, "scenarioCommitment": a.input.spec.Commitment,
+				"interventionCommitment": a.input.spec.Overlay.Commitment, "interventions": a.input.spec.Overlay.Interventions, "baseline": base, "variant": variant,
+				"fields": map[string]any{"baseline": baseFields, "variant": variantFields}, "nativeExecutions": 0, "EVMReexecution": false, "coverage": "TARGET_TRANSFORM_ONLY_NOT_EXECUTION_CLOSURE"})
 		}
 		base, e := deriveDynamicOverlay(a.input, Baseline)
 		if e != nil {
@@ -142,6 +184,10 @@ func WorkerEntry(source, policy string, args []string) (resultError error) {
 		}
 		if LinkedProfile == DynamicRuntimeProfile {
 			e = VerifyDynamicEvidence(raw, result)
+		} else if LinkedProfile == OverlayRuntimeProfile {
+			e = VerifyOverlayEvidence(raw, result)
+		} else if LinkedProfile == ProfileRuntimeProfile {
+			e = VerifyProfileEvidence(raw, result)
 		} else {
 			e = VerifyEvidence(raw, result)
 		}
@@ -211,8 +257,11 @@ func WorkerEntry(source, policy string, args []string) (resultError error) {
 	if gate["accepted"] != true || gate["profile"] != LinkedProfile || gate["policySha256"] != policy {
 		return errors.New("HOST_ADMISSION_REQUIRED")
 	}
-	if LinkedProfile == DynamicRuntimeProfile && (b["discoveryProfile"] != nil || b["diagnosticProfile"] != nil) {
-		return errors.New("DYNAMIC_OFFLINE_PAIR_ONLY")
+	if e = offlinePairOnly(LinkedProfile, b); e != nil {
+		return e
+	}
+	if e = profileOperationBinding(LinkedProfile, raw, b); e != nil {
+		return e
 	}
 	var discovery *discoverySource
 	var accepted *Admission
@@ -232,7 +281,7 @@ func WorkerEntry(source, policy string, args []string) (resultError error) {
 		}()
 		accepted, e = admitWithSource(raw, officialProfile(), discovery)
 	} else {
-		accepted, e = admitRuntime(raw)
+		accepted, e = admitRuntimeFor(raw, "NATIVE_EXECUTION")
 	}
 	if e != nil {
 		return e

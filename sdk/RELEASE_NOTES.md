@@ -2,6 +2,33 @@
 
 Unreleased. No tag, GitHub Release or binary upload exists for this candidate.
 
+## 3 November 2026: SDK 0.6 Developer Preview (source)
+
+This update publishes the source of SDK 0.2 to 0.6, which were developed and accepted privately:
+
+- **Parameterized LP Rewards plan 0.1 and Execution workflow 0.2** (`session-plan`, `doctor`, `session-ready`,
+  `session-run`, `session-result`): one chosen `lpBps` from planning to a verified result. See
+  [sessions](SESSIONS.md).
+- **SDK 0.3:** Dynamic Fee OFF as a session intervention.
+- **SDK 0.4:** the Config Overlay Engine, LP Rewards and Dynamic Fee as one typed set
+  ([config overlay](CONFIG_OVERLAY.md), [hook parameters](HOOK_PARAMETERS.md)).
+- **SDK 0.6:** [Profile Descriptor 0.1](PROFILE_DESCRIPTOR_SPEC.md). Hook profiles are reviewed data, read by one
+  interpreter in Go and Python; the catalogue records the review per descriptor and per intervention kind. It adds
+  the descriptor-driven worker profile `nitro-hook-profile-overlay/0.1`, the reviewed engine identity record, the
+  per-operation owner authorization gate, offline profile preparation and the parity comparators, with `profile-*`
+  CLI commands. The first descriptor is `hookr-1` revision 2.
+- **Developer preview:** [`examples/profile_descriptor_preview.py`](examples/profile_descriptor_preview.py) runs
+  catalogue, inspection, planning and validation offline from a clone; its tests check that it reproduces the
+  intervention commitments of the G5 prepared inputs.
+
+The [G5 case study](../docs/research/sdk06-g5-descriptor-parity.md) records the private native acceptance: three
+operations on one reviewed descriptor worker at block 101935336 matched the accepted SDK 0.4 records in every
+pre-registered field, and the gas interaction of the two settings was +36.
+
+Not included: the descriptor worker, the SDK 0.4 input and witness for that checkpoint, any run record or
+authorization. Dynamic Fee Tuning is reviewed for offline planning only. Same Go/Nitro engine lineage; no
+independent cross-client verification; `qualifiedClaims=0`.
+
 ## 30 October 2026: installed on-demand Scenario SDK
 
 - Connect standalone `scenario-close` to the existing owned workflow while

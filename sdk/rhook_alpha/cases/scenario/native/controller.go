@@ -27,15 +27,17 @@ type ActionMapping struct {
 	Hash    common.Hash `json:"transactionHash"`
 }
 type Overlay struct {
-	Intervention string         `json:"interventionCommitment,omitempty"`
-	Writes       []StorageWrite `json:"storageWrites,omitempty"`
-	Common       Setup          `json:"commonSimulationSetup"`
-	CommonRoot   common.Hash    `json:"commonSetupRoot"`
-	InitialRoot  common.Hash    `json:"worldInitialRoot"`
-	Account      common.Address `json:"configurationAccount"`
-	Slot         common.Hash    `json:"configurationSlot"`
-	Before       common.Hash    `json:"originalWord"`
-	After        common.Hash    `json:"initialWord"`
+	Intervention string `json:"interventionCommitment,omitempty"`
+	// SDK 0.6 profile overlays only: the descriptor the writes were derived from. Absent in legacy evidence.
+	ProfileDescriptor string         `json:"profileDescriptorSha256,omitempty"`
+	Writes            []StorageWrite `json:"storageWrites,omitempty"`
+	Common            Setup          `json:"commonSimulationSetup"`
+	CommonRoot        common.Hash    `json:"commonSetupRoot"`
+	InitialRoot       common.Hash    `json:"worldInitialRoot"`
+	Account           common.Address `json:"configurationAccount"`
+	Slot              common.Hash    `json:"configurationSlot"`
+	Before            common.Hash    `json:"originalWord"`
+	After             common.Hash    `json:"initialWord"`
 }
 type WorldResult struct {
 	World              string          `json:"world"`
@@ -130,6 +132,10 @@ func (c *Controller) execute(ctx context.Context, a *Admission, fence Fence, dir
 	x := a.input
 	copyInput := *x
 	x = &copyInput
+	// An offline-prepared profile admission (or one built without the review-gated loader) never reaches Nitro.
+	if x.spec.Schema == ProfileDomain && (x.purpose != purposeNative || x.profile.descriptor == nil || x.profile.Kind != ProfileKind) {
+		return out, errors.New("PROFILE_NATIVE_PURPOSE_REQUIRED")
+	}
 	if gate, ok := fence.(NativeGate); ok {
 		x.producerGate = gate
 	}
@@ -232,7 +238,7 @@ func DecodeOutcome(raw []byte) (Outcome, error) {
 	}
 	pin := out.Commitment
 	out.Commitment = ""
-	if (out.Schema != Domain+"/evidence" && out.Schema != DynamicDomain+"/evidence") || pin != hashValue(out.Schema, out) {
+	if (out.Schema != Domain+"/evidence" && out.Schema != DynamicDomain+"/evidence" && out.Schema != OverlayDomain+"/evidence" && out.Schema != ProfileDomain+"/evidence") || pin != hashValue(out.Schema, out) {
 		return out, errors.New("EVIDENCE_COMMITMENT")
 	}
 	out.Commitment = pin

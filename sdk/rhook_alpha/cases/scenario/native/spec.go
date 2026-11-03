@@ -93,21 +93,25 @@ type Action struct {
 	Raw        hexutil.Bytes `json:"signedTransaction"`
 }
 type Body struct {
-	Intervention *DynamicFeeOff      `json:"intervention,omitempty"`
-	Schema       string              `json:"schema"`
-	Origin       Origin              `json:"origin"`
-	Checkpoint   prestate.Checkpoint `json:"checkpoint"`
-	Parent       json.RawMessage     `json:"parent"`
-	ChainConfig  hexutil.Bytes       `json:"chainConfig"`
-	Inventory    Inventory           `json:"inventory"`
-	Release      string              `json:"releaseManifestSha256"`
-	Pool         common.Hash         `json:"poolId"`
-	Configs      Configurations      `json:"configurations"`
-	Setup        Setup               `json:"commonSetup"`
-	Actions      []Action            `json:"actions"`
-	Environment  Environment         `json:"environment"`
-	Engine       Identity            `json:"engine"`
-	Limits       Limits              `json:"limits"`
+	Intervention *DynamicFeeOff `json:"intervention,omitempty"`
+	Overlay      *ConfigOverlay `json:"configOverlay,omitempty"`
+	// SDK 0.6: a descriptor-driven overlay (rhook/hookr-profile-overlay/0.1). Absent from every legacy input,
+	// so legacy encodings and commitments are unchanged.
+	ProfileOverlay *ProfileOverlay     `json:"profileOverlay,omitempty"`
+	Schema         string              `json:"schema"`
+	Origin         Origin              `json:"origin"`
+	Checkpoint     prestate.Checkpoint `json:"checkpoint"`
+	Parent         json.RawMessage     `json:"parent"`
+	ChainConfig    hexutil.Bytes       `json:"chainConfig"`
+	Inventory      Inventory           `json:"inventory"`
+	Release        string              `json:"releaseManifestSha256"`
+	Pool           common.Hash         `json:"poolId"`
+	Configs        Configurations      `json:"configurations"`
+	Setup          Setup               `json:"commonSetup"`
+	Actions        []Action            `json:"actions"`
+	Environment    Environment         `json:"environment"`
+	Engine         Identity            `json:"engine"`
+	Limits         Limits              `json:"limits"`
 }
 type Spec struct {
 	Body
@@ -200,7 +204,11 @@ func Parse(raw []byte) (Spec, error) {
 	if !bytes.Equal(raw, append(c, '\n')) {
 		return s, errors.New("CANONICAL_SPEC_REQUIRED")
 	}
-	if (s.Schema != Domain && s.Schema != DynamicDomain) || (s.Schema == Domain && s.Intervention != nil) || (s.Schema == DynamicDomain && s.Intervention == nil) || s.Commitment != hashValue(s.Schema, s.Body) {
+	domain := (s.Schema == Domain && s.Intervention == nil && s.Overlay == nil && s.ProfileOverlay == nil) ||
+		(s.Schema == DynamicDomain && s.Intervention != nil && s.Overlay == nil && s.ProfileOverlay == nil) ||
+		(s.Schema == OverlayDomain && s.Intervention == nil && s.Overlay != nil && s.ProfileOverlay == nil) ||
+		(s.Schema == ProfileDomain && s.Intervention == nil && s.Overlay == nil && s.ProfileOverlay != nil)
+	if !domain || s.Commitment != hashValue(s.Schema, s.Body) {
 		return s, errors.New("SCENARIO_DOMAIN_OR_COMMITMENT")
 	}
 	return s, nil
@@ -222,6 +230,11 @@ type profile struct {
 	BaseLpFee     uint64          `json:"baseLpFeePips"`
 	SwapABI       json.RawMessage `json:"swapAbi"`
 	Pins          map[common.Address]common.Hash
+	// Execution-target addresses. Legacy profiles take the compiled constants below; a descriptor profile takes
+	// them from its code-pinned contracts. Not part of profile.json.
+	Rules      common.Address `json:"-"`
+	Router     common.Address `json:"-"`
+	descriptor *Descriptor
 }
 
 func officialProfile() profile {
@@ -240,6 +253,7 @@ func officialProfile() profile {
 		panic(e)
 	}
 	p.Kind = "AUTHENTICATED_CHECKPOINT_SCENARIO"
+	p.Rules, p.Router = rulesAddress, routerAddress
 	p.Pins = map[common.Address]common.Hash{}
 	for _, c := range manifest.Contracts {
 		if c.Role == "root" || c.Role == "router" || c.Role == "poolManager" || c.Address == rulesAddress {
@@ -274,4 +288,7 @@ type admitted struct {
 	producerGate NativeGate
 	discovery    *discoverySource
 	diagnostic   *diagnosticLog
+	// purpose is set only by admitProfileWith; the controller runs a profile-overlay input only when it is
+	// NATIVE_EXECUTION. Unexported, so no caller outside this package can set it.
+	purpose string
 }

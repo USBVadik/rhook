@@ -21,6 +21,21 @@ func VerifyDynamicEvidence(input, output []byte) error {
 	return verifyEvidence(input, output, dynamicProfile())
 }
 
+func VerifyOverlayEvidence(input, output []byte) error {
+	return verifyEvidence(input, output, overlayProfile())
+}
+
+// VerifyProfileEvidence verifies descriptor-overlay evidence (rhook/hookr-profile-overlay/0.1/evidence). It
+// re-loads the descriptor named by the input from the embedded catalogue, under a review that admits native
+// execution, re-derives the writes on the witness StateDB and compares them; recorded writes are never trusted.
+func VerifyProfileEvidence(input, output []byte) error {
+	p, e := profileForInput(input, "NATIVE_EXECUTION", LoadAcceptedDescriptor)
+	if e != nil {
+		return e
+	}
+	return verifyEvidence(input, output, p)
+}
+
 func verifyEvidence(input, output []byte, p profile) error {
 	admitted, e := admit(input, p)
 	if e != nil {
@@ -66,7 +81,27 @@ func verifyEvidence(input, output []byte, p profile) error {
 			if string(a) != string(b) {
 				return errors.New("DYNAMIC_DERIVED_OVERLAY_EVIDENCE")
 			}
-		} else if w.Overlay.Intervention != "" || len(w.Overlay.Writes) != 0 {
+		} else if s.Schema == OverlayDomain {
+			expected, _, e := deriveConfigOverlay(admitted.input, label)
+			if e != nil {
+				return e
+			}
+			a, _ := Canonical(expected)
+			b, _ := Canonical(w.Overlay)
+			if string(a) != string(b) {
+				return errors.New("CONFIG_OVERLAY_DERIVED_EVIDENCE")
+			}
+		} else if s.Schema == ProfileDomain {
+			expected, _, e := deriveProfileOverlay(admitted.input, label)
+			if e != nil {
+				return e
+			}
+			a, _ := Canonical(expected)
+			b, _ := Canonical(w.Overlay)
+			if string(a) != string(b) {
+				return errors.New("PROFILE_DERIVED_OVERLAY_EVIDENCE")
+			}
+		} else if w.Overlay.Intervention != "" || len(w.Overlay.Writes) != 0 || w.Overlay.ProfileDescriptor != "" {
 			return errors.New("LP_EVIDENCE_CANNOT_CARRY_DYNAMIC_OVERLAY")
 		}
 		h := w.Header
@@ -74,7 +109,7 @@ func verifyEvidence(input, output []byte, p profile) error {
 			return errors.New("SYNTHETIC_HEADER_COHERENCE")
 		}
 		if w.Overlay.Common != s.Setup || w.ActorBalanceBefore != s.Setup.Funding || w.Overlay.Before != s.Configs.Baseline[0] || w.Overlay.After != words[0] ||
-			w.Overlay.Account != rulesAddress || w.Overlay.Slot != p.ConfigSlot {
+			w.Overlay.Account != p.Rules || w.Overlay.Slot != p.ConfigSlot {
 			return errors.New("OVERLAY_EVIDENCE")
 		}
 		if w.Overlay.CommonRoot != o.Worlds[0].Overlay.CommonRoot || len(w.Receipts) != len(s.Actions)+1 || len(w.Actions) != len(s.Actions) || w.ActorNonceAfter != uint64(len(s.Actions)) {

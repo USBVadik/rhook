@@ -20,6 +20,53 @@ HERE = Path(__file__).resolve().parent
 COVERAGE_HELPER = HERE / 'hookr-coverage-main.mjs'
 # Fields a prepared variant may differ in from its source; everything else must stay byte-equal.
 VARIANT_FIELDS = {'configurations', 'origin', 'scenarioCommitment'}
+# Dynamic Fee OFF runs on its own reviewed derivative worker, so its input also carries a new schema,
+# engine binding and the committed two-write intervention.
+DYNAMIC_VARIANT_FIELDS = VARIANT_FIELDS | {'schema', 'engine'}
+LP_KIND, DYNAMIC_KIND = 'HOOKR_LP_REWARDS_BPS', 'HOOKR_DYNAMIC_FEE'
+# SDK 0.4: a canonical set of typed interventions on the parameterized config-overlay worker.
+OVERLAY_KIND = 'HOOKR_CONFIG_OVERLAY'
+OVERLAY_VARIANT_FIELDS = DYNAMIC_VARIANT_FIELDS
+OVERLAY_SUBHOME = Path('profiles') / 'hookr-config-overlay'
+# The derivative's registrations, plans and runs live in their own SDK home inside the session home:
+# one SDK home holds exactly one registered runtime.
+DYNAMIC_SUBHOME = Path('profiles') / 'hookr-dynamic-fee-off'
+LP_BACKEND = 'nitro-hookr-scenario/0.1'
+
+
+def dynamic_fee_value(value):
+    """The one supported Dynamic Fee replacement is OFF; ON is the recorded baseline."""
+    check(value != 'ON', 'DYNAMIC_FEE_ON_IS_THE_BASELINE',
+          'Dynamic Fee is ON in the recorded configuration and runs as SCENARIO_BASELINE. The supported variant is OFF.')
+    check(value == 'OFF', 'DYNAMIC_FEE_OFF_ONLY', 'Pass dynamicFee as the string OFF; other Dynamic Fee settings are not supported.',
+          {'value': str(value)[:40]})
+    return value
+
+
+def overlay_interventions(parameters):
+    """Session parameters -> canonical typed set. lpBps 0-99 and/or dynamicFee OFF."""
+    from ..config_overlay import DYNAMIC_FEE, LP_REWARDS, canonical_interventions
+    items = []
+    if 'lpBps' in parameters:
+        lp = parameters['lpBps']
+        check(type(lp) is int and 0 <= lp <= 99, 'LP_BPS_0_TO_99_REQUIRED', 'Choose an integer replacement 0-99; the baseline is LP100.')
+        items.append(dict(kind=LP_REWARDS, lpBps=lp))
+    if 'dynamicFee' in parameters:
+        items.append(dict(kind=DYNAMIC_FEE, dynamicFee=dynamic_fee_value(parameters['dynamicFee'])))
+    check(items, 'UNSUPPORTED_VARIANT', 'A config-overlay variant changes lpBps, dynamicFee or both.')
+    return _sdk_call(canonical_interventions, items)
+
+
+def backend_sdk(home, descriptor):
+    """The SDK that prepares, binds, runs and verifies this variant: the session home for LP, the
+    derivative's own home for Dynamic Fee, the overlay worker's own home for a config-overlay set."""
+    if descriptor['kind'] == OVERLAY_KIND:
+        from ..config_overlay import ConfigOverlayExecutionSDK
+        return ConfigOverlayExecutionSDK(no_links(home) / OVERLAY_SUBHOME)
+    if descriptor['kind'] == DYNAMIC_KIND:
+        from ..dynamic_fee import DynamicFeeExecutionSDK
+        return DynamicFeeExecutionSDK(no_links(home) / DYNAMIC_SUBHOME)
+    return ExecutionSDK(home)
 PRECONDITION_STATUSES = ('SATISFIED', 'NOT_SATISFIED', 'UNKNOWN')
 # The existing scenario compare returns exactly these two projections, BASELINE first; its delta is VARIANT - BASELINE.
 VERIFIED_STATUS = 'VERIFIED_SCENARIO_COMPARISON'
@@ -73,48 +120,126 @@ class HookrScenarioAdapter:
     # ----- variants -----------------------------------------------------------------------------
 
     def variant_descriptor(self, parameters, header):
-        check(type(parameters) is dict and set(parameters) == {'lpBps'}, 'UNSUPPORTED_VARIANT',
-              'This profile supports exactly one parameter, lpBps; other changes are not admitted.')
+        check(type(parameters) is dict and set(parameters) <= {'lpBps', 'dynamicFee', 'backend'}, 'UNSUPPORTED_VARIANT',
+              'A variant sets lpBps, dynamicFee or both (and optionally backend); other changes are not admitted.')
+        explicit = 'backend' in parameters
+        check(not explicit or parameters['backend'] == self.overlay_profile(), 'UNSUPPORTED_BACKEND',
+              'The only selectable backend is the parameterized config-overlay worker.', {'backend': str(parameters.get('backend'))[:60]})
+        settings = {k: v for k, v in parameters.items() if k != 'backend'}
+        if explicit or len(settings) == 2:
+            # One canonical typed set for the overlay worker. Single-setting variants without an explicit
+            # backend keep their 0.1/0.3 descriptors and ids on the existing workers.
+            items = overlay_interventions(settings)
+            replacement = dict(lpBps=next((i['lpBps'] for i in items if 'lpBps' in i), 100),
+                               dynamicFee=next((i['dynamicFee'] for i in items if 'dynamicFee' in i), 'ON'))
+            return dict(kind=OVERLAY_KIND, field='RulesConfig+RootRecord', poolId=header['common']['poolId'],
+                        original=dict(lpBps=header['baseline']['lpBps'], dynamicFee='ON'), replacement=replacement,
+                        interventions=items, backendProfile=self.overlay_profile())
+        check(len(settings) == 1, 'UNSUPPORTED_VARIANT', 'A variant changes lpBps, dynamicFee or both.')
+        if 'dynamicFee' in parameters:
+            value = dynamic_fee_value(parameters['dynamicFee'])
+            return dict(kind=DYNAMIC_KIND, field='DynamicFee', poolId=header['common']['poolId'], original='ON',
+                        replacement=value, backendProfile=self.dynamic_profile())
         lp = parameters['lpBps']
         check(type(lp) is int and 0 <= lp <= 99, 'LP_BPS_0_TO_99_REQUIRED',
               'Choose an integer replacement 0-99; the baseline is LP100.')
-        return dict(kind='HOOKR_LP_REWARDS_BPS', field='RulesConfig.lpBps', poolId=header['common']['poolId'],
+        # LP descriptors keep their 0.1 shape, so existing variant ids stay the same.
+        return dict(kind=LP_KIND, field='RulesConfig.lpBps', poolId=header['common']['poolId'],
                     original=header['baseline']['lpBps'], replacement=lp)
 
     @staticmethod
+    def dynamic_profile():
+        from ..dynamic_fee import PROFILE as DYNAMIC_PROFILE
+        return DYNAMIC_PROFILE
+
+    @staticmethod
+    def overlay_profile():
+        from ..config_overlay import PROFILE as OVERLAY_PROFILE
+        return OVERLAY_PROFILE
+
+    @staticmethod
     def parameters(descriptor):
+        if descriptor.get('kind') == OVERLAY_KIND:
+            value = {('lpBps' if 'lpBps' in i else 'dynamicFee'): i.get('lpBps', i.get('dynamicFee')) for i in descriptor['interventions']}
+            return dict(value, backend=descriptor['backendProfile']) if len(value) == 1 else value
+        if descriptor.get('kind') == DYNAMIC_KIND:
+            return {'dynamicFee': descriptor['replacement']}
         return {'lpBps': descriptor['replacement']}
 
     @staticmethod
     def sort_key(descriptor):
-        return (descriptor['replacement'],)
+        if descriptor.get('kind') == OVERLAY_KIND:
+            r = descriptor['replacement']
+            return (2, r['lpBps'], r['dynamicFee'])
+        return (1, 0) if descriptor.get('kind') == DYNAMIC_KIND else (0, descriptor['replacement'])
 
     # ----- preparation --------------------------------------------------------------------------
 
-    def _sdk(self):
-        return ExecutionSDK(self.home)
+    def _sdk(self, descriptor=None):
+        return backend_sdk(self.home, descriptor or dict(kind=LP_KIND))
 
     def prepare(self, source, header, descriptor, output):
-        sdk = self._sdk()
+        sdk = self._sdk(descriptor)
+        if descriptor['kind'] == OVERLAY_KIND:
+            from ..config_overlay import ACCEPTED_OVERLAY_ENGINE
+            pin = header['source']['sha256']
+            # Read-only MPT authentication of the original Root and Rules target leaves, then the overlay
+            # preparation, bound to the reviewed overlay worker. No worker runs here.
+            check(ACCEPTED_OVERLAY_ENGINE is not None, 'CONFIG_OVERLAY_ENGINE_NOT_ACCEPTED',
+                  'The config-overlay worker has no accepted identity in this SDK yet; nothing was prepared.')
+            plan = _sdk_call(sdk.plan_overlay, source, expected_sha256=pin, interventions=descriptor['interventions'])
+            return _sdk_call(sdk.prepare_overlay, plan['descriptor'], source, expected_sha256=pin, output=output,
+                             engine=ACCEPTED_OVERLAY_ENGINE)
+        if descriptor['kind'] == DYNAMIC_KIND:
+            from ..dynamic_fee import ACCEPTED_DERIVATIVE_ENGINE
+            from ..interventions import DYNAMIC_OFF
+            pin = header['source']['sha256']
+            # Read-only MPT authentication of the original Root and Rules target leaves, then the existing
+            # Dynamic Fee OFF preparation, bound to the reviewed derivative engine. No worker runs here.
+            plan = _sdk_call(sdk.plan_intervention, source, expected_sha256=pin, kind=DYNAMIC_OFF)
+            return _sdk_call(sdk.prepare_intervention, plan['descriptor'], source, expected_sha256=pin, output=output,
+                             engine=ACCEPTED_DERIVATIVE_ENGINE)
         config = _sdk_call(sdk.configure, lp_bps=descriptor['replacement'], checkpoint=header['checkpoint'])
         return _sdk_call(sdk.prepare, config, source, expected_sha256=header['source']['sha256'], output=output)
 
     def check_prepared(self, output, header, descriptor, source_raw):
         """source_raw: the retained source bytes, already checked against the session pin."""
-        _, meta = _sdk_call(self._sdk()._prepared, output)
-        check(meta['selectedLpBps'] == descriptor['replacement'] and meta['checkpoint'] == header['checkpoint']
+        _, meta = _sdk_call(self._sdk(descriptor)._prepared, output)
+        if descriptor['kind'] == OVERLAY_KIND:
+            return self._check_overlay(output, header, descriptor, source_raw, meta)
+        dynamic = descriptor['kind'] == DYNAMIC_KIND
+        check((dynamic or meta['selectedLpBps'] == descriptor['replacement']) and meta['checkpoint'] == header['checkpoint']
               and meta['sourceWitnessSha256'] == header['source']['sha256'], 'PREPARED_VARIANT_MISMATCH',
               'The prepared directory belongs to a different variant, checkpoint or source.')
         prepared = load(output / 'SCENARIO.json', 8 << 20)
         source = strict(source_raw)
-        shared = sorted(set(source) - VARIANT_FIELDS)
-        check(set(prepared) == set(source) and all(prepared[k] == source[k] for k in shared)
+        shared = sorted(set(source) - (DYNAMIC_VARIANT_FIELDS if dynamic else VARIANT_FIELDS))
+        check(set(prepared) == set(source) | ({'intervention'} if dynamic else set()) and all(prepared[k] == source[k] for k in shared)
               and prepared['configurations']['baseline'] == source['configurations']['baseline'],
-              'PREPARED_VARIANT_MISMATCH', 'Only the declared variant word may differ from the session source.')
+              'PREPARED_VARIANT_MISMATCH', 'Only the declared variant fields may differ from the session source.')
+        summary = dict(scenarioCommitment=prepared['scenarioCommitment'], scenarioSha256=sha(output / 'SCENARIO.json'),
+                       authentication=meta['authentication'], witnessClosure=meta['witnessClosure'],
+                       nativeExecutions=meta['nativeExecutions'], sharedWithSource=shared)
+        if dynamic:
+            return dict(summary, dynamicFee=descriptor['replacement'], interventionCommitment=meta['interventionCommitment'],
+                        backendProfile=meta['profile'])
+        return dict(summary, selectedLpBps=meta['selectedLpBps'])
+
+    @staticmethod
+    def _check_overlay(output, header, descriptor, source_raw, meta):
+        check(meta['interventions'] == descriptor['interventions'] and meta['checkpoint'] == header['checkpoint']
+              and meta['sourceWitnessSha256'] == header['source']['sha256'], 'PREPARED_VARIANT_MISMATCH',
+              'The prepared directory belongs to a different intervention set, checkpoint or source.')
+        prepared = load(output / 'SCENARIO.json', 8 << 20)
+        source = strict(source_raw)
+        shared = sorted(set(source) - OVERLAY_VARIANT_FIELDS)
+        check(set(prepared) == set(source) | {'configOverlay'} and all(prepared[k] == source[k] for k in shared)
+              and prepared['configurations']['baseline'] == source['configurations']['baseline'],
+              'PREPARED_VARIANT_MISMATCH', 'Only the declared variant fields may differ from the session source.')
         return dict(scenarioCommitment=prepared['scenarioCommitment'], scenarioSha256=sha(output / 'SCENARIO.json'),
-                    selectedLpBps=meta['selectedLpBps'], authentication=meta['authentication'],
-                    witnessClosure=meta['witnessClosure'], nativeExecutions=meta['nativeExecutions'],
-                    sharedWithSource=shared)
+                    authentication=meta['authentication'], witnessClosure=meta['witnessClosure'],
+                    nativeExecutions=meta['nativeExecutions'], sharedWithSource=shared, interventions=meta['interventions'],
+                    fields=meta['fields'], interventionCommitment=meta['interventionCommitment'], backendProfile=meta['profile'])
 
     # ----- static coverage ----------------------------------------------------------------------
 
@@ -167,8 +292,12 @@ class HookrScenarioAdapter:
             raise SessionError('RUN_RECORD_INCOMPLETE', 'Use a completed run directory with its retained inputs.',
                                {'error': str(error)[:300]}) from error
         from ..cases.scenario.api import PROFILE as BACKEND_PROFILE
-        check(binding.get('profile') == BACKEND_PROFILE and spec.get('schema') == execution.DOMAIN, 'WRONG_PROFILE_EVIDENCE',
-              'Only LP Rewards scenario runs of the hookr-buy/0.1 backend can be attached to this session.')
+        from .. import config_overlay, dynamic_fee
+        pairs = {BACKEND_PROFILE: execution.DOMAIN, dynamic_fee.PROFILE: dynamic_fee.DOMAIN, config_overlay.PROFILE: config_overlay.DOMAIN}
+        check(binding.get('profile') in pairs and spec.get('schema') == pairs[binding.get('profile')], 'WRONG_PROFILE_EVIDENCE',
+              'Only LP Rewards, Dynamic Fee OFF and config-overlay scenario runs of the hookr-buy/0.1 backends can be attached to this session.')
+        engine = {dynamic_fee.PROFILE: dynamic_fee.ACCEPTED_DERIVATIVE_ENGINE,
+                  config_overlay.PROFILE: config_overlay.ACCEPTED_OVERLAY_ENGINE}.get(binding['profile'], header['common']['engine'])
         check(spec.get('checkpoint') == header['checkpoint'], 'WRONG_SESSION_RESULT',
               'The run was produced at a different checkpoint.')
         check(binding.get('scenarioSha256') == input_sha and result.get('operationCommitment') == binding.get('operationCommitment')
@@ -176,16 +305,20 @@ class HookrScenarioAdapter:
               'The run record does not match its own retained input.')
         common = header['common']
         check(spec.get('poolId') == common['poolId'] and spec.get('environment') == common['environment']
-              and spec.get('commonSetup') == common['commonSetup'] and spec.get('engine') == common['engine']
+              and spec.get('commonSetup') == common['commonSetup'] and spec.get('engine') == engine
               and type(spec.get('actions')) is list and len(spec['actions']) == 1 and spec['actions'][0].get('id') == common['actionId'],
               'INCOMPATIBLE_RUN_COMMON', 'The run used a different action, environment or engine binding.')
-        return dict(profile=PROFILE, backendProfile=BACKEND_PROFILE, operationCommitment=result['operationCommitment'],
+        return dict(profile=PROFILE, backendProfile=binding['profile'], operationCommitment=result['operationCommitment'],
                     scenarioCommitment=result['scenarioCommitment'], scenarioSha256=input_sha,
                     resultStatus=result.get('status'))
 
     def verify_run(self, run):
-        # The existing scenario compare first runs the existing verifier on the retained run evidence.
-        return _sdk_call(self._sdk().compare, run)
+        # The existing scenario compare first runs the existing verifier on the retained run evidence,
+        # in the SDK home that holds the run's own registered runtime.
+        from .. import config_overlay, dynamic_fee
+        profile = load(no_links(run) / 'BINDING.json', 65536).get('profile')
+        kind = {dynamic_fee.PROFILE: DYNAMIC_KIND, config_overlay.PROFILE: OVERLAY_KIND}.get(profile, LP_KIND)
+        return _sdk_call(self._sdk(dict(kind=kind)).compare, run)
 
     def admit_verification(self, outcome, binding):
         """Admit only the verifier's complete comparison of exactly this run; anything else records nothing."""

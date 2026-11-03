@@ -42,7 +42,9 @@ func admitWithSource(raw []byte, p profile, source *discoverySource) (accepted *
 	if e = validateOnDemandShape(s); e != nil {
 		return nil, e
 	}
-	if (s.Schema == DynamicDomain) != (p.Kind == DynamicKind) || (s.Schema == DynamicDomain && source != nil) || s.Origin.Kind != p.Kind || !pin(s.Origin.Capsule) || s.Checkpoint.ChainID != 4663 || s.Pool != p.Pool ||
+	if (s.Schema == DynamicDomain) != (p.Kind == DynamicKind) || (s.Schema == OverlayDomain) != (p.Kind == OverlayKind) ||
+		(s.Schema == ProfileDomain) != (p.Kind == ProfileKind) || (p.Kind == ProfileKind && p.descriptor == nil) ||
+		((s.Schema == DynamicDomain || s.Schema == OverlayDomain || s.Schema == ProfileDomain) && source != nil) || s.Origin.Kind != p.Kind || !pin(s.Origin.Capsule) || s.Checkpoint.ChainID != 4663 || s.Pool != p.Pool ||
 		s.Release != hashValue(Domain+"/release", json.RawMessage(p.Manifest)) ||
 		!pin(s.Engine.Source) || !pin(s.Engine.Binary) || !pin(s.Engine.Policy) || s.Limits != policy {
 		return nil, errors.New("PROFILE_IDENTITY")
@@ -89,6 +91,20 @@ func admitWithSource(raw []byte, p profile, source *discoverySource) (accepted *
 	if s.Schema == DynamicDomain {
 		if e = validateDynamic(s, p); e != nil {
 			return nil, e
+		}
+	} else if s.Schema == OverlayDomain {
+		if _, e = validateOverlay(s, p); e != nil {
+			return nil, e
+		}
+	} else if s.Schema == ProfileDomain {
+		// The descriptor recomputes the writes and every binding; the fixed Hookr-family bounds were checked
+		// when the profile was derived from it (profileFromDescriptor).
+		if _, e = p.descriptor.ValidateProfileSpec(s); e != nil {
+			return nil, e
+		}
+		// The reviewed chain configuration bytes; the ArbOS state check below still applies.
+		if digest(s.ChainConfig) != p.descriptor.Chain.ChainConfigSha256 {
+			return nil, errors.New("PROFILE_CHAIN_CONFIG")
 		}
 	} else {
 		if len(s.Configs.Baseline) != 4 || len(s.Configs.Variant) != 4 {
@@ -140,7 +156,7 @@ func admitWithSource(raw []byte, p profile, source *discoverySource) (accepted *
 		back, _ := tx.MarshalBinary()
 		sender, e := types.Sender(types.LatestSignerForChainID(big.NewInt(4663)), &tx)
 		if e != nil || sender != s.Setup.Actor || tx.Type() != types.LegacyTxType || tx.Nonce() != a.Nonce || tx.Gas() != a.Gas || tx.GasPrice().Cmp(price) != 0 ||
-			tx.ChainId().Cmp(big.NewInt(4663)) != 0 || tx.To() == nil || *tx.To() != routerAddress || tx.Value().Cmp(big.NewInt(1000000000000000)) != 0 || !bytes.Equal(tx.Data(), expected) || !bytes.Equal(back, a.Raw) {
+			tx.ChainId().Cmp(big.NewInt(4663)) != 0 || tx.To() == nil || *tx.To() != p.Router || tx.Value().Cmp(big.NewInt(1000000000000000)) != 0 || !bytes.Equal(tx.Data(), expected) || !bytes.Equal(back, a.Raw) {
 			return nil, errors.New("ACTION_TRANSACTION_MAPPING")
 		}
 	}
@@ -237,7 +253,15 @@ func admitWithSource(raw []byte, p profile, source *discoverySource) (accepted *
 		if s.Schema == DynamicDomain && common.BigToHash(rootWord) != dynamicRootOn {
 			return errors.New("DYNAMIC_ORIGINAL_ROOT_WORD")
 		}
-		if common.BigToAddress(rootWord) != rulesAddress || new(big.Int).And(new(big.Int).Rsh(rootWord, 232), big.NewInt(255)).Uint64() != 1 {
+		// Every overlay variant compares against the authenticated LP100 + Dynamic Fee ON original.
+		if s.Schema == OverlayDomain && common.BigToHash(rootWord) != dynamicRootOn {
+			return errors.New("CONFIG_OVERLAY_ORIGINAL_ROOT_WORD")
+		}
+		// A profile overlay compares against the reviewed original Root word of its descriptor.
+		if s.Schema == ProfileDomain && common.BigToHash(rootWord) != p.descriptor.exactWord("rootRecord", 0) {
+			return errors.New("PROFILE_ORIGINAL_WORD")
+		}
+		if common.BigToAddress(rootWord) != p.Rules || new(big.Int).And(new(big.Int).Rsh(rootWord, 232), big.NewInt(255)).Uint64() != 1 {
 			return errors.New("STANDARD_POOL_BINDING")
 		}
 		baseFee := new(big.Int).And(new(big.Int).Rsh(rootWord, 160), big.NewInt(0xffffff)).Uint64()
@@ -245,7 +269,7 @@ func admitWithSource(raw []byte, p profile, source *discoverySource) (accepted *
 			return errors.New("FIRST_PROFILE_POOL_CAPS")
 		}
 		for i, w := range s.Configs.Baseline {
-			if state.GetState(rulesAddress, wordAt(p.ConfigSlot, i)) != w {
+			if state.GetState(p.Rules, wordAt(p.ConfigSlot, i)) != w {
 				return errors.New("AUTHENTICATED_BASELINE_WORD")
 			}
 		}
@@ -270,6 +294,20 @@ func admitWithSource(raw []byte, p profile, source *discoverySource) (accepted *
 		}
 		if err = validateGasCapacity(s.Actions, parent.GasLimit, perTx, perBlock); err != nil {
 			return err
+		}
+		if e := state.Error(); e != nil {
+			return e
+		}
+		// After every legacy check passed: the descriptor's own authentication of all code-pinned contracts
+		// and all target words. It adds checks; it replaces none.
+		if s.Schema == ProfileDomain {
+			originals, e := p.descriptor.AuthenticateProfile(state)
+			if e != nil {
+				return e
+			}
+			if !canonicalEqual(originals, p.descriptor.OriginalsFromDescriptor()) {
+				return errors.New("PROFILE_ORIGINAL_WORD")
+			}
 		}
 		return state.Error()
 	})

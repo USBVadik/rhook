@@ -79,14 +79,21 @@ func validateDynamic(s Spec, p profile) error {
 	return nil
 }
 func validateRuntimeSpec(s Spec, runtime string) error {
-	if (runtime == RuntimeProfile && s.Schema == Domain && s.Intervention == nil) || (runtime == DynamicRuntimeProfile && s.Schema == DynamicDomain && s.Intervention != nil) {
+	if (runtime == RuntimeProfile && s.Schema == Domain && s.Intervention == nil && s.Overlay == nil && s.ProfileOverlay == nil) ||
+		(runtime == DynamicRuntimeProfile && s.Schema == DynamicDomain && s.Intervention != nil && s.Overlay == nil && s.ProfileOverlay == nil) ||
+		(runtime == OverlayRuntimeProfile && s.Schema == OverlayDomain && s.Intervention == nil && s.Overlay != nil && s.ProfileOverlay == nil) ||
+		(runtime == ProfileRuntimeProfile && s.Schema == ProfileDomain && s.Intervention == nil && s.Overlay == nil && s.ProfileOverlay != nil) {
 		return nil
 	}
 	return errors.New("SCENARIO_RUNTIME_DOMAIN")
 }
 func dynamicProfile() profile                     { p := officialProfile(); p.Kind = DynamicKind; return p }
 func AdmitDynamic(raw []byte) (*Admission, error) { return admit(raw, dynamicProfile()) }
-func admitRuntime(raw []byte) (*Admission, error) {
+func admitRuntime(raw []byte) (*Admission, error) { return admitRuntimeFor(raw, "OFFLINE_PREPARATION") }
+
+// admitRuntimeFor: a profile-overlay input is admitted only under a catalogue review that admits the purpose.
+// The one-shot native execution path asks for NATIVE_EXECUTION; legacy profiles ignore the purpose.
+func admitRuntimeFor(raw []byte, purpose string) (*Admission, error) {
 	s, e := Parse(raw)
 	if e != nil {
 		return nil, e
@@ -94,8 +101,14 @@ func admitRuntime(raw []byte) (*Admission, error) {
 	if e = validateRuntimeSpec(s, LinkedProfile); e != nil {
 		return nil, e
 	}
+	if LinkedProfile == ProfileRuntimeProfile {
+		return AdmitProfile(raw, purpose)
+	}
 	if LinkedProfile == DynamicRuntimeProfile {
 		return AdmitDynamic(raw)
+	}
+	if LinkedProfile == OverlayRuntimeProfile {
+		return AdmitOverlay(raw)
 	}
 	return Admit(raw)
 }
@@ -113,24 +126,32 @@ func configurationOverlay(st overlayState, s Spec, p profile, label string) ([]S
 		if e := validateDynamic(s, p); e != nil {
 			return nil, e
 		}
-		rows := append([]StorageWrite{}, s.Intervention.Writes...)
 		// Authenticate the complete pair before any write. A second-field mismatch
 		// cannot leave a partially applied first write.
-		for _, w := range rows {
-			if st.GetState(w.Address, w.Slot) != w.Before {
-				return nil, errors.New("DYNAMIC_ORIGINAL_WORD_CHANGED")
-			}
-		}
-		for i, w := range rows {
-			if label == Variant {
-				st.SetState(w.Address, w.Slot, w.After)
-			} else {
-				rows[i].After = w.Before
-			}
-		}
-		return rows, nil
+		return applyCheckedWrites(st, s.Intervention.Writes, label, "DYNAMIC_ORIGINAL_WORD_CHANGED")
 	}
-	if s.Schema != Domain || s.Intervention != nil {
+	if s.Schema == OverlayDomain {
+		c, e := validateOverlay(s, p)
+		if e != nil {
+			return nil, e
+		}
+		return applyCheckedWrites(st, c.Writes, label, "CONFIG_OVERLAY_ORIGINAL_WORD_CHANGED")
+	}
+	if s.Schema == ProfileDomain {
+		if p.descriptor == nil || p.Kind != ProfileKind {
+			return nil, errors.New("SCENARIO_RUNTIME_DOMAIN")
+		}
+		c, e := p.descriptor.ValidateProfileSpec(s)
+		if e != nil {
+			return nil, e
+		}
+		rows, e := p.descriptor.ApplyProfileWrites(st, c.Writes, label)
+		if e != nil {
+			return nil, e
+		}
+		return profileStorageWrites(rows), nil
+	}
+	if s.Schema != Domain || s.Intervention != nil || s.Overlay != nil || s.ProfileOverlay != nil {
 		return nil, errors.New("SCENARIO_RUNTIME_DOMAIN")
 	}
 	if st.GetState(rulesAddress, p.ConfigSlot) != s.Configs.Baseline[0] {
@@ -180,23 +201,25 @@ func initializeWorld(b *prestate.Bridge, x *admitted, label string) (*state.Stat
 	if label == Variant {
 		words = x.spec.Configs.Variant
 	}
-	out = Overlay{Common: x.spec.Setup, CommonRoot: commonRoot, InitialRoot: initial, Account: rulesAddress, Slot: x.profile.ConfigSlot, Before: x.spec.Configs.Baseline[0], After: words[0], Writes: rows}
+	out = Overlay{Common: x.spec.Setup, CommonRoot: commonRoot, InitialRoot: initial, Account: x.profile.Rules, Slot: x.profile.ConfigSlot, Before: x.spec.Configs.Baseline[0], After: words[0], Writes: rows}
 	if x.spec.Intervention != nil {
 		out.Intervention = x.spec.Intervention.Commitment
+	}
+	if x.spec.Overlay != nil {
+		out.Intervention = x.spec.Overlay.Commitment
+	}
+	if x.spec.ProfileOverlay != nil {
+		out.Intervention = x.spec.ProfileOverlay.Commitment
+		out.ProfileDescriptor = x.spec.ProfileOverlay.Descriptor.Sha256
 	}
 	return st, out, funding, nil
 }
 
 // Pure StateDB/trie setup reconstruction; never invokes Nitro's producer.
-func deriveDynamicOverlay(x *admitted, label string) (out Overlay, err error) {
+func deriveDynamicOverlay(x *admitted, label string) (Overlay, error) {
 	if x.spec.Schema != DynamicDomain || x.discovery != nil {
-		return out, errors.New("DYNAMIC_OFFLINE_REQUIRED")
+		return Overlay{}, errors.New("DYNAMIC_OFFLINE_REQUIRED")
 	}
-	b, e := openBridge(x)
-	if e != nil {
-		return out, e
-	}
-	defer func() { err = errors.Join(err, prestate.CloseScenarioBridge(b)) }()
-	err = b.Protect(func() error { _, overlay, _, e := initializeWorld(b, x, label); out = overlay; return e })
-	return
+	out, _, err := deriveWorldOverlay(x, label)
+	return out, err
 }

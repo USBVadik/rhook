@@ -9,6 +9,7 @@ frozen developer workflow, separate from later archive-based SDK development.
 
 | Result | What was established |
 |---|---|
+| [SDK 0.6 G5: descriptor parity](sdk06-g5-descriptor-parity.md) | One descriptor-driven Go/Nitro worker ran LP Rewards 23 / Dynamic Fee ON, LP 100 / DF OFF and LP 23 / DF OFF on hypothetical worlds at block 101935336. Every pre-registered field matched the accepted SDK 0.4 records; four-configuration gas interaction +36. Same-engine record parity, not cross-client verification; worker and witness are private. |
 | [Hookr Pair03: LP Rewards 100 → 50](hookr-pair03-100-to-50.md) | Canonical Go/Nitro ACTUAL and a new 50 branch over the same seven arrivals; +0.5040100829% buyer Transfer-event net. Unified and installed developer workers reproduced the result; a Linux worker matched the macOS world files. One engine lineage; private replay inputs are not distributed and the external developer pilot has not run. |
 | [Hookr Pair03](hookr-pair03.md) | One saved Hookr block, seven arrivals, canonical Go/Nitro ACTUAL and LP Rewards 100→0 BRANCH: +1.0088% receipt-derived buyer output. Single-engine observation; Rust qualification pending. [SDK Alpha v2 workflow status](sdk-alpha-v2-status.md). |
 | [Initial heterogeneous execution](robinhood-heterogeneous/README.md) | Go/Nitro/geth and Rust/arb-revm agreed on one frozen Robinhood case and its oriented Branch Protocol 0.2 claim. Selected public artifacts have an offline check. |

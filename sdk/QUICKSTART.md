@@ -11,6 +11,73 @@ python3 -B sdk/tools/test_offline.py
 No worker, sensor, witness or RPC account is needed. These synthetic tests do
 not execute the EVM. A clone alone cannot install the complete native demo.
 
+Run them before installing the adapter's npm dependencies, as CI does. With
+`sdk/engine/adapters/hookr-case/node_modules` present, two tests fail
+(`test_sdk_tree_contains_only_reviewed_source_and_publication_files` and
+`test_prepare_cli_returns_success_for_binding_but_failure_for_stop`); the same happens
+on earlier releases. The Go descriptor tests (`tools/run_descriptor_go_tests.py`) need a
+retained Go module cache for the pinned Nitro version and are not part of the public run.
+
+## Profile descriptor developer preview (SDK 0.6)
+
+Also from the repository root, offline, with nothing but the clone:
+
+```sh
+python3 -B sdk/examples/profile_descriptor_preview.py catalogue
+python3 -B sdk/examples/profile_descriptor_preview.py inspect --profile hookr-1
+```
+
+`catalogue` lists the reviewed descriptors, the purposes each intervention kind is reviewed for and the reviewed
+worker identity (not distributed). `inspect` shows the descriptor's contracts, storage targets, bit fields with
+their original values and the intervention kinds with their parameter ranges.
+
+Choose interventions and plan them:
+
+```sh
+python3 -B sdk/examples/profile_descriptor_preview.py plan --lp-bps 37
+python3 -B sdk/examples/profile_descriptor_preview.py plan --lp-bps 23 --dynamic-fee OFF
+python3 -B sdk/examples/profile_descriptor_preview.py plan --tuning-sens 1 --tuning-max-fee 5000
+```
+
+`plan` checks the parameter ranges, kind conflicts, the original-state predicates and the result invariants, then
+prints the masked storage writes (`before`/`after` words), the changed fields and the commitments a prepared input
+would carry: `interventionCommitment` and `capsuleId`. The default checkpoint is the public header of Robinhood
+Chain block 101935336; `--checkpoint FILE` takes another `{blockHash, blockNumber, chainId, stateRoot}`. The same
+values give the same output on any machine. For `--lp-bps 23 --dynamic-fee OFF` the commitments equal those of the
+SDK 0.6 G5 run.
+
+Refusals print `"status": "REFUSED"` with the SDK's code and exit with 2, for example:
+
+| Command | Code |
+| --- | --- |
+| `plan --lp-bps 100` (100 is the original value) | `PROFILE_PARAMETER` |
+| `plan --dynamic-fee OFF --tuning-sens 1 --tuning-max-fee 5000` | `PROFILE_KIND_CONFLICT` |
+| `plan --tuning-sens 1 --tuning-max-fee 3000` (outside the pool's caps) | `PROFILE_INVARIANT` |
+| `plan --tuning-sens 1 --tuning-max-fee 5000 --purpose NATIVE_EXECUTION` | `PROFILE_KIND_REVIEW_INSUFFICIENT` |
+
+`--purpose NATIVE_EXECUTION` only checks the review; it runs nothing.
+
+To experiment with the descriptor itself, copy it, change it and validate the copy:
+
+```sh
+cp sdk/rhook_alpha/cases/scenario/native/descriptors/hookr-1.json my-descriptor.json
+python3 -B sdk/examples/profile_descriptor_preview.py validate --descriptor my-descriptor.json
+```
+
+The file is canonical JSON: one line, sorted keys, no spaces, one trailing newline. An edited copy that is not
+canonical is refused with `DESCRIPTOR_ENCODING`; re-serialize it with
+`json.dumps(value, sort_keys=True, separators=(',', ':')) + '\n'`. Validation then checks shape and internal
+consistency (pool id, slot derivations, field layout, release commitment). A changed copy has a different SHA-256 and reports `"workflowUse": "REFUSED_NOT_IN_CATALOGUE"`:
+workflows load only reviewed catalogue descriptors.
+
+What this preview does not do: it reads no witness, starts no worker, executes no EVM and grants no authority.
+`native-requirements` lists what a native run additionally needs: the reviewed descriptor worker, the pinned
+SDK 0.4 input with its witness, the registered runtime and host sensor, an owner-controlled Apple Silicon Mac,
+and per run the owner's authorization of the exact operation, consent and host admission. None of these assets is
+in this repository. The corresponding CLI commands (`rhook-cases profile-prepare`, `profile-authenticate`,
+`profile-operation`, `profile-authorize`, `profile-run`) are in the source and stop with an explicit error without
+them.
+
 ## Private pilot: use its own kit
 
 The private macOS developer kit completed clean installation and a new native
