@@ -2,6 +2,7 @@
 import contextlib
 import io
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -15,7 +16,58 @@ from rhook_alpha import install
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def publication_paths(root):
+    """Check source entries without traversing the adapter's installed dependencies."""
+    root = files.no_links(root)
+    dependencies = root / 'engine/adapters/hookr-case/node_modules'
+    result = set()
+
+    def visit(directory):
+        for path in directory.iterdir():
+            if path == dependencies:
+                continue
+            files.require(not path.is_symlink(), 'TREE_SYMLINK')
+            if path.is_file():
+                result.add(str(path.relative_to(root)))
+            else:
+                files.require(path.is_dir(), 'TREE_SPECIAL_FILE')
+                visit(path)
+
+    visit(root)
+    return result
+
+
 class PublicSourceBoundary(unittest.TestCase):
+    def test_publication_inventory_excludes_only_the_adapter_dependency_tree(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            dependency = root / 'engine/adapters/hookr-case/node_modules'
+            dependency.mkdir(parents=True)
+            (dependency / 'installed.js').write_bytes(b'installed dependency')
+            # The exclusion must not hide added SDK source, even with the same name.
+            other = root / 'rhook_alpha/node_modules'
+            other.mkdir(parents=True)
+            (other / 'unexpected.py').write_bytes(b'unreviewed source')
+            (root / 'engine/adapters/hookr-case/extra.mjs').write_bytes(b'unreviewed source')
+            self.assertEqual(publication_paths(root), {
+                'engine/adapters/hookr-case/extra.mjs',
+                'rhook_alpha/node_modules/unexpected.py',
+            })
+
+    def test_publication_inventory_still_rejects_source_symlinks_and_special_files(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            target = root / 'source.py'
+            target.write_bytes(b'reviewed source')
+            link = root / 'alias.py'
+            link.symlink_to(target)
+            with self.assertRaisesRegex(ValueError, 'TREE_SYMLINK'):
+                publication_paths(root)
+            link.unlink()
+            os.mkfifo(root / 'pipe')
+            with self.assertRaisesRegex(ValueError, 'TREE_SPECIAL_FILE'):
+                publication_paths(root)
+
     def test_legacy_top_level_install_imports_without_portable_package(self):
         with tempfile.TemporaryDirectory() as directory:
             prefix = Path(directory).resolve()
@@ -70,7 +122,7 @@ assert not home.exists()
         for name, pin in derived['files'].items():
             self.assertEqual(files.sha(ROOT / name), pin, name)
         expected |= set(derived['files']) | {'case-source.json'}
-        self.assertEqual(set(files.tree(ROOT)), expected)
+        self.assertEqual(publication_paths(ROOT), expected)
 
     def test_explicit_engine_root_is_verified_not_trusted(self):
         with tempfile.TemporaryDirectory() as directory:
