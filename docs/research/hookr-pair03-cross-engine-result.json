@@ -1,0 +1,142 @@
+{
+  "actual": {
+    "blockGasUsed": 1819539,
+    "blockHash": "0xc73ef372869ad5bf2a664bc1bc4cbe411c3adeb1938f349dd7686d82425398cd",
+    "receiptsRoot": "0x920c08cb6953014f0800587bbe2c0f8db5a7855ddb9f6263d5b4e230edeba98f",
+    "stateRoot": "0xd4ea0fe6f558cbc4a6b4161e3afc41ee4b7709001c170e32bc2144e64bdeb10b"
+  },
+  "arrivals": 7,
+  "assurance": {
+    "LP0OrG5RustQualificationClaimed": false,
+    "comparisonsWereBlind": false,
+    "cryptographicExecutionProof": false,
+    "economicAssurance": "UNRESOLVED",
+    "generalWitnessCompleteness": "UNKNOWN",
+    "organizationalIndependence": false,
+    "thirdPartyDistributionClearance": "NOT_ESTABLISHED",
+    "tokenDecimalsAuthenticated": false,
+    "transferEventNetIsProfit": false
+  },
+  "canonicalControl": "COMPUTED_ACTUAL_ROOTS_AND_HASH_MATCH_RECORDED_CANONICAL_HEADER_NOT_L1_FINALITY",
+  "case": "Hookr Pair03 cross-engine execution",
+  "chainId": 4663,
+  "dynamicFeeOff": {
+    "actualSource": "PREVIOUS_RECORDED_ACTUAL_NOT_REEXECUTED_BY_DF_BINARY",
+    "bothRepetitionsByteIdentical": true,
+    "branch": {
+      "blockGasUsed": 1746288,
+      "blockHash": "0x4db925e1d21a04617cc8be59d68ac3a36eae7437011b24c2e12fdf19099cc527",
+      "receiptsRoot": "0xa7d56998ae3adcf7ebf064ac8782fbfc3319acf65964cc503f4280a3dd889980",
+      "stateRoot": "0x50580e7affb2053fc12348bbf64071898a08fdb3409eeece8aaedef3a4fe1914"
+    },
+    "comparatorSourceSha256": "59da92a8a2e5456269592088a7a3f97aaa3db5196efdbdfd12aad5d29acc95f3",
+    "comparedReceiptFields": [
+      "transactionHash",
+      "status",
+      "gasUsed",
+      "cumulativeGasUsed",
+      "gasUsedForL1",
+      "orderedLogAddressTopicsData"
+    ],
+    "comparisonRecordSha256": "92bf03ffc2973e9d9e65f8af038fe5bc586001d37738c8c0ac9538bddab47235",
+    "fullJsonRpcObjectParity": false,
+    "goBranchRecordSha256": "1beb0a6a484c58ed075466779db49ce5e317d4f308f3746fb787e0cee5627092",
+    "interventionSha256": "a47684020689c58cf043bcfd6e009aa7035dd7cba8f18200d3642c108b067f2a",
+    "mismatchesInDeclaredChecks": 0,
+    "perReceiptTypeAndBloomDirectComparisonClaimed": false,
+    "qualificationStatus": "SEPARATE_RECORDED_BRANCH_COMPARISON_NOT_FOUR_WORLD_QUALIFICATION",
+    "reportedReferenceActualRustBinarySha256": "52fed73717dc601a0d110e81535d92228b3976db977fe6f87b21f244810eab2f",
+    "reportedRustBinarySha256": "43e03704a4474c419f3f9b39ed3b836d5a29a20c9b86679842faed6f53155de4",
+    "runnerSourceIdentityScope": "ONE_RUNNER_FILE_NOT_A_COMPLETE_DEPENDENCY_OR_BUILD_CLOSURE",
+    "runnerSourceSha256": "4788f666b5fa1b211fe610253d78dc64671290c105bb7808501a1dfce87368a2",
+    "rustArrivalsSha256": "b6e3aabc5e46184df0122214174e46049beba376184e16564f7dda24b7bcde1e",
+    "rustNativeWorlds": {
+      "ACTUAL": 0,
+      "BRANCH": 2
+    },
+    "rustWorldSha256": "abcf5776f6de1202cda1513a87bf295c88f1f5a8d7b5c6f9d07b5c4f55d33173",
+    "subject": {
+      "gasActual": 1483206,
+      "gasBranch": 1409955,
+      "ordinal": 3,
+      "outerSwapFeePipsActual": 11048,
+      "outerSwapFeePipsBranch": 11000,
+      "statusActual": "SUCCESS",
+      "statusBranch": "SUCCESS",
+      "transferEventNetActualBaseUnits": "291469365928126821002944",
+      "transferEventNetBranchBaseUnits": "291486689098951541822309"
+    },
+    "transform": {
+      "arbRecapture": "RETAINED",
+      "lpBps": "RETAINED_100",
+      "rootModeFrom": 3,
+      "rootModeTo": 2,
+      "rulesDynamicFeeSensFrom": 2,
+      "rulesDynamicFeeSensTo": 0,
+      "rulesMaxFeePipsFrom": 11500,
+      "rulesMaxFeePipsTo": 3000
+    }
+  },
+  "engineFamilies": [
+    "Go/Nitro",
+    "Rust/arb-revm"
+  ],
+  "independentExternalReproduction": false,
+  "lp50": {
+    "actualSource": "FRESH_RUST_EXECUTION",
+    "bothRepetitionsByteIdentical": true,
+    "branch": {
+      "blockGasUsed": 1819539,
+      "blockHash": "0xb8bc78a61d8394f24a6a3c5bdeb79be801ec63eaa52764e814ef2a1f2a88a542",
+      "receiptsRoot": "0xc55c829dd13052c41831de4ff6518a8c62c57bdcf798e14193ca5f225ac92b1c",
+      "stateRoot": "0xa6bf412783c620248df6746dfb2c637a87e828481abff901797463c73b777ad2"
+    },
+    "comparatorSourceSha256": "58559511b44fee26092444cd84e2e91a7d400e5723462e91116342e1d97f48b1",
+    "comparedFields": "FULL_TYPED_CONSENSUS_RECEIPTS_HEADERS_GAS_AND_ORDERED_LOGS",
+    "fullJsonRpcObjectParity": false,
+    "goActualRecordSha256": "a6858c4bc1fd7bb50b6ffc328d8351eae90f90c6747781405caff3bf31704953",
+    "goBranchRecordSha256": "586df83db3c4e25e71dbc01ea4083d810ddb234ec19c3f755c73202d57c1ff13",
+    "interventionSha256": "1b9c338c14b6d80b391addb55af2436a25c84439d19d97a241bcff416c27a7ca",
+    "mismatches": 0,
+    "outputSealSha256": "aa6a8fc5051687598e5e0ef47b7445f3556a209d287b7fd451d1c1da6bcca005",
+    "qualificationStatus": "PAIR03_PARITY_PASS",
+    "rustArrivalsSha256": "df4536882de7749d6f71972af656fc6bebd59797ce0112298e79ae9c11c68ab8",
+    "rustBinarySha256": "90c94d60cb99a93b4ed3ec4552f24c175799f602d7bea03e025a0db566f91012",
+    "rustNativeWorlds": {
+      "ACTUAL": 2,
+      "BRANCH": 2
+    },
+    "rustWorldSha256": "6161078f514b8bb1b24075fda4148fbc7509904f35fbaa4fb0c426e052554890",
+    "sourceAndContractManifestSha256": "ed1f6cd60927bcb1ef20eb30d99919f69d88e89dd7436e236a07213a2bf927a6",
+    "subject": {
+      "gasActual": 1483206,
+      "gasBranch": 1483206,
+      "ordinal": 3,
+      "outerSwapFeePipsActual": 11048,
+      "outerSwapFeePipsBranch": 7048,
+      "statusActual": "SUCCESS",
+      "statusBranch": "SUCCESS",
+      "transferEventNetActualBaseUnits": "291469365928126821002944",
+      "transferEventNetBranchBaseUnits": "292938400920971228766928"
+    },
+    "transform": {
+      "arbRecapture": "RETAINED",
+      "dynamicFee": "RETAINED_ON",
+      "lpBpsFrom": 100,
+      "lpBpsTo": 50
+    },
+    "unavailableMetadataEntries": 602
+  },
+  "packageSha256": "b55ba3a6d70bd081148966f3b447135a098a26c18bae0c773f065beda807bda3",
+  "parent": {
+    "blockHash": "0x991db6ee40bd7056cfabff012763a1b75995979e5023dc010553dbc304c16016",
+    "blockNumber": 93251802,
+    "stateRoot": "0x9c63ad5d9c6ba4fd19c301ea35264cec28dd1ad0e951a5f5578af8a32131baa6"
+  },
+  "publicNativeReproduction": false,
+  "publicationPayload": "SUMMARY_TEXT_AND_SELECTED_COMMITMENTS_ONLY_NO_RAW_RECORDS_WORKER_WITNESS_SOURCE_CLOSURE_OR_AUTHORITY",
+  "qualifiedClaims": 0,
+  "recordDate": "2026-11-11",
+  "recordType": "PUBLIC_RESEARCH_SUMMARY_NOT_EXECUTION_PROOF",
+  "targetBlockNumber": 93251803
+}

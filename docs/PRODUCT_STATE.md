@@ -1,4 +1,9 @@
-# RHOOK product state
+# RHOOK product state — historical snapshot
+
+> Historical planning snapshot, superseded as the coordination entry point by
+> [PROJECT_STATUS.md](PROJECT_STATUS.md), status date 11 November 2026.
+> The next-step section below records an earlier plan; it is not a current task
+> or execution authorization. Retained scope statements describe that snapshot.
 
 ## Product goal
 

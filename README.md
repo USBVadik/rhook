@@ -4,6 +4,9 @@
 
 **A Counterfactual Execution protocol and developer toolkit for Arbitrum-based chains.**
 
+**Start here:** [Project status and accepted decisions](docs/PROJECT_STATUS.md) —
+public capabilities, private milestones, current blockers and work already completed.
+
 ## What RHOOK enables
 
 RHOOK replays historical execution, or a scenario on an authenticated checkpoint, changes one reviewed rule of a
@@ -27,12 +30,14 @@ moving through four stages:
 
 The first two stages are done for bounded cases. Descriptor-driven tooling is now a **Developer Preview** (SDK
 0.6): its offline part runs from a clone, while native execution still needs assets that are not published.
-Integrations and a public product have not started.
+The public native product and independent external developer acceptance remain pending.
+The [project status](docs/PROJECT_STATUS.md) separates private local integrations from public availability.
 
 ## What has been demonstrated
 
 | Demonstration | Result and scope |
 | --- | --- |
+| Hookr Pair03 cross-engine execution | Privately retained Rust/arb-revm results match Go/Nitro for LP100→50 and, in a separate experiment, Dynamic Fee OFF. LP50 completed two fresh ACTUAL/BRANCH pairs with strict consensus-field comparison; the DF-OFF record has a different binary and narrower comparison scope. [Case study and selected commitments](docs/research/hookr-pair03-cross-engine.md). Full native reproduction assets are not published. |
 | SDK 0.6 descriptor parity (G5) | One descriptor-driven worker ran LP Rewards 23 / Dynamic Fee ON, LP 100 / DF OFF and LP 23 / DF OFF at block 101935336. Every pre-registered field matched the accepted SDK 0.4 records; gas interaction of the two settings **+36**. Hypothetical worlds, same engine lineage. [Case study](docs/research/sdk06-g5-descriptor-parity.md). |
 | Historical Hookr LP100→50 | Both Go/Nitro worlds of all seven arrivals in block 93251803 completed. Buyer RHOOK Transfer-event net increased by **0.5040100829%**; subject gas was unchanged. [Case study](docs/research/hookr-pair03-100-to-50.md). |
 | Mac/Linux execution agreement | A separate Ubuntu amd64 worker reproduced the complete macOS results for this case. This is portability within the same engine lineage. |
@@ -46,9 +51,11 @@ the canonical header before BRANCH runs, and BRANCH starts from a fresh copy of 
 scenarios are different: both worlds execute a synthetic signed buy on the checkpoint state, so neither is a
 transaction that happened on chain.
 
-There is no independent Rust execution of these Hookr cases, economic assurance is unresolved and qualified
-protocol Claims are zero. Other projects in this repository's [research index](docs/research/README.md) did compare
-Go/Nitro with Rust/arb-revm on other Robinhood cases.
+A separate Rust/arb-revm implementation has now executed historical Pair03 LP50 and Dynamic Fee OFF in retained
+private experiments. The [cross-engine study](docs/research/hookr-pair03-cross-engine.md) separates their binary
+identities, comparison coverage and canonical control. This is bounded cross-engine agreement, not independent
+external reproduction, a public native runtime or qualification of the G5 scenarios. Economic assurance remains
+unresolved and `qualifiedClaims=0`.
 
 ## What developers can use today
 
@@ -57,7 +64,7 @@ Go/Nitro with Rust/arb-revm on other Robinhood cases.
 | 1. Public clone only | Profile descriptor catalogue, inspection, offline planning of interventions with their storage writes and commitments, descriptor validation; Python API and CLI source; synthetic offline tests; the protocol-neutral evidence stack | [descriptor preview](sdk/QUICKSTART.md#profile-descriptor-developer-preview-sdk-06), `python3 -B sdk/tools/test_offline.py`, [evidence-stack quickstart](QUICKSTART.md) |
 | 2. Recorded evidence | Offline check of a recorded ACTUAL/BRANCH pack against a block hash you trust (Node.js 24+). Only a synthetic pack ships here; the real Pair03 pack is not distributed yet and may be shared separately after approval. Offline checks of selected heterogeneous-execution artifacts | [verify-pack](sdk/verify-pack/README.md), [heterogeneous results](docs/research/robinhood-heterogeneous/README.md) |
 | 3. Complete runtime and input kit on a supported host (not distributed) | Preparing a full scenario input, binding an exact operation, owner authorization and one native run, followed by verification and comparison. Needs the reviewed worker, the pinned input with its witness, the registered Node runtime and host sensor, an owner-controlled Apple Silicon Mac on AC power with the lid open, and per run the owner's authorization, one-shot consent and host admission | `rhook-cases profile-*`, `session-*`, `scenario-*` ([sessions](sdk/SESSIONS.md), [scenarios](sdk/SCENARIOS.md)); `profile_descriptor_preview.py native-requirements` |
-| 4. Research-only or unsupported | Native Dynamic Fee Tuning, arbitrary pools, contracts or storage writes, caller-supplied descriptors, hosted execution, independent cross-client verification of the Hookr cases | — |
+| 4. Research-only or unsupported | Native Dynamic Fee Tuning, arbitrary pools, contracts or storage writes, caller-supplied descriptors, hosted execution, public native reproduction or general cross-engine qualification of Hookr cases | — |
 
 Tier 3 commands are in the public source and stop with an explicit error when an asset is missing. None of the
 tier 3 assets is distributed; see [distribution status](sdk/DISTRIBUTION.md).
@@ -119,7 +126,8 @@ reviewed for native execution, and `DYNAMIC_FEE_TUNING`, reviewed for offline pl
 
 ## Limitations and roadmap
 
-- Native results come from one engine lineage (Go/Nitro) and a few bounded inputs; general coverage is unknown.
+- Public SDK native workflows use Go/Nitro. Separate private Rust/Go execution results cover the two historical
+  Pair03 interventions described above; general coverage remains unknown.
 - Executables, witnesses and run records are private. A public clone can check descriptors, interpreters and
   commitments, not repeat a native run. The [license scope](sdk/LICENSE_SCOPE.md) and
   [distribution status](sdk/DISTRIBUTION.md) explain why.
@@ -130,8 +138,9 @@ runtime with cleared terms; further reviewed descriptors. None of these is done.
 
 ## Research and contributing
 
-The [research index](docs/research/README.md) separates the SDK results from earlier experiments, including
-Go/Nitro and Rust/arb-revm agreement on other Robinhood cases. Those results do not qualify the Hookr cases on Rust.
+The [research index](docs/research/README.md) separates SDK results, the new bounded Hookr cross-engine study and
+earlier Go/Nitro and Rust/arb-revm agreement on other Robinhood cases. These milestones do not qualify arbitrary
+Hookr scenarios or promote protocol Claims.
 See the [model](docs/counterfactual-model.md), [architecture](docs/architecture.md) and
 [threat model](docs/threat-model.md) for protocol details.
 
