@@ -142,3 +142,10 @@ has not been scientifically rerun on Alchemix by the protocol-neutral stack.
 Read [CONTRIBUTING.md](CONTRIBUTING.md). Original RHOOK code and documentation use [Apache-2.0](LICENSE); the
 [SDK license scope](sdk/LICENSE_SCOPE.md) and [third-party notices](THIRD_PARTY_NOTICES.md) preserve upstream terms.
 The source license does not clear the combined executable or historical witness for release.
+
+## Hookr Studio Developer Preview
+
+Explore three saved Nitro BASELINE/VARIANT configurations and the retained Hookr
+catalogue in the [runnable Studio preview](examples/studio-preview/README.md).
+It uses static public datasets with explicit acceptance boundaries; edited drafts
+are not executed and live Run remains unavailable.
