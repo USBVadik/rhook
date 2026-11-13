@@ -240,14 +240,15 @@ class CounterfactualSession:
     def _prepared_dir(self, variant_id):
         return self.directory / 'variants' / variant_id / 'prepared'
 
-    def prepare_variant(self, variant_id):
+    def prepare_variant(self, variant_id, *, node=None):
         """Produce the existing SDK's prepared input for one variant. No native work, no acquisition."""
         record = self._load_variant(variant_id)
         self._retained_source()
         out = self._prepared_dir(variant_id)
         if out.exists():
             return dict(self._preparation(record), alreadyPrepared=True)
-        result = self.adapter.prepare(self.source_path, self.header, record['descriptor'], out)
+        args = (self.source_path, self.header, record['descriptor'], out)
+        result = self.adapter.prepare(*args) if node is None else self.adapter.prepare(*args, node=node)
         return dict(self._preparation(record), alreadyPrepared=False, sdkResult=result)
 
     def _preparation(self, record):

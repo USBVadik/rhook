@@ -11,11 +11,11 @@ python3 -B sdk/tools/test_offline.py
 No worker, sensor, witness or RPC account is needed. These synthetic tests do
 not execute the EVM. A clone alone cannot install the complete native demo.
 
-Run them before installing the adapter's npm dependencies, as CI does. With
-`sdk/engine/adapters/hookr-case/node_modules` present, two tests fail
-(`test_sdk_tree_contains_only_reviewed_source_and_publication_files` and
-`test_prepare_cli_returns_success_for_binding_but_failure_for_stop`); the same happens
-on earlier releases. The Go descriptor tests (`tools/run_descriptor_go_tests.py`) need a
+The suite works both before and after installing the adapter's npm dependencies.
+The publication inventory excludes only `sdk/engine/adapters/hookr-case/node_modules`;
+the reviewed source files are still checked against their pinned hashes. With Node 24+
+and the adapter dependencies installed, additional synthetic coverage tests run.
+The Go descriptor tests (`tools/run_descriptor_go_tests.py`) need a
 retained Go module cache for the pinned Nitro version and are not part of the public run.
 
 ## Profile descriptor developer preview (SDK 0.6)

@@ -31,9 +31,8 @@ jobs:
           node-version: 24
       - run: npm ci --ignore-scripts --no-audit --no-fund --prefix sdk/engine/adapters/hookr-case
       - run: npm run test:sdk-cases
-      # sdk-offline has no Node dependencies, so the Python -> Node session and handoff coverage tests skip there.
-      - run: python3 -B -m unittest discover -v -s tests_cases -t tests_cases -p 'test_session*.py'
-        working-directory: sdk
+      # Re-run the full suite with dependencies; require Python -> Node session and handoff coverage.
+      - run: python3 -B sdk/tools/test_offline.py
         env:
           RHOOK_REQUIRE_SESSION_COVERAGE: '1'
   sdk-offline:
@@ -42,3 +41,8 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - run: python3 -B sdk/tools/test_offline.py
+      - name: Check temporary-directory aliases
+        run: |
+          mkdir "$RUNNER_TEMP/rhook-tmp-physical"
+          ln -s "$RUNNER_TEMP/rhook-tmp-physical" "$RUNNER_TEMP/rhook-tmp-alias"
+          TMPDIR="$RUNNER_TEMP/rhook-tmp-alias" python3 -B sdk/tools/test_offline.py
