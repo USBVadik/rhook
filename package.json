@@ -14,12 +14,12 @@
     "./host": "./host/src/index.mjs"
   },
   "scripts": {
-    "check": "for file in core/src/*.mjs runtime/src/*.mjs host/src/*.mjs host/test/*.mjs examples/minimal/*.mjs scripts/*.mjs test/*.mjs examples/robinhood-v4/scripts/*.mjs examples/robinhood-v4/test/*.mjs; do node --check \"$file\" || exit 1; done",
+    "check": "for file in core/src/*.mjs runtime/src/*.mjs host/src/*.mjs host/test/*.mjs examples/minimal/*.mjs scripts/*.mjs test/*.mjs examples/robinhood-v4/scripts/*.mjs examples/robinhood-v4/test/*.mjs examples/studio-preview/*.mjs examples/studio-preview/tests/*.mjs; do node --check \"$file\" || exit 1; done",
     "test:core": "node --test --test-concurrency=1 core/test/*.test.mjs",
     "test:runtime": "node --test --test-concurrency=1 runtime/test/*.test.mjs",
     "test:host": "node --test --test-concurrency=1 host/test/*.test.mjs",
     "test:surface": "node --test --test-concurrency=1 test/*.test.mjs",
-    "test": "npm run test:core && npm run test:runtime && npm run test:host && npm run test:surface && npm run test:robinhood",
+    "test": "npm run test:core && npm run test:runtime && npm run test:host && npm run test:surface && npm run test:robinhood && npm run test:studio",
     "inspect": "node scripts/inspect-transcript.mjs",
     "verify-transcript": "node scripts/verify-transcript.mjs",
     "tamper-test": "node scripts/tamper-transcript.mjs",
@@ -30,7 +30,8 @@
     "quickstart": "npm run demo:generate && npm run demo:inspect && npm run demo:verify && npm run demo:tamper",
     "demo:robinhood": "node examples/robinhood-v4/scripts/demo.mjs",
     "test:robinhood": "node --test examples/robinhood-v4/test/*.test.mjs",
-    "test:sdk-cases": "RHOOK_TEST_INSTALLED_LIB=\"$PWD/sdk\" node --test --test-concurrency=1 sdk/tests_cases/*.test.mjs"
+    "test:sdk-cases": "RHOOK_TEST_INSTALLED_LIB=\"$PWD/sdk\" node --test --test-concurrency=1 sdk/tests_cases/*.test.mjs",
+    "test:studio": "node --test examples/studio-preview/tests/*.test.mjs"
   },
   "repository": {
     "type": "git",

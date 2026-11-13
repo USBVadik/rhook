@@ -1,0 +1,10 @@
+{
+  "schema": "rhook/public-studio-integrity/0.1",
+  "meaning": "SHA-256 byte consistency only; not EVM correctness or independent verification.",
+  "files": {
+    "a.json": "d88ed41345f1e540eb10357ecbab4ecfe52f916a6a1213a3a973f0380532d871",
+    "b.json": "84f8740509b6077ea0cbc827ba71ca5aab225a1e34142956f9ec857ce9ff6fe1",
+    "burn.json": "3bca67f039d9511cb24e5717709732a73a7bdb29bfbf94e4efd86e834b87d66b",
+    "catalog.json": "f032813bde856f621d4a38b2dbb9c422270b520e7f4555c92ccea145b7be49e7"
+  }
+}

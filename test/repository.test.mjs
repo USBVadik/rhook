@@ -107,6 +107,12 @@ test('repository tree is small and excludes research/archive clutter', async () 
     'docs/research/robinhood-heterogeneous/query.json',
     'docs/research/robinhood-heterogeneous/result.json',
     'examples/minimal/transcript.json',
+    'examples/studio-preview/data/a.json',
+    'examples/studio-preview/data/b.json',
+    'examples/studio-preview/data/burn.json',
+    'examples/studio-preview/data/catalog.json',
+    'examples/studio-preview/data/integrity.json',
+    'examples/studio-preview/schema.json',
   ])
 })
 

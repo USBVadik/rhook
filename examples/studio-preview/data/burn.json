@@ -1,0 +1,640 @@
+{
+  "schema": "rhook/public-studio-record/0.1",
+  "id": "burn",
+  "label": "Auto Burn",
+  "draft": {
+    "blocks": [
+      {
+        "enabled": true,
+        "id": "anti-snipe",
+        "parameters": {
+          "guardEndBlock": 19,
+          "maxBuyQuoteAmount": "3000000000000000",
+          "snipeCurve": 0,
+          "snipeDecaySeconds": 0,
+          "snipeFloorPips": 0,
+          "snipeTaxPips": 1000
+        }
+      },
+      {
+        "enabled": true,
+        "id": "dynamic-fees",
+        "parameters": {
+          "carryBps": null,
+          "dynamicFeeLiquidityDivisor": null,
+          "dynamicFeeSens": 2,
+          "maxFeePips": 8000,
+          "moveTicks": null,
+          "resetSeconds": null,
+          "windowSeconds": null
+        }
+      },
+      {
+        "enabled": true,
+        "id": "auto-burn",
+        "parameters": {
+          "burnBps": 100
+        }
+      },
+      {
+        "enabled": false,
+        "id": "lp-rewards",
+        "parameters": {
+          "lpBps": 200
+        }
+      },
+      {
+        "enabled": false,
+        "id": "arb-recapture",
+        "parameters": {}
+      },
+      {
+        "enabled": false,
+        "id": "buy-sell-block",
+        "parameters": {
+          "buyPauseBlocks": 0,
+          "sellLockBlocks": 0
+        }
+      },
+      {
+        "enabled": false,
+        "id": "agent-gate",
+        "parameters": {
+          "flags": 1,
+          "minAge": 3600,
+          "minScore": 0,
+          "reviewers": null,
+          "tierPips": 0,
+          "tierScore": 0
+        }
+      },
+      {
+        "enabled": false,
+        "id": "market-guard",
+        "parameters": {
+          "bandBps": 1000,
+          "minDepth": "0",
+          "mode": 2,
+          "rampBps": 1000,
+          "staleness": null,
+          "surchargePips": 10000
+        }
+      },
+      {
+        "enabled": false,
+        "id": "market-hours-fee",
+        "parameters": {
+          "afterHoursPips": null,
+          "closeRampSeconds": 900,
+          "closedPips": null,
+          "flags": 1,
+          "openRampSeconds": 1800,
+          "overnightPips": null,
+          "preMarketPips": null,
+          "regularPips": null
+        }
+      },
+      {
+        "enabled": false,
+        "id": "managed-fee",
+        "parameters": {
+          "afterHoursPips": 0,
+          "cap": null,
+          "closeRampSeconds": 0,
+          "closedPips": 0,
+          "flags": 0,
+          "maxStep": 1000,
+          "maxTtl": 3600,
+          "minInterval": 60,
+          "openRampSeconds": 0,
+          "overnightPips": 0,
+          "preMarketPips": 0,
+          "premium0": 0,
+          "premium1": 0,
+          "regularPips": 0,
+          "surcharge": null
+        }
+      },
+      {
+        "enabled": false,
+        "id": "zap-source",
+        "parameters": {
+          "afterHoursPips": 0,
+          "closeRampSeconds": 0,
+          "closedPips": 0,
+          "flags": 0,
+          "openRampSeconds": 0,
+          "overnightPips": 0,
+          "preMarketPips": 0,
+          "regularPips": 0,
+          "source.takePips": 10000,
+          "source.vault": null
+        }
+      },
+      {
+        "enabled": false,
+        "id": "zap-target",
+        "parameters": {
+          "afterHoursPips": 0,
+          "closeRampSeconds": 0,
+          "closedPips": 0,
+          "flags": 0,
+          "gate.feeders": 1,
+          "openRampSeconds": 0,
+          "overnightPips": 0,
+          "preMarketPips": 0,
+          "regularPips": 0,
+          "route.impactBps": 500,
+          "route.maxPerZap": "0",
+          "route.mode": 0,
+          "route.rewardBps": 50,
+          "route.sink": null,
+          "route.threshold": "1000",
+          "route.windowBlocks": 1,
+          "route.windowScope": 1
+        }
+      },
+      {
+        "enabled": false,
+        "id": "swap-reward-mint",
+        "parameters": {
+          "afterHoursPips": 0,
+          "buyTakePips": 10000,
+          "closeRampSeconds": 0,
+          "closedPips": 0,
+          "creatorRecipient": null,
+          "flags": 0,
+          "lifetimeRewardCap": "340282366920938463463374607431768211455",
+          "maxRewardPerSwap": null,
+          "openRampSeconds": 0,
+          "overnightPips": 0,
+          "preMarketPips": 0,
+          "regularPips": 0,
+          "rewardPerQuoteWad": "1000000000000000000",
+          "rewardToken": null,
+          "runSeconds": 0,
+          "sellTakePips": 10000
+        }
+      },
+      {
+        "enabled": false,
+        "id": "usage-fee",
+        "parameters": {
+          "afterHoursPips": 0,
+          "closeRampSeconds": 0,
+          "closedPips": 0,
+          "flags": 0,
+          "openRampSeconds": 0,
+          "overnightPips": 0,
+          "preMarketPips": 0,
+          "regularPips": 0,
+          "usageFeePips": null
+        }
+      },
+      {
+        "enabled": false,
+        "id": "pay-later",
+        "parameters": {
+          "anchorDecayBlocks": 7200,
+          "maxActiveUnits": "0",
+          "maxBlockDepthBps": null,
+          "maxInventory": "0",
+          "maxOrderUnits": "0",
+          "maxUnitsPerBlock": "0",
+          "minOrderUnits": null,
+          "minPremium": "0",
+          "premiumBps": 500,
+          "priceWindowBlocks": 25,
+          "strikeMarkupBps": 0,
+          "tenor": 86400,
+          "topGuardBps": 1000
+        }
+      },
+      {
+        "enabled": false,
+        "id": "exit-clock",
+        "parameters": {
+          "exitCurve": 0,
+          "exitFloorBps": 0,
+          "exitHorizonHours": 24,
+          "exitRecords": 0,
+          "exitTo": 0,
+          "exitTopBps": 100
+        }
+      },
+      {
+        "enabled": false,
+        "id": "holder-pot",
+        "parameters": {}
+      },
+      {
+        "enabled": false,
+        "id": "storm-fee",
+        "parameters": {
+          "stormCeilingPips": 6000,
+          "stormFloorPips": 0,
+          "stormTo": 0
+        }
+      },
+      {
+        "enabled": false,
+        "id": "wallet-cap",
+        "parameters": {
+          "walletCapBps": 200
+        }
+      },
+      {
+        "enabled": false,
+        "id": "swap-cut",
+        "parameters": {
+          "buyCutPips": 10000,
+          "sellCutPips": 10000
+        }
+      },
+      {
+        "enabled": false,
+        "id": "sandwich-guard",
+        "parameters": {
+          "sandwichMaxPips": 100000,
+          "sandwichWindowBlocks": 1
+        }
+      }
+    ],
+    "wallets": [
+      {
+        "id": "actor-a"
+      }
+    ],
+    "actions": [
+      {
+        "amount": "1000000000000000",
+        "kind": "BUY",
+        "walletId": "actor-a"
+      },
+      {
+        "amount": "1000000000000000",
+        "kind": "BUY",
+        "walletId": "actor-a"
+      }
+    ]
+  },
+  "acceptance": {
+    "nativeExecution": "COMPLETED",
+    "recordedVerify": "PASS",
+    "originalController": "COMPARE_STOP",
+    "savedResultAcceptance": "PASS",
+    "originalLabResultInstalled": false,
+    "originalQuarantineRetained": true
+  },
+  "provenance": {
+    "originalRecordSha256": "871cd2163aa025cd6694de4db67ccc14756ff5daca9749cb2e49e592405b764f",
+    "workerSha256": "3d1f62270367e0c9bbbc54536fc8ffa00fc9e924336b98e8c4e36a9d2cae5500",
+    "sourceCommitment": "26c0be95ff27334d5fce5de7c22473dd31feba7e2b54afa8689c0a73b9a86ec7",
+    "recordKind": "SANITIZED_OWNER_RECORDED_NITRO_PROJECTION",
+    "independentEVMReexecution": false,
+    "qualifiedClaims": 0,
+    "newExecutionInPreview": false,
+    "sidecar": {
+      "schema": "rhook/saved-native-acceptance/0.1",
+      "status": "SAVED_NATIVE_RECORDED_ACCEPTANCE_PASS",
+      "acceptanceIdentity": "e0cd11e4b764a8cf7a4d94db5a5b18b803940f2b3e00c27989ef1ad0c660ad5c",
+      "verificationRequestCommitment": "1d842d546023b990d5ef1cace90314e2b8b29e3b7d232b4755f80cb5f1bdab72",
+      "originalOperation": "d8b6bfc2126e4c3e87d4ebc20d286ae226d7e6ef76b7073e0a8000607f9bff5e",
+      "inputSha256": "07db95b5565b2c24077ebfec9da74912efd40f1617faf82dc960afae3c81eae9",
+      "savedFinalSha256": "9d2f0f276fd819d81983799ecfba5edaf19b6682ad9a263fe9f05166b736b766",
+      "nativeExecutionPerformedNow": false,
+      "originalNativeExecutionPerformed": true,
+      "recordVerificationPerformedNow": true,
+      "independentEVMReexecution": false,
+      "qualifiedClaims": 0,
+      "originalControllerStateUnchanged": "CONTROLLER_CLEANUP_UNCERTAIN",
+      "quarantineUnchanged": 1,
+      "controllerRecordRewritten": false,
+      "LabResultInstalled": false,
+      "verifierSha256": "3d1f62270367e0c9bbbc54536fc8ffa00fc9e924336b98e8c4e36a9d2cae5500"
+    }
+  },
+  "projection": {
+    "schema": "rhook/studio-playground-result/0.2",
+    "status": "VERIFIED_PLAYGROUND_COMPARISON",
+    "executionProfile": "nitro-hookr-playground/0.3",
+    "baselinePolicy": "COMMON_AS_DF_BURN_OFF",
+    "jobId": "4153263d7c42c9dc89db051f7d45d38b",
+    "requestCommitment": "74c9a5f4b35345c85f2ec2d4d520bc32beab8c767e7ba2510c38c8c7196e6c49",
+    "resultIdentity": "2ab39ec4a6591fb384240afe26d3bb22baadb530243607bc848879012fb89216",
+    "operationCommitment": "d8b6bfc2126e4c3e87d4ebc20d286ae226d7e6ef76b7073e0a8000607f9bff5e",
+    "scenarioCommitment": "9032403e5b087a4abf01ea16df61b2a77ee57adc9db4f0339f8186b0ea59c1af",
+    "bindingCommitment": "b4f161329d4eeb82703f1234a32d4d8c72519f32db587ab6ea448d9fa26268cc",
+    "commonBootstrapRoot": "0x8807b03e1fe7b475e67e4b6399b359bebf5fdac953e8285da762354e7898842d",
+    "nativeExecutionPerformedNow": true,
+    "independentEVMReexecution": false,
+    "recordVerificationPerformedNow": true,
+    "historicalAuthentication": false,
+    "qualifiedClaims": 0,
+    "verification": "RECORDED_INTEGRITY_NOT_EXECUTION_PROOF",
+    "worlds": [
+      {
+        "actions": [
+          {
+            "index": 0,
+            "kind": "APPROVE",
+            "transactionHash": "0xae0064803a8eaead5c61e2188b74d3402b743ce438133c41ae5dd534efb2e496",
+            "receiptStatus": 1,
+            "gasUsed": 46018,
+            "tokenTransferNetBaseUnits": "0",
+            "outerSwapFeePips": [],
+            "state": {
+              "accountingL1Block": 17,
+              "action": "APPROVE-0",
+              "actorNativeBalanceWei": "99999995398200000000",
+              "actorNonce": 1,
+              "dynamicFeeWord": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "guardWord": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "transactionHash": "0xae0064803a8eaead5c61e2188b74d3402b743ce438133c41ae5dd534efb2e496"
+            }
+          },
+          {
+            "index": 1,
+            "kind": "LAUNCH_POOL",
+            "transactionHash": "0x9532279de6eddada644574f9d65763dcc34c15365aa9b858f2ac5b58b97e2548",
+            "receiptStatus": 1,
+            "gasUsed": 833958,
+            "tokenTransferNetBaseUnits": "-5823264130625194",
+            "outerSwapFeePips": [],
+            "state": {
+              "accountingL1Block": 17,
+              "action": "LAUNCH_POOL-1",
+              "actorNativeBalanceWei": "99994088738269374806",
+              "actorNonce": 2,
+              "dynamicFeeWord": "0x00000000000000000000000000000000000000000000000000038d7ea4c68000",
+              "guardWord": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "transactionHash": "0x9532279de6eddada644574f9d65763dcc34c15365aa9b858f2ac5b58b97e2548"
+            }
+          },
+          {
+            "index": 2,
+            "kind": "BUY",
+            "transactionHash": "0xfb81ec4047103f7b50cacd34d2c851d06880bffd9597a223da18bd93febb765c",
+            "receiptStatus": 1,
+            "gasUsed": 371574,
+            "tokenTransferNetBaseUnits": "986176455131533",
+            "outerSwapFeePips": [
+              3802
+            ],
+            "state": {
+              "accountingL1Block": 17,
+              "action": "BUY-2",
+              "actorNativeBalanceWei": "99993051580869374806",
+              "actorNonce": 3,
+              "dynamicFeeWord": "0x01006b49e01e006b49e01e000000ffff3a0000000000000000038d7ea4c68000",
+              "guardWord": "0x00000000000000110000000000000000000000000000000000038d7ea4c68000",
+              "transactionHash": "0xfb81ec4047103f7b50cacd34d2c851d06880bffd9597a223da18bd93febb765c"
+            }
+          },
+          {
+            "index": 3,
+            "kind": "BUY",
+            "transactionHash": "0xb8bedb19c8de3deda3cf1d22ecb4ab158d5d3abe74308bbb34aba0788e1bce94",
+            "receiptStatus": 1,
+            "gasUsed": 258672,
+            "tokenTransferNetBaseUnits": "966900154292365",
+            "outerSwapFeePips": [
+              3815
+            ],
+            "state": {
+              "accountingL1Block": 17,
+              "action": "BUY-3",
+              "actorNativeBalanceWei": "99992025713669374806",
+              "actorNonce": 4,
+              "dynamicFeeWord": "0x01006b49e01e006b49e01efffe76fffe760000000000000000038d7ea4c68000",
+              "guardWord": "0x00000000000000110000000000000000000000000000000000071afd498d0000",
+              "transactionHash": "0xb8bedb19c8de3deda3cf1d22ecb4ab158d5d3abe74308bbb34aba0788e1bce94"
+            }
+          }
+        ],
+        "receiptsRoot": "0x16b1278b72e20e501abaeb60097d2d536f9c8720432d6b9a25355e948a079a54",
+        "stateRoot": "0x7e154a151249d56c30c2f56e31a6d9e5e30a27d2a43aa8ea494cbc03ff357a87",
+        "world": "SCENARIO_BASELINE"
+      },
+      {
+        "actions": [
+          {
+            "index": 0,
+            "kind": "APPROVE",
+            "transactionHash": "0xae0064803a8eaead5c61e2188b74d3402b743ce438133c41ae5dd534efb2e496",
+            "receiptStatus": 1,
+            "gasUsed": 46018,
+            "tokenTransferNetBaseUnits": "0",
+            "outerSwapFeePips": [],
+            "state": {
+              "accountingL1Block": 17,
+              "action": "APPROVE-0",
+              "actorNativeBalanceWei": "99999995398200000000",
+              "actorNonce": 1,
+              "dynamicFeeWord": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "guardWord": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "transactionHash": "0xae0064803a8eaead5c61e2188b74d3402b743ce438133c41ae5dd534efb2e496"
+            }
+          },
+          {
+            "index": 1,
+            "kind": "LAUNCH_POOL",
+            "transactionHash": "0x3548a517c9fff5fc5dc6072d303e83647b29268e776bed215af5eaea8d34a7d7",
+            "receiptStatus": 1,
+            "gasUsed": 833764,
+            "tokenTransferNetBaseUnits": "-5823264130625194",
+            "outerSwapFeePips": [],
+            "state": {
+              "accountingL1Block": 17,
+              "action": "LAUNCH_POOL-1",
+              "actorNativeBalanceWei": "99994088757669374806",
+              "actorNonce": 2,
+              "dynamicFeeWord": "0x00000000000000000000000000000000000000000000000000038d7ea4c68000",
+              "guardWord": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "transactionHash": "0x3548a517c9fff5fc5dc6072d303e83647b29268e776bed215af5eaea8d34a7d7"
+            }
+          },
+          {
+            "index": 2,
+            "kind": "BUY",
+            "transactionHash": "0xfb81ec4047103f7b50cacd34d2c851d06880bffd9597a223da18bd93febb765c",
+            "receiptStatus": 1,
+            "gasUsed": 405276,
+            "tokenTransferNetBaseUnits": "976349338917186",
+            "outerSwapFeePips": [
+              3802
+            ],
+            "state": {
+              "accountingL1Block": 17,
+              "action": "BUY-2",
+              "actorNativeBalanceWei": "99993048230069374806",
+              "actorNonce": 3,
+              "dynamicFeeWord": "0x01006b49e01e006b49e01e000000ffff3b0000000000000000038d7ea4c68000",
+              "guardWord": "0x00000000000000110000000000000000000000000000000000038d7ea4c68000",
+              "transactionHash": "0xfb81ec4047103f7b50cacd34d2c851d06880bffd9597a223da18bd93febb765c"
+            }
+          },
+          {
+            "index": 3,
+            "kind": "BUY",
+            "transactionHash": "0xb8bedb19c8de3deda3cf1d22ecb4ab158d5d3abe74308bbb34aba0788e1bce94",
+            "receiptStatus": 1,
+            "gasUsed": 275218,
+            "tokenTransferNetBaseUnits": "957302519314693",
+            "outerSwapFeePips": [
+              3815
+            ],
+            "state": {
+              "accountingL1Block": 17,
+              "action": "BUY-3",
+              "actorNativeBalanceWei": "99992020708269374806",
+              "actorNonce": 4,
+              "dynamicFeeWord": "0x01006b49e01e006b49e01efffe77fffe770000000000000000038d7ea4c68000",
+              "guardWord": "0x00000000000000110000000000000000000000000000000000071afd498d0000",
+              "transactionHash": "0xb8bedb19c8de3deda3cf1d22ecb4ab158d5d3abe74308bbb34aba0788e1bce94"
+            }
+          }
+        ],
+        "receiptsRoot": "0x33e6fe7c8ef6d4f6ad7d85edbd8c8269aafa94a44bad1fe071929a26cbfd3145",
+        "stateRoot": "0x09fa1ad7566798edbebe44657d72e90eea639c67c463631dc0ae75d4fcca2e88",
+        "world": "SCENARIO_VARIANT"
+      }
+    ],
+    "tokenFlow": {
+      "burnDestination": "0x000000000000000000000000000000000000dead",
+      "claimSemantics": "ACCRUED_QUOTE_CLAIM_NOT_WITHDRAWAL",
+      "provenance": "WORKER_REPORTED_ABI_STATIC_CALL_NO_INDEPENDENT_MPT_PROOF",
+      "schema": "rhook/playground-token-flow/0.3",
+      "supplySemantics": "TRANSFER_TO_DEAD_NOT_TOTAL_SUPPLY_BURN",
+      "viewCalls": 60,
+      "worlds": [
+        {
+          "buys": [
+            {
+              "action": "BUY-2",
+              "poolManagerDeltaBaseUnits": "-986176455131533",
+              "protocolClaimableDeltaWei": "200000000000",
+              "receiptStatus": 1,
+              "sentToDeadBaseUnits": "0",
+              "supplyDeltaBaseUnits": "0",
+              "traderDeltaBaseUnits": "986176455131533",
+              "transactionHash": "0xfb81ec4047103f7b50cacd34d2c851d06880bffd9597a223da18bd93febb765c"
+            },
+            {
+              "action": "BUY-3",
+              "poolManagerDeltaBaseUnits": "-966900154292365",
+              "protocolClaimableDeltaWei": "203000000000",
+              "receiptStatus": 1,
+              "sentToDeadBaseUnits": "0",
+              "supplyDeltaBaseUnits": "0",
+              "traderDeltaBaseUnits": "966900154292365",
+              "transactionHash": "0xb8bedb19c8de3deda3cf1d22ecb4ab158d5d3abe74308bbb34aba0788e1bce94"
+            }
+          ],
+          "snapshots": [
+            {
+              "accountingL1Block": 17,
+              "action": "LAUNCH_POOL-1",
+              "transactionHash": "0x9532279de6eddada644574f9d65763dcc34c15365aa9b858f2ac5b58b97e2548",
+              "values": {
+                "deadBalance": "0",
+                "poolManagerBalance": "5823264130625194",
+                "protocolClaimable": "0",
+                "totalSupply": "1000000000000000000000000000000",
+                "traderBalance": "999999999999994176735869374806"
+              }
+            },
+            {
+              "accountingL1Block": 17,
+              "action": "BUY-2",
+              "transactionHash": "0xfb81ec4047103f7b50cacd34d2c851d06880bffd9597a223da18bd93febb765c",
+              "values": {
+                "deadBalance": "0",
+                "poolManagerBalance": "4837087675493661",
+                "protocolClaimable": "200000000000",
+                "totalSupply": "1000000000000000000000000000000",
+                "traderBalance": "999999999999995162912324506339"
+              }
+            },
+            {
+              "accountingL1Block": 17,
+              "action": "BUY-3",
+              "transactionHash": "0xb8bedb19c8de3deda3cf1d22ecb4ab158d5d3abe74308bbb34aba0788e1bce94",
+              "values": {
+                "deadBalance": "0",
+                "poolManagerBalance": "3870187521201296",
+                "protocolClaimable": "403000000000",
+                "totalSupply": "1000000000000000000000000000000",
+                "traderBalance": "999999999999996129812478798704"
+              }
+            }
+          ],
+          "world": "SCENARIO_BASELINE"
+        },
+        {
+          "buys": [
+            {
+              "action": "BUY-2",
+              "poolManagerDeltaBaseUnits": "-984223123908453",
+              "protocolClaimableDeltaWei": "2200000000000",
+              "receiptStatus": 1,
+              "sentToDeadBaseUnits": "7873784991267",
+              "supplyDeltaBaseUnits": "0",
+              "traderDeltaBaseUnits": "976349338917186",
+              "transactionHash": "0xfb81ec4047103f7b50cacd34d2c851d06880bffd9597a223da18bd93febb765c"
+            },
+            {
+              "action": "BUY-3",
+              "poolManagerDeltaBaseUnits": "-965022700922069",
+              "protocolClaimableDeltaWei": "2203000000000",
+              "receiptStatus": 1,
+              "sentToDeadBaseUnits": "7720181607376",
+              "supplyDeltaBaseUnits": "0",
+              "traderDeltaBaseUnits": "957302519314693",
+              "transactionHash": "0xb8bedb19c8de3deda3cf1d22ecb4ab158d5d3abe74308bbb34aba0788e1bce94"
+            }
+          ],
+          "snapshots": [
+            {
+              "accountingL1Block": 17,
+              "action": "LAUNCH_POOL-1",
+              "transactionHash": "0x3548a517c9fff5fc5dc6072d303e83647b29268e776bed215af5eaea8d34a7d7",
+              "values": {
+                "deadBalance": "0",
+                "poolManagerBalance": "5823264130625194",
+                "protocolClaimable": "0",
+                "totalSupply": "1000000000000000000000000000000",
+                "traderBalance": "999999999999994176735869374806"
+              }
+            },
+            {
+              "accountingL1Block": 17,
+              "action": "BUY-2",
+              "transactionHash": "0xfb81ec4047103f7b50cacd34d2c851d06880bffd9597a223da18bd93febb765c",
+              "values": {
+                "deadBalance": "7873784991267",
+                "poolManagerBalance": "4839041006716741",
+                "protocolClaimable": "2200000000000",
+                "totalSupply": "1000000000000000000000000000000",
+                "traderBalance": "999999999999995153085208291992"
+              }
+            },
+            {
+              "accountingL1Block": 17,
+              "action": "BUY-3",
+              "transactionHash": "0xb8bedb19c8de3deda3cf1d22ecb4ab158d5d3abe74308bbb34aba0788e1bce94",
+              "values": {
+                "deadBalance": "15593966598643",
+                "poolManagerBalance": "3874018305794672",
+                "protocolClaimable": "4403000000000",
+                "totalSupply": "1000000000000000000000000000000",
+                "traderBalance": "999999999999996110387727606685"
+              }
+            }
+          ],
+          "world": "SCENARIO_VARIANT"
+        }
+      ]
+    }
+  }
+}
