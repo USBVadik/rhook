@@ -1,0 +1,741 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RHOOK public Studio publication contracts",
+  "description": "Structural schema only. Semantic bindings are checked by provider.mjs and playground-result.mjs. SHA consistency is not an EVM correctness proof.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/record"
+    },
+    {
+      "$ref": "#/$defs/catalog"
+    },
+    {
+      "$ref": "#/$defs/integrity"
+    },
+    {
+      "$ref": "#/$defs/draft"
+    }
+  ],
+  "$defs": {
+    "record": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "rhook/public-studio-record/0.1"
+        },
+        "id": {
+          "enum": [
+            "a",
+            "b",
+            "burn"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "draft": {
+          "type": "object",
+          "required": [
+            "blocks",
+            "actions",
+            "wallets"
+          ]
+        },
+        "acceptance": {
+          "type": "object",
+          "properties": {
+            "nativeExecution": {
+              "const": "COMPLETED"
+            },
+            "recordedVerify": {
+              "const": "PASS"
+            },
+            "originalController": {
+              "enum": [
+                "VERIFY_COMPARE_READ_FINAL_PASS",
+                "COMPARE_STOP"
+              ]
+            },
+            "savedResultAcceptance": {
+              "enum": [
+                "PASS",
+                "NOT_APPLICABLE"
+              ]
+            },
+            "originalLabResultInstalled": {
+              "type": "boolean"
+            },
+            "originalQuarantineRetained": {
+              "const": true
+            }
+          },
+          "required": [
+            "nativeExecution",
+            "recordedVerify",
+            "originalController",
+            "savedResultAcceptance",
+            "originalLabResultInstalled"
+          ],
+          "additionalProperties": false
+        },
+        "provenance": {
+          "type": "object",
+          "required": [
+            "originalRecordSha256",
+            "workerSha256",
+            "sourceCommitment",
+            "recordKind",
+            "independentEVMReexecution",
+            "qualifiedClaims",
+            "newExecutionInPreview"
+          ],
+          "properties": {
+            "originalRecordSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "workerSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "sourceCommitment": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "newExecutionInPreview": {
+              "const": false
+            },
+            "qualifiedClaims": {
+              "const": 0
+            },
+            "independentEVMReexecution": {
+              "const": false
+            },
+            "sidecar": {
+              "$ref": "#/$defs/sidecar"
+            }
+          }
+        },
+        "projection": {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "enum": [
+                "rhook/studio-playground-result/0.1",
+                "rhook/studio-playground-result/0.2"
+              ]
+            },
+            "resultIdentity": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "operationCommitment": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "requestCommitment": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "scenarioCommitment": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "commonBootstrapRoot": {
+              "type": "string",
+              "pattern": "^0x[0-9a-f]{64}$"
+            },
+            "qualifiedClaims": {
+              "const": 0
+            },
+            "independentEVMReexecution": {
+              "const": false
+            },
+            "historicalAuthentication": {
+              "const": false
+            },
+            "worlds": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "world": {
+                    "enum": [
+                      "SCENARIO_BASELINE",
+                      "SCENARIO_VARIANT"
+                    ]
+                  },
+                  "stateRoot": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-f]{64}$"
+                  },
+                  "receiptsRoot": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-f]{64}$"
+                  },
+                  "actions": {
+                    "type": "array",
+                    "minItems": 4,
+                    "maxItems": 4,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "index": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 3
+                        },
+                        "kind": {
+                          "enum": [
+                            "APPROVE",
+                            "LAUNCH_POOL",
+                            "BUY"
+                          ]
+                        },
+                        "receiptStatus": {
+                          "enum": [
+                            0,
+                            1
+                          ]
+                        },
+                        "gasUsed": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "tokenTransferNetBaseUnits": {
+                          "type": "string",
+                          "pattern": "^(0|-?[1-9][0-9]*)$"
+                        },
+                        "transactionHash": {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-f]{64}$"
+                        },
+                        "outerSwapFeePips": {
+                          "type": "array",
+                          "items": {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        },
+                        "state": {
+                          "type": "object",
+                          "properties": {
+                            "accountingL1Block": {
+                              "type": "integer"
+                            },
+                            "action": {
+                              "type": "string"
+                            },
+                            "actorNativeBalanceWei": {
+                              "type": "string",
+                              "pattern": "^(0|[1-9][0-9]*)$"
+                            },
+                            "actorNonce": {
+                              "type": "integer"
+                            },
+                            "dynamicFeeWord": {
+                              "type": "string",
+                              "pattern": "^0x[0-9a-f]{64}$"
+                            },
+                            "guardWord": {
+                              "type": "string",
+                              "pattern": "^0x[0-9a-f]{64}$"
+                            },
+                            "transactionHash": {
+                              "type": "string",
+                              "pattern": "^0x[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "accountingL1Block",
+                            "action",
+                            "actorNativeBalanceWei",
+                            "actorNonce",
+                            "dynamicFeeWord",
+                            "guardWord",
+                            "transactionHash"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "index",
+                        "kind",
+                        "receiptStatus",
+                        "gasUsed",
+                        "tokenTransferNetBaseUnits",
+                        "transactionHash",
+                        "outerSwapFeePips",
+                        "state"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "world",
+                  "stateRoot",
+                  "receiptsRoot",
+                  "actions"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "tokenFlow": {
+              "$ref": "#/$defs/tokenFlow"
+            }
+          },
+          "required": [
+            "schema",
+            "resultIdentity",
+            "operationCommitment",
+            "requestCommitment",
+            "scenarioCommitment",
+            "commonBootstrapRoot",
+            "qualifiedClaims",
+            "independentEVMReexecution",
+            "historicalAuthentication",
+            "worlds"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "schema",
+        "id",
+        "label",
+        "draft",
+        "acceptance",
+        "provenance",
+        "projection"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "id": {
+                "const": "burn"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "projection": {
+                "required": [
+                  "tokenFlow"
+                ],
+                "properties": {
+                  "schema": {
+                    "const": "rhook/studio-playground-result/0.2"
+                  }
+                }
+              },
+              "provenance": {
+                "required": [
+                  "sidecar"
+                ]
+              },
+              "acceptance": {
+                "properties": {
+                  "originalController": {
+                    "const": "COMPARE_STOP"
+                  },
+                  "originalLabResultInstalled": {
+                    "const": false
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "projection": {
+                "properties": {
+                  "schema": {
+                    "const": "rhook/studio-playground-result/0.1"
+                  }
+                }
+              },
+              "acceptance": {
+                "properties": {
+                  "originalController": {
+                    "const": "VERIFY_COMPARE_READ_FINAL_PASS"
+                  },
+                  "originalLabResultInstalled": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "catalog": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "rhook/public-studio-catalog/0.1"
+        },
+        "sdkVersion": {
+          "type": "string"
+        },
+        "catalogSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sourceCommit": {
+          "type": "string"
+        },
+        "metadataContext": {
+          "type": "string"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "summary",
+              "slot",
+              "parameters",
+              "recordedCoverage"
+            ]
+          }
+        }
+      },
+      "required": [
+        "schema",
+        "sdkVersion",
+        "catalogSha256",
+        "sourceCommit",
+        "metadataContext",
+        "blocks"
+      ],
+      "additionalProperties": false
+    },
+    "integrity": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "rhook/public-studio-integrity/0.1"
+        },
+        "meaning": {
+          "type": "string"
+        },
+        "files": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      },
+      "required": [
+        "schema",
+        "meaning",
+        "files"
+      ],
+      "additionalProperties": false
+    },
+    "draft": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "rhook/public-studio-draft/0.1"
+        },
+        "status": {
+          "const": "UNEXECUTED_UNVALIDATED_DRAFT"
+        },
+        "referenceRecord": {
+          "enum": [
+            "a",
+            "b",
+            "burn"
+          ]
+        },
+        "nativeExecutionPerformedNow": {
+          "const": false
+        },
+        "configuration": {
+          "type": "object",
+          "required": [
+            "blocks",
+            "wallets",
+            "actions"
+          ]
+        }
+      },
+      "required": [
+        "schema",
+        "status",
+        "referenceRecord",
+        "nativeExecutionPerformedNow",
+        "configuration"
+      ],
+      "additionalProperties": false
+    },
+    "tokenFlow": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "rhook/playground-token-flow/0.3"
+        },
+        "burnDestination": {
+          "const": "0x000000000000000000000000000000000000dead"
+        },
+        "claimSemantics": {
+          "const": "ACCRUED_QUOTE_CLAIM_NOT_WITHDRAWAL"
+        },
+        "provenance": {
+          "const": "WORKER_REPORTED_ABI_STATIC_CALL_NO_INDEPENDENT_MPT_PROOF"
+        },
+        "supplySemantics": {
+          "const": "TRANSFER_TO_DEAD_NOT_TOTAL_SUPPLY_BURN"
+        },
+        "viewCalls": {
+          "const": 60
+        },
+        "worlds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "world": {
+                "enum": [
+                  "SCENARIO_BASELINE",
+                  "SCENARIO_VARIANT"
+                ]
+              },
+              "buys": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "BUY-2",
+                        "BUY-3"
+                      ]
+                    },
+                    "transactionHash": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-f]{64}$"
+                    },
+                    "receiptStatus": {
+                      "enum": [
+                        0,
+                        1
+                      ]
+                    },
+                    "traderDeltaBaseUnits": {
+                      "type": "string",
+                      "pattern": "^(0|-?[1-9][0-9]*)$"
+                    },
+                    "sentToDeadBaseUnits": {
+                      "type": "string",
+                      "pattern": "^(0|-?[1-9][0-9]*)$"
+                    },
+                    "poolManagerDeltaBaseUnits": {
+                      "type": "string",
+                      "pattern": "^(0|-?[1-9][0-9]*)$"
+                    },
+                    "supplyDeltaBaseUnits": {
+                      "type": "string",
+                      "pattern": "^(0|-?[1-9][0-9]*)$"
+                    },
+                    "protocolClaimableDeltaWei": {
+                      "type": "string",
+                      "pattern": "^(0|-?[1-9][0-9]*)$"
+                    }
+                  },
+                  "required": [
+                    "action",
+                    "transactionHash",
+                    "receiptStatus",
+                    "traderDeltaBaseUnits",
+                    "sentToDeadBaseUnits",
+                    "poolManagerDeltaBaseUnits",
+                    "supplyDeltaBaseUnits",
+                    "protocolClaimableDeltaWei"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "snapshots": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "accountingL1Block": {
+                      "const": 17
+                    },
+                    "action": {
+                      "enum": [
+                        "LAUNCH_POOL-1",
+                        "BUY-2",
+                        "BUY-3"
+                      ]
+                    },
+                    "transactionHash": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-f]{64}$"
+                    },
+                    "values": {
+                      "type": "object",
+                      "properties": {
+                        "traderBalance": {
+                          "type": "string",
+                          "pattern": "^(0|[1-9][0-9]*)$"
+                        },
+                        "deadBalance": {
+                          "type": "string",
+                          "pattern": "^(0|[1-9][0-9]*)$"
+                        },
+                        "poolManagerBalance": {
+                          "type": "string",
+                          "pattern": "^(0|[1-9][0-9]*)$"
+                        },
+                        "totalSupply": {
+                          "type": "string",
+                          "pattern": "^(0|[1-9][0-9]*)$"
+                        },
+                        "protocolClaimable": {
+                          "type": "string",
+                          "pattern": "^(0|[1-9][0-9]*)$"
+                        }
+                      },
+                      "required": [
+                        "traderBalance",
+                        "deadBalance",
+                        "poolManagerBalance",
+                        "totalSupply",
+                        "protocolClaimable"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "accountingL1Block",
+                    "action",
+                    "transactionHash",
+                    "values"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "world",
+              "buys",
+              "snapshots"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "schema",
+        "burnDestination",
+        "claimSemantics",
+        "provenance",
+        "supplySemantics",
+        "viewCalls",
+        "worlds"
+      ],
+      "additionalProperties": false
+    },
+    "sidecar": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "rhook/saved-native-acceptance/0.1"
+        },
+        "status": {
+          "const": "SAVED_NATIVE_RECORDED_ACCEPTANCE_PASS"
+        },
+        "acceptanceIdentity": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "verificationRequestCommitment": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "originalOperation": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inputSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "savedFinalSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "nativeExecutionPerformedNow": {
+          "const": false
+        },
+        "originalNativeExecutionPerformed": {
+          "const": true
+        },
+        "recordVerificationPerformedNow": {
+          "const": true
+        },
+        "independentEVMReexecution": {
+          "const": false
+        },
+        "qualifiedClaims": {
+          "const": 0
+        },
+        "originalControllerStateUnchanged": {
+          "const": "CONTROLLER_CLEANUP_UNCERTAIN"
+        },
+        "quarantineUnchanged": {
+          "const": 1
+        },
+        "controllerRecordRewritten": {
+          "const": false
+        },
+        "LabResultInstalled": {
+          "const": false
+        },
+        "verifierSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "schema",
+        "status",
+        "acceptanceIdentity",
+        "verificationRequestCommitment",
+        "originalOperation",
+        "inputSha256",
+        "savedFinalSha256",
+        "nativeExecutionPerformedNow",
+        "originalNativeExecutionPerformed",
+        "recordVerificationPerformedNow",
+        "independentEVMReexecution",
+        "qualifiedClaims",
+        "originalControllerStateUnchanged",
+        "quarantineUnchanged",
+        "controllerRecordRewritten",
+        "LabResultInstalled",
+        "verifierSha256"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

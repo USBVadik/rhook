@@ -1,0 +1,2410 @@
+{
+  "schema": "rhook/public-studio-catalog/0.1",
+  "sdkVersion": "1.6.1",
+  "catalogSha256": "f3949abade670eb3122173de23b0b27f75d6e19966dd57f47645ddbdc6ab388e",
+  "sourceCommit": "412960b37a631ce145d49fb4a1887f04a4d1fa74",
+  "metadataContext": "Retained SDK metadata; not a live release manifest or native admission for all blocks.",
+  "blocks": [
+    {
+      "id": "anti-snipe",
+      "name": "Anti-Snipe",
+      "summary": "Caps early buys and adds an LP fee in the first blocks",
+      "slot": "rules",
+      "parameters": [
+        {
+          "key": "guardEndBlock",
+          "label": "Guard ends at block",
+          "unit": "blocks",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": true,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint40",
+          "dependsOn": []
+        },
+        {
+          "key": "maxBuyQuoteAmount",
+          "label": "Max buy per block",
+          "unit": "raw",
+          "min": 0,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": "uint128",
+          "dependsOn": [
+            "guardEndBlock"
+          ]
+        },
+        {
+          "key": "snipeTaxPips",
+          "label": "Snipe tax",
+          "unit": "pips",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint24",
+          "dependsOn": [
+            "guardEndBlock",
+            "baseLpFeePips",
+            "snipeFloorPips",
+            "snipeDecaySeconds"
+          ]
+        },
+        {
+          "key": "snipeFloorPips",
+          "label": "Snipe tax floor",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint24",
+          "dependsOn": [
+            "snipeTaxPips",
+            "snipeDecaySeconds"
+          ]
+        },
+        {
+          "key": "snipeDecaySeconds",
+          "label": "Snipe tax decay",
+          "unit": "seconds",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint16",
+          "dependsOn": [
+            "guardEndBlock",
+            "snipeTaxPips",
+            "snipeFloorPips"
+          ]
+        },
+        {
+          "key": "snipeCurve",
+          "label": "Decay curve",
+          "unit": "raw",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [
+            {
+              "value": 0,
+              "label": "Linear"
+            },
+            {
+              "value": 1,
+              "label": "Front-loaded"
+            },
+            {
+              "value": 2,
+              "label": "Step"
+            }
+          ],
+          "type": "integer",
+          "solidityType": "uint8",
+          "dependsOn": [
+            "guardEndBlock",
+            "snipeDecaySeconds"
+          ]
+        }
+      ],
+      "recordedCoverage": "EXACT_SAVED_CONFIGURATIONS_ONLY"
+    },
+    {
+      "id": "dynamic-fees",
+      "name": "Dynamic fees",
+      "summary": "Fee scales with how far a swap moves the price",
+      "slot": "rules",
+      "parameters": [
+        {
+          "key": "maxFeePips",
+          "label": "Fee ceiling",
+          "unit": "pips",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint24",
+          "dependsOn": [
+            "baseLpFeePips",
+            "dynamicFeeSens",
+            "protocolShareBps"
+          ]
+        },
+        {
+          "key": "dynamicFeeSens",
+          "label": "Sensitivity",
+          "unit": "raw",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint16",
+          "dependsOn": [
+            "maxFeePips",
+            "baseLpFeePips",
+            "protocolShareBps"
+          ]
+        },
+        {
+          "key": "windowSeconds",
+          "label": "Step every",
+          "unit": "seconds",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint16",
+          "dependsOn": [
+            "dynamicFeeSens"
+          ]
+        },
+        {
+          "key": "resetSeconds",
+          "label": "Reset after",
+          "unit": "seconds",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 15,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint16",
+          "dependsOn": [
+            "dynamicFeeSens",
+            "windowSeconds"
+          ]
+        },
+        {
+          "key": "carryBps",
+          "label": "Gap kept per step",
+          "unit": "bps",
+          "min": 0,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 125,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint16",
+          "dependsOn": [
+            "dynamicFeeSens"
+          ]
+        },
+        {
+          "key": "moveTicks",
+          "label": "Ticks for a counted move",
+          "unit": "raw",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint24",
+          "dependsOn": [
+            "dynamicFeeSens"
+          ]
+        },
+        {
+          "key": "dynamicFeeLiquidityDivisor",
+          "label": "Liquidity divisor",
+          "unit": "raw",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint16",
+          "dependsOn": [
+            "dynamicFeeSens"
+          ]
+        }
+      ],
+      "recordedCoverage": "EXACT_SAVED_CONFIGURATIONS_ONLY"
+    },
+    {
+      "id": "auto-burn",
+      "name": "Auto Burn",
+      "summary": "Burns a share of actual buy output",
+      "slot": "rules",
+      "parameters": [
+        {
+          "key": "burnBps",
+          "label": "Burn share",
+          "unit": "bps",
+          "min": 0,
+          "max": null,
+          "defaultValue": 100,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint16",
+          "dependsOn": [
+            "lpBps"
+          ]
+        }
+      ],
+      "recordedCoverage": "EXACT_SAVED_CONFIGURATIONS_ONLY"
+    },
+    {
+      "id": "lp-rewards",
+      "name": "LP Rewards",
+      "summary": "An extra LP fee on buys that in-range LPs keep",
+      "slot": "rules",
+      "parameters": [
+        {
+          "key": "lpBps",
+          "label": "LP fee on buys",
+          "unit": "bps",
+          "min": null,
+          "max": null,
+          "defaultValue": 200,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": "uint16",
+          "dependsOn": [
+            "burnBps",
+            "royaltyBps",
+            "protocolShareBps",
+            "baseLpFeePips"
+          ]
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "arb-recapture",
+      "name": "Arb recapture",
+      "summary": "Pool keeps price-gap profit",
+      "slot": "ring",
+      "parameters": [],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "buy-sell-block",
+      "name": "Buy/Sell Block",
+      "summary": "Pauses buys and locks sells for a set time after launch",
+      "slot": "rules",
+      "parameters": [
+        {
+          "key": "buyPauseBlocks",
+          "label": "Buy pause",
+          "unit": "blocks",
+          "min": 0,
+          "max": 300,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "sellLockBlocks",
+          "label": "Sell lock",
+          "unit": "blocks",
+          "min": 0,
+          "max": 5,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "agent-gate",
+      "name": "Agent gate",
+      "summary": "Only ERC-8004 agents can buy, sell or add liquidity; removing is never gated",
+      "slot": "advisory",
+      "parameters": [
+        {
+          "key": "flags",
+          "label": "Checks",
+          "unit": "mask",
+          "min": 0,
+          "max": 3,
+          "defaultValue": 1,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "minScore",
+          "label": "Score to enter",
+          "unit": "raw",
+          "min": 0,
+          "max": "4294967295",
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": true,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "tierScore",
+          "label": "Score for the base fee",
+          "unit": "raw",
+          "min": 0,
+          "max": "4294967295",
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": true,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "tierPips"
+          ]
+        },
+        {
+          "key": "tierPips",
+          "label": "Fee tier surcharge",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": true,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "tierScore"
+          ]
+        },
+        {
+          "key": "reviewers",
+          "label": "Reviewer set",
+          "unit": "bytes32",
+          "min": 0,
+          "max": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "defaultValue": null,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "bytes32",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "minAge",
+          "label": "Age to enter",
+          "unit": "seconds",
+          "min": 0,
+          "max": 2592000,
+          "defaultValue": 3600,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": true,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "market-guard",
+      "name": "Market Guard",
+      "summary": "Swaps that stray from a live Chainlink price pay the pool's LPs a surcharge",
+      "slot": "advisory",
+      "parameters": [
+        {
+          "key": "mode",
+          "label": "Mode",
+          "unit": "raw",
+          "min": 1,
+          "max": 2,
+          "defaultValue": 2,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [
+            {
+              "value": 2,
+              "label": "Surcharge"
+            }
+          ],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "bandBps",
+          "label": "Band",
+          "unit": "bps",
+          "min": 50,
+          "max": 5000,
+          "defaultValue": 1000,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "rampBps",
+          "label": "Ramp",
+          "unit": "bps",
+          "min": 50,
+          "max": 5000,
+          "defaultValue": 1000,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "surchargePips",
+          "label": "Full surcharge",
+          "unit": "pips",
+          "min": 1,
+          "max": null,
+          "defaultValue": 10000,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "staleness",
+          "label": "Price age limit",
+          "unit": "seconds",
+          "min": 60,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "minDepth",
+          "label": "Least depth",
+          "unit": "raw",
+          "min": 0,
+          "max": "1000000000000000000000000000000",
+          "defaultValue": "0",
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": true,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "market-hours-fee",
+      "name": "Market-hours fee",
+      "summary": "A fee that follows the US stock market's sessions",
+      "slot": "advisory",
+      "parameters": [
+        {
+          "key": "regularPips",
+          "label": "Regular hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "preMarketPips",
+          "label": "Pre-market",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "afterHoursPips",
+          "label": "After hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "overnightPips",
+          "label": "Overnight",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "closedPips",
+          "label": "Market closed",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "openRampSeconds",
+          "label": "Ramp into the open",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 1800,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "closeRampSeconds"
+          ]
+        },
+        {
+          "key": "closeRampSeconds",
+          "label": "Ramp into the close",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 900,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "openRampSeconds"
+          ]
+        },
+        {
+          "key": "flags",
+          "label": "Days off the calendar",
+          "unit": "mask",
+          "min": 0,
+          "max": 1,
+          "defaultValue": 1,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "managed-fee",
+      "name": "Managed fee",
+      "summary": "A surcharge Hookr's keeper moves as the price moves, inside a cap you fix at launch",
+      "slot": "advisory",
+      "parameters": [
+        {
+          "key": "cap",
+          "label": "Surcharge cap",
+          "unit": "pips",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "surcharge",
+            "premium0",
+            "premium1"
+          ]
+        },
+        {
+          "key": "surcharge",
+          "label": "Starting surcharge",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "cap",
+            "premium0",
+            "premium1"
+          ]
+        },
+        {
+          "key": "premium0",
+          "label": "Premium one way",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "cap",
+            "surcharge"
+          ]
+        },
+        {
+          "key": "premium1",
+          "label": "Premium the other way",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "cap",
+            "surcharge"
+          ]
+        },
+        {
+          "key": "maxStep",
+          "label": "Largest change per update",
+          "unit": "pips",
+          "min": 1,
+          "max": "16777215",
+          "defaultValue": 1000,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "minInterval",
+          "label": "Least time between updates",
+          "unit": "seconds",
+          "min": 1,
+          "max": 86400,
+          "defaultValue": 60,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "maxTtl",
+          "label": "Longest a setting lasts",
+          "unit": "seconds",
+          "min": 1,
+          "max": 259200,
+          "defaultValue": 3600,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "regularPips",
+          "label": "Regular hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "cap"
+          ]
+        },
+        {
+          "key": "preMarketPips",
+          "label": "Pre-market",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "cap"
+          ]
+        },
+        {
+          "key": "afterHoursPips",
+          "label": "After hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "cap"
+          ]
+        },
+        {
+          "key": "overnightPips",
+          "label": "Overnight",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "cap"
+          ]
+        },
+        {
+          "key": "closedPips",
+          "label": "Market closed",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "cap"
+          ]
+        },
+        {
+          "key": "openRampSeconds",
+          "label": "Ramp into the open",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "closeRampSeconds"
+          ]
+        },
+        {
+          "key": "closeRampSeconds",
+          "label": "Ramp into the close",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "openRampSeconds"
+          ]
+        },
+        {
+          "key": "flags",
+          "label": "Days off the calendar",
+          "unit": "mask",
+          "min": 0,
+          "max": 1,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "zap-source",
+      "name": "Zap Relay source",
+      "summary": "Routes a cut of every buy to a zap vault that buys another pool",
+      "slot": "advisory",
+      "parameters": [
+        {
+          "key": "source.takePips",
+          "label": "Cut of each buy",
+          "unit": "pips",
+          "min": 1,
+          "max": 100000,
+          "defaultValue": 10000,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "source.vault",
+          "label": "Zap vault",
+          "unit": "address",
+          "min": 1,
+          "max": "1461501637330902918203684832716283019655932542975",
+          "defaultValue": null,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "address",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "regularPips",
+          "label": "Regular hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "preMarketPips",
+          "label": "Pre-market",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "afterHoursPips",
+          "label": "After hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "overnightPips",
+          "label": "Overnight",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "closedPips",
+          "label": "Market closed",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "openRampSeconds",
+          "label": "Ramp into the open",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "closeRampSeconds"
+          ]
+        },
+        {
+          "key": "closeRampSeconds",
+          "label": "Ramp into the close",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "openRampSeconds"
+          ]
+        },
+        {
+          "key": "flags",
+          "label": "Days off the calendar",
+          "unit": "mask",
+          "min": 0,
+          "max": 1,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "zap-target",
+      "name": "Zap Relay target",
+      "summary": "Only zaps from its source pools may buy, and anyone may sell",
+      "slot": "advisory",
+      "parameters": [
+        {
+          "key": "route.mode",
+          "label": "What a zap does",
+          "unit": "raw",
+          "min": 0,
+          "max": 1,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [
+            {
+              "value": 0,
+              "label": "Buy and burn"
+            },
+            {
+              "value": 1,
+              "label": "Buy and add liquidity"
+            }
+          ],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "route.sink",
+          "label": "Send bought tokens to",
+          "unit": "address",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "address",
+          "solidityType": null,
+          "dependsOn": [
+            "route.mode"
+          ]
+        },
+        {
+          "key": "route.impactBps",
+          "label": "Price rise per window",
+          "unit": "bps",
+          "min": 1,
+          "max": 2000,
+          "defaultValue": 500,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "route.rewardBps",
+          "label": "Reward for zapping",
+          "unit": "bps",
+          "min": 0,
+          "max": 100,
+          "defaultValue": 50,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "route.threshold",
+          "label": "Zap once this much gathers",
+          "unit": "raw",
+          "min": 1000,
+          "max": "340282366920938463463374607431768211455",
+          "defaultValue": "1000",
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "route.maxPerZap",
+          "label": "Most per zap",
+          "unit": "raw",
+          "min": null,
+          "max": "340282366920938463463374607431768211455",
+          "defaultValue": "0",
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": true,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": [
+            "route.threshold"
+          ]
+        },
+        {
+          "key": "route.windowBlocks",
+          "label": "Impact window",
+          "unit": "blocks",
+          "min": 1,
+          "max": 300,
+          "defaultValue": 1,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "route.windowScope",
+          "label": "Window counts",
+          "unit": "raw",
+          "min": 0,
+          "max": 1,
+          "defaultValue": 1,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [
+            {
+              "value": 0,
+              "label": "Per vault"
+            },
+            {
+              "value": 1,
+              "label": "Whole pool"
+            }
+          ],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "gate.feeders",
+          "label": "Pools that can feed it",
+          "unit": "raw",
+          "min": 1,
+          "max": 4,
+          "defaultValue": 1,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "regularPips",
+          "label": "Regular hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "preMarketPips",
+          "label": "Pre-market",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "afterHoursPips",
+          "label": "After hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "overnightPips",
+          "label": "Overnight",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "closedPips",
+          "label": "Market closed",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "openRampSeconds",
+          "label": "Ramp into the open",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "closeRampSeconds"
+          ]
+        },
+        {
+          "key": "closeRampSeconds",
+          "label": "Ramp into the close",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "openRampSeconds"
+          ]
+        },
+        {
+          "key": "flags",
+          "label": "Days off the calendar",
+          "unit": "mask",
+          "min": 0,
+          "max": 1,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "swap-reward-mint",
+      "name": "Swap Reward Mint",
+      "summary": "Pays traders a reward token for each swap, funded by a slice of the trade",
+      "slot": "advisory",
+      "parameters": [
+        {
+          "key": "buyTakePips",
+          "label": "Buy slice",
+          "unit": "pips",
+          "min": 0,
+          "max": 50000,
+          "defaultValue": 10000,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "sellTakePips",
+          "label": "Sell slice",
+          "unit": "pips",
+          "min": 0,
+          "max": 50000,
+          "defaultValue": 10000,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "rewardToken",
+          "label": "Reward token",
+          "unit": "address",
+          "min": 1,
+          "max": "1461501637330902918203684832716283019655932542975",
+          "defaultValue": null,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "address",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "rewardPerQuoteWad",
+          "label": "Reward rate",
+          "unit": "raw",
+          "min": "1",
+          "max": "1000000000000000000000000000000000000",
+          "defaultValue": "1000000000000000000",
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "lifetimeRewardCap",
+          "label": "Total reward",
+          "unit": "raw",
+          "min": null,
+          "max": "340282366920938463463374607431768211455",
+          "defaultValue": "340282366920938463463374607431768211455",
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": [
+            "rewardPerQuoteWad"
+          ]
+        },
+        {
+          "key": "maxRewardPerSwap",
+          "label": "Reward per swap",
+          "unit": "raw",
+          "min": null,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": [
+            "rewardPerQuoteWad",
+            "lifetimeRewardCap"
+          ]
+        },
+        {
+          "key": "runSeconds",
+          "label": "Runs for",
+          "unit": "seconds",
+          "min": 1,
+          "max": "1099511627775",
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": true,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "creatorRecipient",
+          "label": "Your payout",
+          "unit": "address",
+          "min": 1,
+          "max": "1461501637330902918203684832716283019655932542975",
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "address",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "regularPips",
+          "label": "Regular hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "preMarketPips",
+          "label": "Pre-market",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "afterHoursPips",
+          "label": "After hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "overnightPips",
+          "label": "Overnight",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "closedPips",
+          "label": "Market closed",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "openRampSeconds",
+          "label": "Ramp into the open",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "closeRampSeconds"
+          ]
+        },
+        {
+          "key": "closeRampSeconds",
+          "label": "Ramp into the close",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "openRampSeconds"
+          ]
+        },
+        {
+          "key": "flags",
+          "label": "Days off the calendar",
+          "unit": "mask",
+          "min": 0,
+          "max": 1,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "usage-fee",
+      "name": "Usage fee",
+      "summary": "Hook Blocks Market block: every swap pays a usage fee to its builder, backers, Hookr and a reserve",
+      "slot": "advisory",
+      "parameters": [
+        {
+          "key": "usageFeePips",
+          "label": "Usage fee",
+          "unit": "pips",
+          "min": 1,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "regularPips",
+          "label": "Regular hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "preMarketPips",
+          "label": "Pre-market",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "afterHoursPips",
+          "label": "After hours",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "overnightPips",
+          "label": "Overnight",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "closedPips",
+          "label": "Market closed",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "openRampSeconds",
+          "label": "Ramp into the open",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "closeRampSeconds"
+          ]
+        },
+        {
+          "key": "closeRampSeconds",
+          "label": "Ramp into the close",
+          "unit": "seconds",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "openRampSeconds"
+          ]
+        },
+        {
+          "key": "flags",
+          "label": "Days off the calendar",
+          "unit": "mask",
+          "min": 0,
+          "max": 1,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "pay-later",
+      "name": "Pay Later",
+      "summary": "Buyers pay a premium now for the right to buy at a fixed price later",
+      "slot": "periphery",
+      "parameters": [
+        {
+          "key": "premiumBps",
+          "label": "Premium",
+          "unit": "bps",
+          "min": 100,
+          "max": 5000,
+          "defaultValue": 500,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "strikeMarkupBps",
+          "label": "Strike above the price",
+          "unit": "bps",
+          "min": 0,
+          "max": 5000,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "tenor",
+          "label": "Term",
+          "unit": "seconds",
+          "min": 300,
+          "max": 604800,
+          "defaultValue": 86400,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "topGuardBps",
+          "label": "Top guard",
+          "unit": "bps",
+          "min": 500,
+          "max": 5000,
+          "defaultValue": 1000,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "priceWindowBlocks",
+          "label": "Price window",
+          "unit": "blocks",
+          "min": 1,
+          "max": 64,
+          "defaultValue": 25,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "maxBlockDepthBps",
+          "label": "Depth per block",
+          "unit": "bps",
+          "min": 1,
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "baseLpFeePips"
+          ]
+        },
+        {
+          "key": "anchorDecayBlocks",
+          "label": "High fades over",
+          "unit": "blocks",
+          "min": 300,
+          "max": 50400,
+          "defaultValue": 7200,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "minOrderUnits",
+          "label": "Smallest reservation",
+          "unit": "raw",
+          "min": "1",
+          "max": null,
+          "defaultValue": null,
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": [
+            "maxOrderUnits"
+          ]
+        },
+        {
+          "key": "maxOrderUnits",
+          "label": "Largest reservation",
+          "unit": "raw",
+          "min": null,
+          "max": null,
+          "defaultValue": "0",
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": [
+            "minOrderUnits",
+            "maxUnitsPerBlock"
+          ]
+        },
+        {
+          "key": "maxUnitsPerBlock",
+          "label": "Most reserved per block",
+          "unit": "raw",
+          "min": null,
+          "max": null,
+          "defaultValue": "0",
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": [
+            "maxOrderUnits",
+            "maxActiveUnits"
+          ]
+        },
+        {
+          "key": "maxActiveUnits",
+          "label": "Most reserved at once",
+          "unit": "raw",
+          "min": null,
+          "max": null,
+          "defaultValue": "0",
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": [
+            "maxUnitsPerBlock",
+            "maxInventory"
+          ]
+        },
+        {
+          "key": "maxInventory",
+          "label": "Inventory cap",
+          "unit": "raw",
+          "min": null,
+          "max": "1000000000000000000000000000000000000",
+          "defaultValue": "0",
+          "requiresContext": true,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": [
+            "maxActiveUnits"
+          ]
+        },
+        {
+          "key": "minPremium",
+          "label": "Least premium",
+          "unit": "raw",
+          "min": "0",
+          "max": "340282366920938463463374607431768211455",
+          "defaultValue": "0",
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "uint-string",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "exit-clock",
+      "name": "Exit Clock",
+      "summary": "The sell fee falls with the pool's age, or with each seller's time held on a per-holder clock",
+      "slot": "rules",
+      "parameters": [
+        {
+          "key": "exitTopBps",
+          "label": "Top rate",
+          "unit": "bps",
+          "min": 10,
+          "max": 1000,
+          "defaultValue": 100,
+          "requiresContext": false,
+          "grid": 10,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "exitFloorBps",
+          "label": "Floor",
+          "unit": "bps",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 10,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "exitTopBps"
+          ]
+        },
+        {
+          "key": "exitHorizonHours",
+          "label": "Horizon",
+          "unit": "raw",
+          "min": 1,
+          "max": 720,
+          "defaultValue": 24,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [
+            {
+              "value": 6,
+              "label": "6 hours"
+            },
+            {
+              "value": 12,
+              "label": "12 hours"
+            },
+            {
+              "value": 24,
+              "label": "24 hours"
+            },
+            {
+              "value": 48,
+              "label": "48 hours"
+            },
+            {
+              "value": 72,
+              "label": "3 days"
+            },
+            {
+              "value": 168,
+              "label": "7 days"
+            },
+            {
+              "value": 336,
+              "label": "14 days"
+            },
+            {
+              "value": 720,
+              "label": "30 days"
+            }
+          ],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "exitCurve",
+          "label": "Curve",
+          "unit": "raw",
+          "min": 0,
+          "max": 2,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [
+            {
+              "value": 0,
+              "label": "Linear"
+            },
+            {
+              "value": 1,
+              "label": "Front-loaded"
+            },
+            {
+              "value": 2,
+              "label": "Steps"
+            }
+          ],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "exitTo",
+          "label": "Paid to",
+          "unit": "raw",
+          "min": 0,
+          "max": 1,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [
+            {
+              "value": 0,
+              "label": "LP fee"
+            },
+            {
+              "value": 1,
+              "label": "Liquidity owner"
+            }
+          ],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "exitRecords",
+          "label": "Clock",
+          "unit": "raw",
+          "min": 0,
+          "max": 1,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [
+            {
+              "value": 0,
+              "label": "Pool-wide"
+            },
+            {
+              "value": 1,
+              "label": "Per holder"
+            }
+          ],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "holder-pot",
+      "name": "Holder Pot",
+      "summary": "Sandwich Guard's charges pay holders daily, by amount and time held",
+      "slot": "rules",
+      "parameters": [],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "storm-fee",
+      "name": "Storm Fee",
+      "summary": "The fee rises when the price gets choppy and eases as it calms, within launch limits",
+      "slot": "rules",
+      "parameters": [
+        {
+          "key": "stormCeilingPips",
+          "label": "Ceiling",
+          "unit": "pips",
+          "min": 500,
+          "max": 100000,
+          "defaultValue": 6000,
+          "requiresContext": false,
+          "grid": 500,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "stormFloorPips",
+          "label": "Floor",
+          "unit": "pips",
+          "min": 0,
+          "max": null,
+          "defaultValue": 0,
+          "requiresContext": true,
+          "grid": 500,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": [
+            "stormCeilingPips"
+          ]
+        },
+        {
+          "key": "stormTo",
+          "label": "Paid to",
+          "unit": "raw",
+          "min": 0,
+          "max": 1,
+          "defaultValue": 0,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [
+            {
+              "value": 0,
+              "label": "LP fee"
+            },
+            {
+              "value": 1,
+              "label": "Liquidity owner"
+            }
+          ],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "wallet-cap",
+      "name": "Wallet Cap",
+      "summary": "No wallet can buy more than a set share of the supply while the launch guard lasts",
+      "slot": "rules",
+      "parameters": [
+        {
+          "key": "walletCapBps",
+          "label": "Cap per wallet",
+          "unit": "bps",
+          "min": 10,
+          "max": 1000,
+          "defaultValue": 200,
+          "requiresContext": false,
+          "grid": 10,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "swap-cut",
+      "name": "Swap Cut",
+      "summary": "Takes a fixed cut of each buy and each sell, set at launch, for the pool's liquidity owner",
+      "slot": "rules",
+      "parameters": [
+        {
+          "key": "buyCutPips",
+          "label": "Buy cut",
+          "unit": "pips",
+          "min": 0,
+          "max": 100000,
+          "defaultValue": 10000,
+          "requiresContext": false,
+          "grid": 1000,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "sellCutPips",
+          "label": "Sell cut",
+          "unit": "pips",
+          "min": 0,
+          "max": 100000,
+          "defaultValue": 10000,
+          "requiresContext": false,
+          "grid": 1000,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    },
+    {
+      "id": "sandwich-guard",
+      "name": "Sandwich Guard",
+      "summary": "A swap that moves the price back toward where its window opened pays that move, up to a maximum, and so does a sandwich inside one window",
+      "slot": "rules",
+      "parameters": [
+        {
+          "key": "sandwichWindowBlocks",
+          "label": "Window",
+          "unit": "raw",
+          "min": 1,
+          "max": 4,
+          "defaultValue": 1,
+          "requiresContext": false,
+          "grid": 1,
+          "zeroIsOff": false,
+          "choices": [
+            {
+              "value": 1,
+              "label": "1 block"
+            },
+            {
+              "value": 2,
+              "label": "2 blocks"
+            },
+            {
+              "value": 3,
+              "label": "3 blocks"
+            },
+            {
+              "value": 4,
+              "label": "4 blocks"
+            }
+          ],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        },
+        {
+          "key": "sandwichMaxPips",
+          "label": "Most per swap",
+          "unit": "pips",
+          "min": 50000,
+          "max": 150000,
+          "defaultValue": 100000,
+          "requiresContext": false,
+          "grid": 10000,
+          "zeroIsOff": false,
+          "choices": [],
+          "type": "integer",
+          "solidityType": null,
+          "dependsOn": []
+        }
+      ],
+      "recordedCoverage": "CATALOG_ONLY"
+    }
+  ]
+}
