@@ -178,7 +178,7 @@ class HookrScenarioAdapter:
     def _sdk(self, descriptor=None):
         return backend_sdk(self.home, descriptor or dict(kind=LP_KIND))
 
-    def prepare(self, source, header, descriptor, output):
+    def prepare(self, source, header, descriptor, output, *, node=None):
         sdk = self._sdk(descriptor)
         if descriptor['kind'] == OVERLAY_KIND:
             from ..config_overlay import ACCEPTED_OVERLAY_ENGINE
@@ -187,18 +187,18 @@ class HookrScenarioAdapter:
             # preparation, bound to the reviewed overlay worker. No worker runs here.
             check(ACCEPTED_OVERLAY_ENGINE is not None, 'CONFIG_OVERLAY_ENGINE_NOT_ACCEPTED',
                   'The config-overlay worker has no accepted identity in this SDK yet; nothing was prepared.')
-            plan = _sdk_call(sdk.plan_overlay, source, expected_sha256=pin, interventions=descriptor['interventions'])
+            plan = _sdk_call(sdk.plan_overlay, source, expected_sha256=pin, interventions=descriptor['interventions'], node=node)
             return _sdk_call(sdk.prepare_overlay, plan['descriptor'], source, expected_sha256=pin, output=output,
-                             engine=ACCEPTED_OVERLAY_ENGINE)
+                             engine=ACCEPTED_OVERLAY_ENGINE, node=node)
         if descriptor['kind'] == DYNAMIC_KIND:
             from ..dynamic_fee import ACCEPTED_DERIVATIVE_ENGINE
             from ..interventions import DYNAMIC_OFF
             pin = header['source']['sha256']
             # Read-only MPT authentication of the original Root and Rules target leaves, then the existing
             # Dynamic Fee OFF preparation, bound to the reviewed derivative engine. No worker runs here.
-            plan = _sdk_call(sdk.plan_intervention, source, expected_sha256=pin, kind=DYNAMIC_OFF)
+            plan = _sdk_call(sdk.plan_intervention, source, expected_sha256=pin, kind=DYNAMIC_OFF, node=node)
             return _sdk_call(sdk.prepare_intervention, plan['descriptor'], source, expected_sha256=pin, output=output,
-                             engine=ACCEPTED_DERIVATIVE_ENGINE)
+                             engine=ACCEPTED_DERIVATIVE_ENGINE, node=node)
         config = _sdk_call(sdk.configure, lp_bps=descriptor['replacement'], checkpoint=header['checkpoint'])
         return _sdk_call(sdk.prepare, config, source, expected_sha256=header['source']['sha256'], output=output)
 

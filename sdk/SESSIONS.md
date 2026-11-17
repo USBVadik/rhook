@@ -38,6 +38,10 @@ session.verify_selected(v50, run_directory)  # existing scenario verifier, then 
 session.compare_verified()
 ```
 
+The Python planning methods and `session.prepare_variant(variant_id, node=...)` accept an explicit
+Node executable. Dynamic Fee and Config Overlay preparation use that same executable for both
+original-target proof checks, including when Node is absent from `PATH`.
+
 `sdk.open_session(session_id)` reopens a session offline. Every identity is re-derived from the retained
 source; an edited manifest or source copy is reported as drift. An open session checks the retained source
 against its pin again before each coverage, preparation and preparation check, and passes on exactly the
