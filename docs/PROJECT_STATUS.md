@@ -1,6 +1,6 @@
 # RHOOK project status and accepted decisions
 
-**Status date: 11 November 2026.** Start here before proposing work. This is a
+**Status date: 18 November 2026.** Start here before proposing work. This is a
 public coordination index, not scientific evidence, native execution permission
 or a complete copy of private project history. Check the linked commit/PR state
 before acting; an accepted local milestone and a merged public release are
@@ -12,16 +12,12 @@ historical pilot scope, not the intended long-term boundary of the protocol.
 
 ## Public source and publication baseline
 
-At this update's preparation, public main was
-[`493dc5b7`](https://github.com/USBVadik/rhook/commit/493dc5b7a7ab101a2cfcd0be40f13eaa326405a2),
-the SDK 0.6 Developer Preview merged in
-[PR #19](https://github.com/USBVadik/rhook/pull/19). The existing
-[PR #20](https://github.com/USBVadik/rhook/pull/20) was OPEN/DRAFT at
-`7dfabe04fda71294716c8bc0ce71a706956ab868`; its
-[CI run 42478097960](https://github.com/USBVadik/rhook/actions/runs/42478097960)
-completed verify and sdk-offline successfully. This is a dated reference
-snapshot, not a permanent assertion about current main or merge authorization.
-The present status/cross-engine documentation is a separate change from PR #20.
+This update is based on public main at
+[`4b10966`](https://github.com/USBVadik/rhook/commit/4b10966f3dc7df3fa0483c2f185d2a48a9355818),
+which merged the Hookr cross-engine study and the November status snapshot in
+[PR #21](https://github.com/USBVadik/rhook/pull/21). The SDK 0.6 Developer Preview
+remains available from [PR #19](https://github.com/USBVadik/rhook/pull/19).
+[PR #20](https://github.com/USBVadik/rhook/pull/20) is tracked separately.
 
 Public entry points: [SDK](../sdk/README.md), [sessions](../sdk/SESSIONS.md),
 [scenarios](../sdk/SCENARIOS.md), [descriptor specification](../sdk/PROFILE_DESCRIPTOR_SPEC.md),
@@ -59,6 +55,20 @@ without their private preimages/context. LP0–99 is an admitted numeric domain;
 executed LP37/38 do not establish complete coverage of that domain. `FRESH_NATIVE`
 describes a result's execution origin: reading it later performs no new EVM work.
 The LP50 Rust study does not silently upgrade LP37/38, LP0 or G5 verification.
+
+## Linux execution and Studio delivery
+
+One private Linux Go/Nitro run completed both worlds of a synthetic Hookr
+Playground 0.2 scenario. The controller completed Verify, Compare and ReadFinal.
+The original outer run stopped at Studio result binding. A separate recovery
+matched all 39,182 canonical bytes of the saved controller projection.
+
+The recorded-only RC 01 delivered that saved comparison through Linux Nginx and
+HTTPS to Studio in WebKit. Run remained disabled. A new two-buy Anti-Snipe and
+Dynamic Fee configuration passed offline admission and encoding. It has no live
+Linux operation or result. The next product validation remains a fresh Studio
+request under operator approval, followed by an external developer evaluating a
+supported question. See the [Linux milestone](research/linux-studio-recorded-delivery.md).
 
 ## Implemented privately, not distributed here
 
