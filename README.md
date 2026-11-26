@@ -9,10 +9,10 @@ public capabilities, private milestones, current blockers and work already compl
 
 ## What RHOOK enables
 
-RHOOK replays a supported history or checkpoint scenario, applies a reviewed
-intervention, and compares receipts, logs, fees, balances and state roots across
-ACTUAL and BRANCH. Input acquisition, execution and verification are separate
-steps. Missing authenticated state stops the replay.
+RHOOK replays supported historical execution or a scenario on an authenticated
+checkpoint, applies a reviewed intervention, and compares receipts, logs, fees,
+balances and state roots across ACTUAL and BRANCH. Input acquisition, execution
+and verification are separate steps. Missing authenticated state stops the replay.
 
 The retained implementations cover bounded Robinhood Chain and Ethereum Mainnet
 cases. Hookr is the first practical application on Robinhood Chain. The
@@ -25,8 +25,12 @@ The workflow:
 inspect → plan → authorize → replay → verify → compare
 ```
 
-The public clone provides the existing offline SDK, descriptor preview and recorded
-Robinhood evidence example. The source-only Common Developer Consumer has
+The public clone provides the offline SDK, descriptor preview and recorded
+Robinhood evidence example. Run the offline checks with
+`python3 -B sdk/tools/test_offline.py`.
+Native execution requires a worker and witness. Their public distribution is pending.
+
+The source-only Common Developer Consumer has
 passed local packaging and a recorded inspection using the public example.
 Its source has a separate publication scope. The Ethereum execution and
 verification experiments used retained private inputs and tools.
