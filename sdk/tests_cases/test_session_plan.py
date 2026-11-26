@@ -3,7 +3,7 @@ from pathlib import Path
 import hashlib, json, os, subprocess, sys, unittest
 from unittest.mock import patch
 
-from developer.files import load
+from developer.files import canonical, load
 from rhook_alpha.execution import ExecutionSDK
 from rhook_alpha.cases.api import CaseSDK
 from rhook_alpha.session import SessionError, MAX_VARIANTS, hookr
@@ -177,6 +177,46 @@ class Readiness(PlanTest):
         self.assertEqual((ninth['status'], ninth['variantId'], [s['code'] for s in ninth['readiness']['stops']]), ('PLAN_STOP', None, ['VARIANT_LIMIT']))
         variants = self.root / 'home/sessions' / outs[0]['sessionId'] / 'variants'
         self.assertEqual(len([p for p in variants.iterdir() if p.name[0] != '.']), MAX_VARIANTS)
+
+
+class SelectedNode(PlanTest):
+    """Exercise real target planning/preparation with a synthetic proof-helper response."""
+    def plan_with_selected_node(self, mode):
+        from rhook_alpha import interventions
+        from test_interventions import Interventions
+        _, _, descriptor = Interventions().prepared()
+        projection = descriptor['originalProjection']
+        selected = self.root / 'selected-node'
+        commands = []
+
+        def authenticate(command, **kwargs):
+            self.assertEqual(command, [str(selected), str(interventions.AUTHENTICATOR)])
+            commands.append(command)
+            # The fixture is synthetic: no trie, native engine or network is executed.
+            return subprocess.CompletedProcess(command, 0, canonical(projection), b'')
+
+        value, src, pin = self.pinned()
+        with patch.object(hookr.HookrScenarioAdapter, 'coverage', return_value=satisfied_report()), \
+             patch.object(interventions.shutil, 'which', return_value=None), \
+             patch.object(interventions.subprocess, 'run', side_effect=authenticate), \
+             NoNativeNoNetwork() as guard, Forbidden():
+            sdk = self.sdk()
+            selection = dict(source=src, expected_sha256=pin, checkpoint=value['checkpoint'], node=selected)
+            if mode == 'dynamic':
+                out = sdk.plan_dynamic_fee_variant('OFF', **selection)
+            else:
+                out = sdk.plan_config_overlay_variant(lp_bps=23, dynamic_fee='OFF', **selection)
+        self.assertEqual(out['status'], READY, out['readiness'])
+        self.assertEqual(len(commands), 2, 'both planning and preparation must authenticate the target')
+        self.assertEqual(guard.launched, [])
+        self.assert_boundaries(out)
+        self.assert_no_native_traces('home')
+
+    def test_dynamic_fee_preparation_uses_the_selected_node_without_path_lookup(self):
+        self.plan_with_selected_node('dynamic')
+
+    def test_config_overlay_preparation_uses_the_selected_node_without_path_lookup(self):
+        self.plan_with_selected_node('overlay')
 
 
 @COVERAGE

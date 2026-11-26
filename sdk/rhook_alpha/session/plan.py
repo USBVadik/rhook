@@ -175,7 +175,7 @@ def _plan(sdk, parameters, selection, remaining, *, session_id, source, expected
     prepared_now = None
     if not stops:
         try:
-            prepared_now = session.prepare_variant(vid)
+            prepared_now = session.prepare_variant(vid) if node is None else session.prepare_variant(vid, node=node)
         except SessionError as error:
             stops.append(dict(code=error.code, nextStep=error.next_step, details=error.details))
     view = next(v for v in session.variants() if v['variantId'] == vid)

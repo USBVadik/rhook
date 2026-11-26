@@ -283,12 +283,16 @@ class HostCli(unittest.TestCase):
     def test_prepare_cli_returns_success_for_binding_but_failure_for_stop(self):
         from rhook_alpha.cases.__main__ import main
         binding={'schema':'rhook/scenario-operation/0.1','operationCommitment':'a'*64}
-        with patch.object(CaseSDK,'prepare_scenario',return_value=binding),\
-             contextlib.redirect_stdout(io.StringIO()):
-            self.assertEqual(main(['scenario-prepare','/not-read']),0)
-        with patch.object(CaseSDK,'prepare_scenario',side_effect=ValueError('STOP')),\
-             contextlib.redirect_stdout(io.StringIO()):
-            self.assertEqual(main(['scenario-prepare','/not-read']),1)
+        with tempfile.TemporaryDirectory() as tmp:
+            home=Path(tmp).resolve()/'home'
+            args=['--home',str(home),'scenario-prepare','/not-read']
+            with patch.object(CaseSDK,'prepare_scenario',return_value=binding),\
+                 contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(main(args),0)
+            with patch.object(CaseSDK,'prepare_scenario',side_effect=ValueError('STOP')),\
+                 contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(main(args),1)
+            self.assertFalse(home.exists())
 
 
 if __name__=='__main__':unittest.main()

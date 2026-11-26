@@ -561,7 +561,7 @@ class G4ABackend(unittest.TestCase):
         from rhook_alpha.cases.scenario import api
         self.api = api
         self.tmp = tempfile.TemporaryDirectory(prefix='rhook-g4a-')
-        self.sdk = _FakeSDK(self.tmp.name)
+        self.sdk = _FakeSDK(Path(self.tmp.name).resolve())
 
     def tearDown(self):
         self.tmp.cleanup()

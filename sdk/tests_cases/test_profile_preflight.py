@@ -49,7 +49,7 @@ def runtime_of(engine, profile=api.PROFILE_OVERLAY_PROFILE):
 class Home(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix='rhook-g5-')
-        self.home = Path(self.tmp.name) / 'home'
+        self.home = Path(self.tmp.name).resolve() / 'home'
         self.home.mkdir(mode=0o700)
         self.sdk = CaseSDK(self.home)
 
@@ -317,12 +317,13 @@ class NativeGate(Home):
         self.assertLess(value['body']['expiresUnix'], value['body']['notBeforeUnix'] + 600)
         from rhook_alpha.cases import authority
         with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
             b = dict(self.b, planId='c-' + 'e' * 32)
             with self.assertRaises(ValueError) as caught:
-                authority.issue(Path(tmp), b, b'k' * 32, now=1000, not_after=1179)
+                authority.issue(root, b, b'k' * 32, now=1000, not_after=1179)
             self.assertIn('CONSENT_AUTHORIZATION_WINDOW', str(caught.exception))
-            self.assertFalse((Path(tmp) / b['planId']).exists())
-            grant = authority.issue(Path(tmp), b, b'k' * 32, now=1000)
+            self.assertFalse((root / b['planId']).exists())
+            grant = authority.issue(root, b, b'k' * 32, now=1000)
             self.assertEqual(json.loads(grant.read_bytes())['body']['expiresUnix'], 1600)
 
     def test_execution_sdk_refuses_before_the_attempt_marker(self):
