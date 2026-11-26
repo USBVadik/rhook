@@ -1,0 +1,26 @@
+{
+  "name": "@rhook/evidence-consumer",
+  "version": "0.2.0-recorded-preview.1",
+  "description": "RHOOK Developer Preview for inspecting recorded counterfactual results.",
+  "type": "module",
+  "private": true,
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "exports": {
+    ".": "./src/index.mjs",
+    "./case": "./src/case/index.mjs"
+  },
+  "bin": {
+    "rhook-evidence": "bin/rhook-evidence.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "vendor/strict-json.mjs",
+    "LICENSE",
+    "LICENSES/Apache-2.0.txt",
+    "NOTICE.md"
+  ]
+}

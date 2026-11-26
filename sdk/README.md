@@ -121,3 +121,10 @@ Read [compatibility](COMPATIBILITY.md), [distribution](DISTRIBUTION.md) and
 [Apache-2.0 license](../LICENSE), with the third-party/data exceptions in
 [LICENSE_SCOPE.md](LICENSE_SCOPE.md). No binary or witness rights follow merely
 from publishing this source.
+
+## Common Developer Consumer
+
+The [source-only inspection preview](evidence-consumer/README.md) provides
+the recorded comparison CLI and JavaScript API. Try it with the pinned
+public Robinhood `70397227:4` case. It produces a local inspection
+projection with execution assurance `UNRESOLVED`.

@@ -64,6 +64,23 @@ assert not home.exists()
             'README.md', 'QUICKSTART.md', 'COMPATIBILITY.md', 'LICENSE_SCOPE.md',
             'DISTRIBUTION.md', 'RELEASE_NOTES.md', 'source-provenance.json',
             'tools/test_offline.py', 'tools/tests/test_public_source.py',
+            'evidence-consumer/LICENSE',
+            'evidence-consumer/LICENSES/Apache-2.0.txt',
+            'evidence-consumer/NOTICE.md',
+            'evidence-consumer/README.md',
+            'evidence-consumer/bin/case-command.mjs',
+            'evidence-consumer/bin/rhook-evidence.mjs',
+            'evidence-consumer/examples/project-public-reference.mjs',
+            'evidence-consumer/package.json',
+            'evidence-consumer/src/case/evidence.mjs',
+            'evidence-consumer/src/case/index.mjs',
+            'evidence-consumer/src/case/pins.json',
+            'evidence-consumer/src/case/projections.mjs',
+            'evidence-consumer/src/case/verifiers.mjs',
+            'evidence-consumer/src/codec.mjs',
+            'evidence-consumer/src/index.mjs',
+            'evidence-consumer/src/schema.mjs',
+            'evidence-consumer/vendor/strict-json.mjs',
         }
         derived = json.loads((ROOT / 'case-source.json').read_bytes())
         self.assertEqual(derived['schema'], 'rhook/portable-case-source/0.1')
