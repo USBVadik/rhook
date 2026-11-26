@@ -1,0 +1,151 @@
+{
+  "pair03": {
+    "ACTUAL.json": {
+      "bytes": 194265,
+      "sha256": "a6858c4bc1fd7bb50b6ffc328d8351eae90f90c6747781405caff3bf31704953"
+    },
+    "BRANCH.json": {
+      "bytes": 195336,
+      "sha256": "586df83db3c4e25e71dbc01ea4083d810ddb234ec19c3f755c73202d57c1ff13"
+    },
+    "CHAIN_CONTEXT.json": {
+      "bytes": 15004,
+      "sha256": "e4adda014940e4e98e4cfc5aeb6e5680a5a538fe504b62dbda8bf0610da1031d"
+    },
+    "RUNTIME_PLAN.json": {
+      "bytes": 3108,
+      "sha256": "d54448edc0cff6786f2b00281e4d2e83dc02af83b2bf163426c88bbcc659f110"
+    },
+    "PAIR03_VERIFIER_REPORT.json": {
+      "bytes": 6092,
+      "sha256": "7b68ea0fac0e5cea5fee4ec6924a9f9166e16acf61d61c2b2cf84083258bcf36"
+    },
+    "PAIR03_CROSS_ENGINE.json": {
+      "bytes": 6325,
+      "sha256": "57d1c5d2bba6f081bf895a3641eb51a2ff4c864103727e4a98d5d75c0f05cdfb"
+    }
+  },
+  "tx70": {
+    "anchor-01/bin/rhook-eth-anchor": {
+      "sha256": "11486a7bf6c7c84ce34e5666dd13d15f05cc92c28439fd4030eb6af0c69b4507",
+      "bytes": 6103682
+    },
+    "consensus-verify-01/bin/rhook-eth-consensus-verify": {
+      "sha256": "980c1de4c40f345047abdc5f22d939812a020dab54398a1a8d891f7d66153d6c",
+      "bytes": 10447586
+    },
+    "runs/p2p-actual-01/CAPSULE.json": {
+      "sha256": "8178eae04793b9fd0cd2b9db0e2fcc916248486d116174ae6d8404bb18f0c614",
+      "bytes": 12993116
+    },
+    "runs/p2p-actual-01/DISCOVERY.json": {
+      "sha256": "d84def0af5895340b29f99528e6ada8dd4739cdd48b2e13b40d53956903d08b5",
+      "bytes": 9324
+    },
+    "SPEC_tx70_x3.json": {
+      "sha256": "dae66960263fac65d9ec3e0f4501d789234b99a7247e6b6b86f19e0cb5592886",
+      "bytes": 2030
+    },
+    "runs/tx70-x3-econ/BRANCH.json": {
+      "sha256": "135ec1a4bf6d41e1856e417a64c9a9436ea5bc0db0970bd3d0c6065c3398c138",
+      "bytes": 119918
+    },
+    "runs/consensus-acquire-02/RESULT-primary.json": {
+      "sha256": "9427003a349c37db76ced1b90266ea7f764eefbb7cfdfc613cc265065ed172dc",
+      "bytes": 386
+    },
+    "runs/consensus-acquire-02/bootstrap-primary.json": {
+      "sha256": "5b3bd351cb44f8607e5290afdfac32a6bb89bc5f370f2ff218c6373bbcf4b501",
+      "bytes": 55888
+    },
+    "runs/consensus-acquire-02/finality-primary.json": {
+      "sha256": "e1c5cdb8e6cbc295ad011c3fc0b54a7a176ea24177b5fc841e6b7d96d4cacdd1",
+      "bytes": 2838
+    },
+    "runs/elhdr-01-live/EVIDENCE.json": {
+      "sha256": "ca9f3fa3026d804bf8f9d34a77ba7a0fe4c9decafa620ecbc898ebbbe62c64e2",
+      "bytes": 9621022
+    },
+    "runs/closure-01/beacon-block-slot15734080.ssz": {
+      "sha256": "c487d2aee566f97365aac1dd6bc46770f9343b5fde815118dc43ff5913b7e7bc",
+      "bytes": 182288
+    },
+    "runs/closure-01/PORTABLE_CHAIN_RECEIPT.json": {
+      "sha256": "af376ea4889e8f51584c175771ff74ecf0c10c53fa3ebc70bb3f420a6f15455a",
+      "bytes": 5849
+    },
+    "consensus-close-01/bin/rhook-eth-consensus-close": {
+      "sha256": "7c4cc33b2d01cfc3c9b102ca42e0d459d267bbc6c7c1dd4dda63b877b650b3ef",
+      "bytes": 6370722
+    },
+    "verify_portable_chain.py": {
+      "sha256": "858b9169663abd532fc005d7614932b578c2bebb1898b7594dbfc3026fff7efc",
+      "bytes": 7969
+    }
+  },
+  "verifyPack": {
+    "files": {
+      "sdk/verify-pack/cli.mjs": {
+        "bytes": 2992,
+        "sha256": "85bdcd8c5d311c6208232df7c9931bb97c194958aba6250e5dcad0f7485937ec"
+      },
+      "sdk/verify-pack/verify-pack.mjs": {
+        "bytes": 32600,
+        "sha256": "0c836ac391168348b71fdbce4b8d82c2668161cd7dc42775c9c4a235a8a2b75b"
+      },
+      "sdk/verify-pack/pins/hookr-pair03-lp50.json": {
+        "bytes": 480,
+        "sha256": "ce830a711f99e1c0d223f1eac448378e3b634114e592322499ce8c0a67ffe4f4"
+      },
+      "sdk/engine/plan_native/ethereum.mjs": {
+        "bytes": 2438,
+        "sha256": "0cdd94e42646b3c4d1c9f7d49a1bd4ae2b83c0d53c6c381d37c8f5ef4c5548b9"
+      },
+      "sdk/engine/adapters/hookr-case/package.json": {
+        "bytes": 313,
+        "sha256": "2fa39f5c68c03043436c71a2f7a161adc6f18ca0dd158e8eb61ec9637ad7aeb9"
+      },
+      "sdk/engine/adapters/hookr-case/package-lock.json": {
+        "bytes": 7454,
+        "sha256": "7b45f0a8cc6a580d624cf395aeed1686c469deaa84e225ba2a04a0118d49d90f"
+      },
+      "sdk/engine/adapters/hookr-case/primitives.mjs": {
+        "bytes": 1634,
+        "sha256": "1f59ab4c08aacf6484f810b6d9d68609558d7bb1b6abb3d077e7f39bb0c52ea3"
+      },
+      "sdk/engine/adapters/hookr-case/proof.mjs": {
+        "bytes": 5072,
+        "sha256": "0276d539ead827ed1848c16deedee15f1f3bd138bcc70fd1ea35ff8b01d9bea6"
+      },
+      "sdk/engine/adapters/hookr-case/strict-json.mjs": {
+        "bytes": 3597,
+        "sha256": "8b0e1fed8e0ab50f218c4075dbbf23a9549ba21b5438c83f81e6404b4063627a"
+      },
+      "sdk/rhook_alpha/cases/adapters/code.mjs": {
+        "bytes": 525,
+        "sha256": "145304b5428fab021f5d9386f22c55324c9494d7f5f91df2c750e68a37a277dc"
+      },
+      "sdk/rhook_alpha/cases/adapters/hookr.mjs": {
+        "bytes": 13554,
+        "sha256": "29705622872e2748b4f67392684b48fb767f4297f7890d30d19ee32526ab1d43"
+      }
+    },
+    "dependencyInventorySha256": "267a3674d7a4209d2caa1ccf71eaadad761511e226c8d1b01c82f177acd308d3",
+    "dependencyFiles": 12334,
+    "dependencyBytes": 41898217
+  },
+  "ethereumLinuxAmd64": {
+    "anchor-01/bin/rhook-eth-anchor": {
+      "bytes": 5523831,
+      "sha256": "c50e8e5544e73294f6bc7fc720f023250383af083223bb5e5a13853a6931b490"
+    },
+    "consensus-verify-01/bin/rhook-eth-consensus-verify": {
+      "bytes": 9989210,
+      "sha256": "04fa194c6e3cfa9e79f0bca3baed630bb1c4bc3ddc4495ce28e8c5fa29004842"
+    },
+    "consensus-close-01/bin/rhook-eth-consensus-close": {
+      "bytes": 6383327,
+      "sha256": "2c02cd7a3cc9b60128a8a1733932d7d7f6c7d7ca27d274d8234ed66984dc7c9a"
+    }
+  }
+}
