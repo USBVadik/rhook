@@ -2,29 +2,38 @@
 
 [![CI](https://github.com/USBVadik/rhook/actions/workflows/ci.yml/badge.svg)](https://github.com/USBVadik/rhook/actions/workflows/ci.yml)
 
-**A Counterfactual Execution protocol and developer toolkit for Arbitrum-based chains.**
+**A Counterfactual Execution protocol and developer toolkit for EVM chains.**
 
 **Start here:** [Project status and accepted decisions](docs/PROJECT_STATUS.md) —
 public capabilities, private milestones, current blockers and work already completed.
 
 ## What RHOOK enables
 
-RHOOK replays historical execution, or a scenario on an authenticated checkpoint, changes one reviewed rule of a
-contract or hook, and compares what happens: receipts, logs, fees, balances and state roots of both worlds. Missing
-state stops the run; nothing is guessed or fetched mid-replay. The workflow:
+RHOOK replays a supported history or checkpoint scenario, applies a reviewed
+intervention, and compares receipts, logs, fees, balances and state roots across
+ACTUAL and BRANCH. Input acquisition, execution and verification are separate
+steps. Missing authenticated state stops the replay.
+
+The retained implementations cover bounded Robinhood Chain and Ethereum Mainnet
+cases. Hookr is the first practical application on Robinhood Chain. The
+Ethereum work covers one historical block and a specific swap intervention.
+[Research index](docs/research/README.md)
+
+The workflow:
 
 ```text
 inspect → plan → authorize → replay → verify → compare
 ```
 
-**Executable download is pending.** The public clone contains source, offline tests
-(`python3 -B sdk/tools/test_offline.py`) and an offline profile-descriptor preview. Native execution needs a worker
-and witness that are not published.
+The public clone provides the existing offline SDK, descriptor preview and recorded
+Robinhood evidence example. The source-only Common Developer Consumer has
+passed local packaging and a recorded inspection using the public example.
+Its source has a separate publication scope. The Ethereum execution and
+verification experiments used retained private inputs and tools.
+[Consumer report](docs/research/common-developer-consumer.md)
 
 This is for developers who need to know how a hook or protocol parameter changes the outcome of a concrete
-transaction: before shipping a configuration change, while debugging a pool or when explaining a fee. Hookr is the
-first supported application, on Robinhood Chain; RHOOK is the protocol and the tooling around it. The project is
-moving through four stages:
+transaction: before shipping a configuration change, while debugging a pool or when explaining a fee. The project is moving through four stages:
 
 **research prototype → reproducible execution workflow → descriptor-driven developer tooling → integrations and a public product**
 
@@ -37,6 +46,9 @@ The [project status](docs/PROJECT_STATUS.md) separates private local integration
 
 | Demonstration | Result and scope |
 | --- | --- |
+| Ethereum Mainnet P2P and tx70 | Accepted private acquisition and replay of all 195 transactions in block 26486739. The exact-in swap intervention changed recorded pool input from 30 to 90 USDT. [Case study](docs/research/ethereum-p2p-counterfactual.md). |
+| Portable Ethereum history verification | Sync-committee BLS and finality, SSZ beacon-to-execution binding, and 7,391 execution headers bound the retained target and parent state relative to a trusted checkpoint. [Assurance and limits](docs/research/ethereum-consensus-anchoring.md). |
+| Common Developer Consumer | One locally accepted interface for retained Robinhood and Ethereum cases. Public-reference inspection runs without a native worker. Linux verifier acceptance used x86-64 userspace via Rosetta on an ARM64 kernel. [Report](docs/research/common-developer-consumer.md). |
 | Hookr Pair03 cross-engine execution | Privately retained Rust/arb-revm results match Go/Nitro for LP100→50 and, in a separate experiment, Dynamic Fee OFF. LP50 completed two fresh ACTUAL/BRANCH pairs with strict consensus-field comparison; the DF-OFF record has a different binary and narrower comparison scope. [Case study and selected commitments](docs/research/hookr-pair03-cross-engine.md). Full native reproduction assets are not published. |
 | SDK 0.6 descriptor parity (G5) | One descriptor-driven worker ran LP Rewards 23 / Dynamic Fee ON, LP 100 / DF OFF and LP 23 / DF OFF at block 101935336. Every pre-registered field matched the accepted SDK 0.4 records; gas interaction of the two settings **+36**. Hypothetical worlds, same engine lineage. [Case study](docs/research/sdk06-g5-descriptor-parity.md). |
 | Historical Hookr LP100→50 | Both Go/Nitro worlds of all seven arrivals in block 93251803 completed. Buyer RHOOK Transfer-event net increased by **0.5040100829%**; subject gas was unchanged. [Case study](docs/research/hookr-pair03-100-to-50.md). |
