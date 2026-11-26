@@ -1,27 +1,25 @@
 # RHOOK project status and accepted decisions
 
-**Status date: 11 November 2026.** Start here before proposing work. This is a
+**Status date: 26 November 2026.** Start here before proposing work. This is a
 public coordination index, not scientific evidence, native execution permission
 or a complete copy of private project history. Check the linked commit/PR state
 before acting; an accepted local milestone and a merged public release are
 different facts.
 
 RHOOK's goal is **Developer Question → Counterfactual Execution → Portable Result
-→ External Consumer**. Current capabilities are bounded. Pair03 is the present
-historical pilot scope, not the intended long-term boundary of the protocol.
+→ External Consumer**. Scope is bounded to admitted cases. Hookr is the first
+practical application. Accepted Ethereum work extends the research scope to
+Ethereum Mainnet while private inputs and tools remain access-controlled.
 
 ## Public source and publication baseline
 
-At this update's preparation, public main was
-[`493dc5b7`](https://github.com/USBVadik/rhook/commit/493dc5b7a7ab101a2cfcd0be40f13eaa326405a2),
-the SDK 0.6 Developer Preview merged in
-[PR #19](https://github.com/USBVadik/rhook/pull/19). The existing
-[PR #20](https://github.com/USBVadik/rhook/pull/20) was OPEN/DRAFT at
-`7dfabe04fda71294716c8bc0ce71a706956ab868`; its
-[CI run 42478097960](https://github.com/USBVadik/rhook/actions/runs/42478097960)
-completed verify and sdk-offline successfully. This is a dated reference
-snapshot, not a permanent assertion about current main or merge authorization.
-The present status/cross-engine documentation is a separate change from PR #20.
+This update was prepared against public main
+[`4b10966f`](https://github.com/USBVadik/rhook/commit/4b10966f3dc7df3fa0483c2f185d2a48a9355818).
+[PR #21](https://github.com/USBVadik/rhook/pull/21) merged the previous project
+status and the Hookr cross-engine study. [PR #20](https://github.com/USBVadik/rhook/pull/20)
+was the only open public PR at preparation time. Its draft head was
+`7dfabe04fda71294716c8bc0ce71a706956ab868`. The technical update and the
+disclosure-scoped consumer source change are separate from that draft.
 
 Public entry points: [SDK](../sdk/README.md), [sessions](../sdk/SESSIONS.md),
 [scenarios](../sdk/SCENARIOS.md), [descriptor specification](../sdk/PROFILE_DESCRIPTOR_SPEC.md),
@@ -34,6 +32,10 @@ as a historical planning snapshot.
 
 | Milestone | Established scope | What it does not establish |
 | --- | --- | --- |
+| [Ethereum P2P acquisition and tx70](research/ethereum-p2p-counterfactual.md) | Authenticated retained state and ACTUAL agreement across 195 transactions. One BRANCH changed the requested and consumed swap input from 30 to 90 USDT. | Arbitrary-history acquisition, an independent BRANCH execution proof or an open Ethereum runtime |
+| [Portable consensus anchoring](research/ethereum-consensus-anchoring.md) | Private fresh offline checks of BLS finality, SSZ payload binding and EL ancestry down to the target and parent state root. The verifier uses an independently chosen trusted checkpoint. | Verification of the BRANCH state transition or finality independent of policy input |
+| [Common Developer Consumer](research/common-developer-consumer.md) | A local CLI and JS interface for recorded comparison and policy evaluation on two exact cases. The source-only Preview was locally packed, installed and exercised against the public Robinhood example. | Public consumption of the retained Pair03 or tx70 packages or self-service historical execution |
+| Linux amd64 userspace | Both exact cases were checked with network isolated in Linux. Node and the ELF ran as x86-64 userspace through Rosetta on an ARM64 kernel. Two retained-input builds matched all three ELF. | Native x86-64 kernel qualification. A clean rebuild from public inputs matched P1 only, with a hash mismatch for the EL anchor and consensus verifier |
 | Public SDK 0.6 | Source and offline descriptor catalogue/inspection/planning/validation; [G5 case study](research/sdk06-g5-descriptor-parity.md) records private native parity against prior same-engine results | A complete public native runtime, general Hookr support or independent EVM verification |
 | Historical Hookr LP50 | Canonical Go/Nitro ACTUAL, separate BRANCH over the retained seven-arrival block; [original study](research/hookr-pair03-100-to-50.md) | Arbitrary pool/amount/intervention coverage |
 | Historical LP37 | Privately retained Go/Nitro ACTUAL/BRANCH, selected numeric value observed before execution and after finalization; separate verification/compare passed | Rust qualification of LP37, all LP values, external self-service or a public replay kit |
@@ -127,6 +129,14 @@ Concrete defect reproduction, new admissible semantics or an external technical
 requirement can justify new work under its own scope and authorization.
 
 ## Latest accepted decisions and next necessary step
+
+**26 November 2026 — keep disclosure and capability separate.** The next
+developer exercise is source-only inspection of the existing public
+`70397227:4` recording. Local assurance remains `UNRESOLVED` for execution.
+The two exact historical policy cases require their separately admitted files.
+Source publication, retained evidence transfer and verifier distribution each
+need review of their exact contents. The private Ethereum implementation and
+scientific evidence have separate preservation scopes.
 
 **11 November 2026 — reuse accepted capabilities and obtain a real developer
 requirement.** Repeated fee/qualification work was not creating a new user
